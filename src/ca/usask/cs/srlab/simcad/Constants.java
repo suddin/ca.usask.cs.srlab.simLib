@@ -13,7 +13,7 @@ public class Constants {
 
 	public static final String MIN_CLUSTER_SIZE ="simcad.settings.general.minClusterSize";
 	public static final String MIN_SIZE_OF_GRANULARITY ="simcad.settings.general.minSizeOfGranularity";
-	
+
 	public static final String REGULAR_HASH_PROVIDER ="simcad.settings.general.preprocess.regularhash_class";
 	public static final String TOKEN_BUILDER ="simcad.settings.general.preprocess.tokenbuilder_class";
 	public static final String INDEX_BUILDER ="simcad.settings.general.index.indexbuilder_class";

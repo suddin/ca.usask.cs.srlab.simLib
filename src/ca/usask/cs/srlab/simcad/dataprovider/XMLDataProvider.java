@@ -100,9 +100,13 @@ public class XMLDataProvider extends AbstractDataProvider{
 					if(loc < PropsUtil.getMinSizeOfGranularity())
 						continue;
 					
-					long simhash[] = simhashGenerator.generateSimhash(content/*, simThreshold > 0*/);
+					CloneFragment cloneFragment = createNewCloneFragment(file, startline, endline, content, content, i, 0, 0);
 					
-					CloneFragment cloneFragment = createNewCloneFragment(file, startline, endline, content, content, i, simhash[0], simhash[1]);
+					long simhash[] = simhashGenerator.generateSimhash(cloneFragment);
+					
+					cloneFragment.setSimhash1(simhash[0]);
+					cloneFragment.setSimhash2(simhash[1]);
+					
 					cloneFragmentList.add(cloneFragment);
 					
 					items++;

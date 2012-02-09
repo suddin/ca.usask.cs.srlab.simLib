@@ -1,11 +1,11 @@
 package ca.usask.cs.srlab.simcad.hash;
 
+import ca.usask.cs.srlab.simcad.Environment;
+import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.token.ITokenBuilder;
-import ca.usask.cs.srlab.simcad.token.TokenBuildStrategy;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-
 
 public class SimhashGenerator {
 	private ITokenBuilder tokenBuilder;
@@ -19,13 +19,13 @@ public class SimhashGenerator {
 		this.regularHashGenerator = regularHashGenerator;
 	}
 	
-	public long[] generateSimhash(String rawData){
+	public long[] generateSimhash(CloneFragment cloneFragment){
 		int v1[]= new int [64];
 		int v2[]= new int [64];
 		
 		int seconderyHashMinFreq = 1;
 		
-		Multiset<String> tokenMap = HashMultiset.create(tokenBuilder.generateToken(rawData));
+		Multiset<String> tokenMap = HashMultiset.create(tokenBuilder.generateToken(cloneFragment));
 		
 		/*
 		System.out.println("########################");
@@ -43,12 +43,9 @@ public class SimhashGenerator {
 				//HashFactory.buildLookup3ycs64Hash(token.getElement());
 				 				
 				for (int c=0; c<64; c++){
-					if (tokenBuilder.getBuildStrategy()
-							.isTokenFrequencyNormalizationOn()) {
-						int normalizationThreshold = tokenBuilder.getBuildStrategy()
-								.isTokenFrequencyNormalizationThreshold();
-						int valueOverThreshold = tokenBuilder.getBuildStrategy()
-								.isTokenFrequencyNormalizationValueOverThreshold();
+					if (Environment.isTokenFrequencyNormalizationOn()) {
+						int normalizationThreshold = Environment.getTokenFrequencyNormalizationThreshold();
+						int valueOverThreshold = Environment.getTokenFrequencyNormalizationOverThresholdValue();
 						modifiedTokenFrequency = originalTokenFrequency > normalizationThreshold ? valueOverThreshold
 								: originalTokenFrequency;
 					}
@@ -74,10 +71,4 @@ public class SimhashGenerator {
 		return simhash;
 	}
 
-	public SimhashGenerator applyTokenBuildStrategy(TokenBuildStrategy strategy) {
-		//TODO: verify if it a valid strategy
-		this.tokenBuilder.setBuildStrategy(strategy);
-		return this;
-	}
-	
 }

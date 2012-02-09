@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import ca.usask.cs.srlab.simcad.Constants;
+import ca.usask.cs.srlab.simcad.Environment;
 import ca.usask.cs.srlab.simcad.SimcadException;
 
 public final class PropsUtil {
@@ -11,8 +12,8 @@ public final class PropsUtil {
 	private static Properties properties;
 	
 	{
-		InputStream userConfig = getResourceAsStream(Constants.EXTERNAL_CONFIGURATION_FILE);
-		InputStream localConfig = getResourceAsStream(Constants.LOCAL_CONFIGURATION_FILE);
+		InputStream userConfig = Environment.getResourceAsStream(Constants.EXTERNAL_CONFIGURATION_FILE);
+		InputStream localConfig = Environment.getResourceAsStream(Constants.LOCAL_CONFIGURATION_FILE);
 			if(localConfig == null)
 				throw new RuntimeException("Unable to load default config file :"+Constants.LOCAL_CONFIGURATION_FILE);
 
@@ -71,30 +72,7 @@ public final class PropsUtil {
 		return properties.getProperty(Constants.TXL_SCRIPT_URL);
 	}
 	
-	
-	
-	
-	
-	
-	public static InputStream getResourceAsStream(String resource) {
-		String stripped = resource.startsWith("/") ?
-				resource.substring(1) : resource;
-
-		InputStream stream = null;
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		if (classLoader!=null) {
-			stream = classLoader.getResourceAsStream( stripped );
-			System.out.println("got by Thread.currentThread().getContextClassLoader()");
-		}
-		if ( stream == null ) {
-			stream = Constants.class.getResourceAsStream( resource );
-			System.out.println("got by Environment.class");
-		}
-		if ( stream == null ) {
-			stream = Constants.class.getClassLoader().getResourceAsStream( stripped );
-			System.out.println("got by Environment.class.getClassLoader()");
-		}
-		return stream;
+	public static String getProperty(String key){
+		return properties.getProperty(key);
 	}
-	
 }

@@ -7,6 +7,10 @@
 <entry key="simcad.settings.advance.clusterMembershipRatio">0.5</entry>
 <entry key="simcad.settings.advance.locTolerance">1</entry>
 
+<entry key="simcad.settings.advance.tokenFrequencyNormalization">false</entry>
+<entry key="simcad.settings.advance.tokenFrequencyNormalizationThreshold">5</entry>
+<entry key="simcad.settings.advance.tokenFrequencyNormalizationOverThresholdValue">5</entry>
+
 <entry key="simcad.settings.general.minClusterSize">2</entry>
 <entry key="simcad.settings.general.minSizeOfGranularity">5</entry>
 

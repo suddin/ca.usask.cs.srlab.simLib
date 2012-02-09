@@ -1,4 +1,4 @@
-package ca.usask.cs.srlab.simcad.engine;
+package ca.usask.cs.srlab.simcad;
 
 
 import java.io.File;
@@ -16,12 +16,10 @@ import ca.usask.cs.srlab.simcad.postprocess.XmlOutputProcessor;
 import ca.usask.cs.srlab.simcad.preprocessor.FixXMLDataInput;
 import ca.usask.cs.srlab.simcad.processor.ProcessorDisptacher;
 
-
-public class SimCadCloneDetector {
+public class SimCad {
 
 	public static final String CLONE_TYPE_1 = "Type 1";
 
-	private ICloneIndex cloneIndex;
 	
 	//simhashGenerator.applyTokenBuildStrategy(TokenBuildStrategyFactory.getStrategyInstanceFor(CLONE_TYPE_1));
 	
@@ -42,7 +40,7 @@ public class SimCadCloneDetector {
 	
 	private DetectionSettings detectionSettings;
 
-	public SimCadCloneDetector(int simThreshold, boolean applySubsumeFiltering) {
+	public SimCad(int simThreshold, boolean applySubsumeFiltering) {
 		super();
 		this.simThreshold = simThreshold;
 		this.applySubsumeFiltering = applySubsumeFiltering;
@@ -136,7 +134,7 @@ public class SimCadCloneDetector {
 		
 		ICloneIndex cloneIndex = null;
 		
-		SimCadCloneDetector scad = new SimCadCloneDetector(simThreshold, granularity.equals("blocks") ? true : false);
+		SimCad scad = new SimCad(simThreshold, granularity.equals("blocks") ? true : false);
 		
 		scad.findClone(cloneFragmentFixFileName, cloneIndex, cloneOutputFolder);
 		

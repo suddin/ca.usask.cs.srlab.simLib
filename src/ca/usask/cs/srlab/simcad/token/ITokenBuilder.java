@@ -2,11 +2,10 @@ package ca.usask.cs.srlab.simcad.token;
 
 import java.util.Collection;
 
+import ca.usask.cs.srlab.simcad.model.CloneFragment;
+
 public interface ITokenBuilder {
 
-	public Collection<String> generateToken(String rawData);
+	public Collection<String> generateToken(CloneFragment cloneFragment);
 
-	public TokenBuildStrategy getBuildStrategy();
-	
-	public void setBuildStrategy(TokenBuildStrategy strategy);
 }

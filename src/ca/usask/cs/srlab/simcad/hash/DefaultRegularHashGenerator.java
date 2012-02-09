@@ -1,6 +1,6 @@
 package ca.usask.cs.srlab.simcad.hash;
 
-public class ApacheHashGenerator implements IRegularHashGenerator {
+public class DefaultRegularHashGenerator implements IRegularHashGenerator {
 
 	/* (non-Javadoc)
 	 * @see ca.usask.cs.srlab.simcad.hash.IRegularHashGenerator#generate64BitHashFor(java.lang.String)
