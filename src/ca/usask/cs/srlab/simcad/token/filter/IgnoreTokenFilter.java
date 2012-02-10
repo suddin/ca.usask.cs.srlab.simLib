@@ -5,17 +5,19 @@ import java.util.Set;
 
 public final class IgnoreTokenFilter extends AbstractTokenFilter {
 
-	protected static Set<String> tokenSetToIgnore = new HashSet<String>();
+	private Set<String> tokenSetToIgnore = new HashSet<String>();
 	
 	public static FilterBuilder getFilterBuilder(){
 		return new FilterBuilder();
 	}
 	
-	private IgnoreTokenFilter() {
+	private IgnoreTokenFilter(Set<String> tokenSetToIgnore) {
+		this.tokenSetToIgnore = tokenSetToIgnore;
 	}
 	
-	private IgnoreTokenFilter(ITokenFilter targetFilter){
+	private IgnoreTokenFilter(ITokenFilter targetFilter, Set<String> tokenSetToIgnore){
 		super(targetFilter);
+		this.tokenSetToIgnore = tokenSetToIgnore;
 	}
 	
 	@Override
@@ -27,17 +29,17 @@ public final class IgnoreTokenFilter extends AbstractTokenFilter {
 
 	
 	public static final class FilterBuilder{
-		
+		private Set<String> tokenSet = new HashSet<String>();
 		public IgnoreTokenFilter build(){
-			return new IgnoreTokenFilter();
+			return new IgnoreTokenFilter(tokenSet);
 		}
 		
 		public IgnoreTokenFilter build(ITokenFilter targetFilter){
-			return new IgnoreTokenFilter(targetFilter);
+			return new IgnoreTokenFilter(targetFilter, tokenSet);
 		}
 		
 		public FilterBuilder addToken(String token){
-			tokenSetToIgnore.add(token);
+			tokenSet.add(token);
 			return this;
 		}
 	}

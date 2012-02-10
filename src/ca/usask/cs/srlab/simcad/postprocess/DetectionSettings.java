@@ -2,19 +2,27 @@ package ca.usask.cs.srlab.simcad.postprocess;
 
 public class DetectionSettings {
 
+	final Integer simThreshold;
+	final String cloneGranularity;
+	final String cloneSetType; //function or block
+	
+	public DetectionSettings(Integer simThreshold, String cloneGranularity,
+			String cloneSetType) {
+		super();
+		this.simThreshold = simThreshold;
+		this.cloneGranularity = cloneGranularity;
+		this.cloneSetType = cloneSetType;
+	}
+
 	public Integer getSimThreshold() {
-		// TODO Auto-generated method stub
-		return null;
+		return simThreshold;
 	}
 
 	public String getCloneGranularity() {
-		// TODO Auto-generated method stub
-		return null;
+		return cloneGranularity;
 	}
 
-	public void getCloneSetType() {
-		// TODO Auto-generated method stub
-		
+	public String getCloneSetType() {
+		return cloneSetType;
 	}
-
 }

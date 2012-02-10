@@ -7,17 +7,19 @@ import java.util.regex.Pattern;
 
 public final class StripTokenByPatternFilter extends AbstractTokenFilter{
 
-	protected static List<Pattern> patternListToStrip = new ArrayList<Pattern>();
+	private List<Pattern> patternListToStrip = new ArrayList<Pattern>();
 	
 	public static FilterBuilder getFilterBuilder(){
 		return new FilterBuilder();
 	}
 	
-	private StripTokenByPatternFilter() {
+	private StripTokenByPatternFilter(List<Pattern> patternListToStrip) {
+		this.patternListToStrip = patternListToStrip;
 	}
 	
-	private StripTokenByPatternFilter(ITokenFilter targetFilter) {
+	private StripTokenByPatternFilter(ITokenFilter targetFilter, List<Pattern> patternListToStrip) {
 		super(targetFilter);
+		this.patternListToStrip = patternListToStrip;
 	}
 	
 	@Override
@@ -32,17 +34,18 @@ public final class StripTokenByPatternFilter extends AbstractTokenFilter{
 	}
 	
 	public static final class FilterBuilder{
+		private List<Pattern> patternList = new ArrayList<Pattern>();
 		
 		public StripTokenByPatternFilter build(){
-			return new StripTokenByPatternFilter();
+			return new StripTokenByPatternFilter(patternList);
 		}
 		
 		public StripTokenByPatternFilter build(ITokenFilter targetFilter){
-			return new StripTokenByPatternFilter(targetFilter);
+			return new StripTokenByPatternFilter(targetFilter, patternList);
 		}
 		
 		public FilterBuilder addPattern(String pattern){
-			patternListToStrip.add(Pattern.compile(pattern));
+			patternList.add(Pattern.compile(pattern));
 			return this;
 		}
 	}

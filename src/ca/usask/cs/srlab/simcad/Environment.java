@@ -28,6 +28,10 @@ public class Environment {
 	public static String getRegularHashGeneratorClass() {
 		return PropsUtil.getProperty(Constants.REGULAR_HASH_PROVIDER);
 	}
+
+	public static String getTokenBuilderClass() {
+		return PropsUtil.getProperty(Constants.TOKEN_BUILDER);
+	}
 	
 	public static InputStream getResourceAsStream(String resource) {
 		String stripped = resource.startsWith("/") ? resource.substring(1)

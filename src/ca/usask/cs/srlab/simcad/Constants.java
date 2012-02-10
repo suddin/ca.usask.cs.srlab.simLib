@@ -16,7 +16,13 @@ public class Constants {
 
 	public static final String REGULAR_HASH_PROVIDER ="simcad.settings.general.preprocess.regularhash_class";
 	public static final String TOKEN_BUILDER ="simcad.settings.general.preprocess.tokenbuilder_class";
-	public static final String INDEX_BUILDER ="simcad.settings.general.index.indexbuilder_class";
+	public static final String INDEX_HOLDER ="simcad.settings.general.index.indexholder_class";
 	public static final String TXL_SCRIPT_URL ="simcad.settings.general.preprocess.txlscript.url";
+
+	public static final String CLONE_GRANULARITY_FUNTIONS = "functions";
+	public static final String CLONE_GRANULARITY_BLOCKS = "blocks";
+
+	public static final String CLONE_SET_TYPE_GROUP = "group";
+	public static final String CLONE_SET_TYPE_PAIR = "pair";
 	
 }

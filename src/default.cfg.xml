@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-<comment>simcad default configuration</comment>
+	<comment>simcad default configuration</comment>
 
-<entry key="simcad.settings.advance.strictOnMembership">false</entry>
-<entry key="simcad.settings.advance.clusterMembershipRatio">0.5</entry>
-<entry key="simcad.settings.advance.locTolerance">1</entry>
+	<entry key="simcad.settings.advance.strictOnMembership">false</entry>
+	<entry key="simcad.settings.advance.clusterMembershipRatio">0.5</entry>
+	<entry key="simcad.settings.advance.locTolerance">1</entry>
 
-<entry key="simcad.settings.advance.tokenFrequencyNormalization">false</entry>
-<entry key="simcad.settings.advance.tokenFrequencyNormalizationThreshold">5</entry>
-<entry key="simcad.settings.advance.tokenFrequencyNormalizationOverThresholdValue">5</entry>
+	<entry key="simcad.settings.advance.tokenFrequencyNormalization">false</entry>
+	<entry key="simcad.settings.advance.tokenFrequencyNormalizationThreshold">5</entry>
+	<entry key="simcad.settings.advance.tokenFrequencyNormalizationOverThresholdValue">5</entry>
 
-<entry key="simcad.settings.general.minClusterSize">2</entry>
-<entry key="simcad.settings.general.minSizeOfGranularity">5</entry>
+	<entry key="simcad.settings.general.minClusterSize">2</entry>
+	<entry key="simcad.settings.general.minSizeOfGranularity">5</entry>
 
-<entry key="simcad.settings.general.preprocess.regularhash_class">ca.usask.cs.srlab.simcad.hash.ApacheHashGenerator</entry>
-<entry key="simcad.settings.general.preprocess.tokenbuilder_class">ca.usask.cs.srlab.simcad.token.DefaultTokenBuilder</entry>
-<entry key="simcad.settings.general.index.indexbuilder_class">car</entry>
-<entry key="simcad.settings.general.preprocess.txlscript.url">car</entry>
+	<entry key="simcad.settings.general.preprocess.regularhash_class">ca.usask.cs.srlab.simcad.hash.DefaultHashGenerator</entry>
+	<entry key="simcad.settings.general.preprocess.tokenbuilder_class">ca.usask.cs.srlab.simcad.token.DefaultTokenBuilder</entry>
+	<entry key="simcad.settings.general.index.indexholder_class">ca.usask.cs.srlab.simcad.index.MemoryCloneIndexByJavaCollection</entry>
+	<entry key="simcad.settings.general.preprocess.txlscript.url">./</entry>
 </properties>

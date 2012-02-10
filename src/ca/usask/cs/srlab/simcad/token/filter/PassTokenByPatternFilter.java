@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public final class IgnoreTokenByPatternFilter extends AbstractTokenFilter {
+public final class PassTokenByPatternFilter extends AbstractTokenFilter {
 
 	private List<Pattern> patternListToIgnore = new ArrayList<Pattern>();
 	
@@ -12,11 +12,11 @@ public final class IgnoreTokenByPatternFilter extends AbstractTokenFilter {
 		return new FilterBuilder();
 	}
 	
-	private IgnoreTokenByPatternFilter( List<Pattern> patternListToIgnore) {
+	private PassTokenByPatternFilter( List<Pattern> patternListToIgnore) {
 		this.patternListToIgnore = patternListToIgnore;
 	}
 	
-	private IgnoreTokenByPatternFilter(ITokenFilter targetFilter,  List<Pattern> patternListToIgnore){
+	private PassTokenByPatternFilter(ITokenFilter targetFilter,  List<Pattern> patternListToIgnore){
 		super(targetFilter);
 		this.patternListToIgnore = patternListToIgnore;
 	}
@@ -25,20 +25,20 @@ public final class IgnoreTokenByPatternFilter extends AbstractTokenFilter {
 	protected String doFilter(String token) {
 		for (Pattern pattern : patternListToIgnore) {
 			if(pattern.matcher(token).matches())
-				return null;
+				return token;
 		}
-		return token;
+		return null;
 	}
 	
 	public static final class FilterBuilder{
 		List<Pattern> patternList = new ArrayList<Pattern>();
 		
-		public IgnoreTokenByPatternFilter build(){
-			return new IgnoreTokenByPatternFilter(patternList);
+		public PassTokenByPatternFilter build(){
+			return new PassTokenByPatternFilter(patternList);
 		}
 		
-		public IgnoreTokenByPatternFilter build(ITokenFilter targetFilter){
-			return new IgnoreTokenByPatternFilter(targetFilter, patternList);
+		public PassTokenByPatternFilter build(ITokenFilter targetFilter){
+			return new PassTokenByPatternFilter(targetFilter, patternList);
 		}
 		
 		public FilterBuilder addPattern(String pattern){

@@ -1,6 +1,5 @@
 package ca.usask.cs.srlab.simcad.token.filter;
 
-
 public final class UnicodeFilter extends AbstractTokenFilter{
 
 	public static FilterBuilder getFilterBuilder(){

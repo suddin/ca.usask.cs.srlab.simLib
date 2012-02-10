@@ -9,9 +9,9 @@ import ca.usask.cs.srlab.simcad.SimcadException;
 
 public final class PropsUtil {
 		
-	private static Properties properties;
+	private static Properties properties = new Properties();
 	
-	{
+	static {
 		InputStream userConfig = Environment.getResourceAsStream(Constants.EXTERNAL_CONFIGURATION_FILE);
 		InputStream localConfig = Environment.getResourceAsStream(Constants.LOCAL_CONFIGURATION_FILE);
 			if(localConfig == null)
@@ -65,7 +65,7 @@ public final class PropsUtil {
 	}
 	
 	public static String getIndexBuilderClassName(){
-		return properties.getProperty(Constants.INDEX_BUILDER);
+		return properties.getProperty(Constants.INDEX_HOLDER);
 	}
 	
 	public static String getTxlScriptUrl(){

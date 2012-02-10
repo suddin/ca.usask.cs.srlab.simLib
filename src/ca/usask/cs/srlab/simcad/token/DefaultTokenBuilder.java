@@ -20,12 +20,16 @@ public final class DefaultTokenBuilder implements ITokenBuilder {
 	private DefaultTokenBuilder() {
 	}
 
-	public DefaultTokenBuilder(DetectionSettings settings) {
+	public DefaultTokenBuilder(DetectionSettings detectionSettings) {
 		super();
-		this.detectionSettings = settings;
+		this.detectionSettings = detectionSettings;
 	}
 
-
+	@Override
+	public void setFilterChain(ITokenFilter tokenFilter){
+		tokenFilterChain = tokenFilter;
+	}
+	
 /* (non-Javadoc)
  * @see ca.usask.cs.srlab.simcad.hash.ITokenBuilder#generateToken(java.lang.String)
  */
