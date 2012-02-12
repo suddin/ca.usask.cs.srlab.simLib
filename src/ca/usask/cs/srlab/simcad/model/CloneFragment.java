@@ -165,9 +165,20 @@ public abstract class CloneFragment implements ICloneFragment {
 	
 	@Transient
 	public Integer getLineOfCode(){
-		if(this.lineOfCode == 0 && transformedCodeBlock != null)
-			this.lineOfCode = transformedCodeBlock.split("\n").length;
+		if(this.lineOfCode == 0 && transformedCodeBlock != null){
+			this.lineOfCode = computeActualLineOfCode(transformedCodeBlock);
+		}
 		return lineOfCode;
+	}
+
+	public static int computeActualLineOfCode(String codeBlock) {
+		String []line = codeBlock.split("\n");
+		int loc = 0; 
+		for(String ln : line){
+			if(ln.length() > 0)
+				loc++;
+		}
+		return loc;
 	}
 	
 	public transient boolean isTempFriend;
@@ -194,6 +205,11 @@ public abstract class CloneFragment implements ICloneFragment {
 		h = 31 * h + toLine;
 		h = 31 * h + simhash1.intValue();
 		return h;
+	}
+	
+	@Override
+	public String toString() {
+		return fileName+" ("+fromLine+","+toLine+")\n"+originalCodeBlock;
 	}
 	
 }

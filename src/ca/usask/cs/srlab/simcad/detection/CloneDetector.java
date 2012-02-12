@@ -1,15 +1,12 @@
-package ca.usask.cs.srlab.simcad.engine;
+package ca.usask.cs.srlab.simcad.detection;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import ca.usask.cs.srlab.simcad.event.CloneFoundEvent;
 import ca.usask.cs.srlab.simcad.event.DetectionEndEvent;
@@ -21,13 +18,16 @@ import ca.usask.cs.srlab.simcad.listener.ICloneDetectionListener;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.model.CloneGroup;
 import ca.usask.cs.srlab.simcad.model.CloneSet;
-import ca.usask.cs.srlab.simcad.model.ICloneFragment;
-import ca.usask.cs.srlab.simcad.model.ICloneSet;
 import ca.usask.cs.srlab.simcad.model.ICloneType;
 import ca.usask.cs.srlab.simcad.postprocess.DetectionSettings;
 import ca.usask.cs.srlab.simcad.util.PropsUtil;
 
 public final class CloneDetector {
+	
+	private static final Integer MIN_CLUSTER_SIZE = PropsUtil.getMinClusterSize();
+	private static final boolean STRICT_ON_MEMBERSHIP = PropsUtil.isStrictOnMembership();
+	private static final Double CLUSTER_MEMBERSHIP_RATIO = PropsUtil.getClusterMembershipRatio();
+	private static final Double LOC_TOLERANCE = PropsUtil.getLocTolerance();
 	
 	private ICloneIndex cloneIndex;
 	private DetectionSettings detectionSettings;
@@ -64,7 +64,6 @@ public final class CloneDetector {
 	
 	private List<CloneSet> detectClones(Collection<CloneFragment> candidateFragments) {
 		List<CloneSet> detectedCloneSets = new LinkedList<CloneSet>();
-		int minClusterSize = PropsUtil.getMinClusterSize();
 		
 		/*
 		//DBSCAN(D, eps, MinPts)
@@ -98,7 +97,7 @@ public final class CloneDetector {
 			
 			List<CloneFragment> newCluster = findNeighbors(cloneFragment);
 			
-			if (newCluster.size() >= minClusterSize){
+			if (newCluster.size() >= MIN_CLUSTER_SIZE){
 				CloneGroup newCloneGroup = createNewCloneGroup(newCluster, cloneSetIndex++);
 				detectedCloneSets.add(newCloneGroup);
 				fireCloneFoundEvent(newCloneGroup);
@@ -276,16 +275,16 @@ public final class CloneDetector {
 				
 				Set<IndexKey> keySet = cloneIndex.getAllKeys();
 				for (IndexKey indexKey : keySet) {
-					if((searchItem.getLineOfCode() - (searchItem.getLineOfCode() * PropsUtil.getLocTolerance()) < indexKey.getLineKey().intValue() && searchItem.getLineOfCode() + (searchItem.getLineOfCode()+PropsUtil.getLocTolerance()) > indexKey.getLineKey().intValue())
+					if((searchItem.getLineOfCode() - (searchItem.getLineOfCode() * LOC_TOLERANCE) < indexKey.getLineKey().intValue() && searchItem.getLineOfCode() + (searchItem.getLineOfCode() * LOC_TOLERANCE) > indexKey.getLineKey().intValue())
 							&& (searchItem.getOneBitCount() - dynamicSimThreshold1 <= indexKey.getBitKey().intValue() && searchItem.getOneBitCount() + dynamicSimThreshold1 >= indexKey.getBitKey().intValue())){
 					
 						for(CloneFragment matchCandidate : cloneIndex.getEntriesByIndex(indexKey)){
 							
-							if(!matchCandidate.isProceessed && ((hamming_dist(searchItem.getSimhash1(), matchCandidate.getSimhash2()) <= dynamicSimThreshold1
+							if(!matchCandidate.isProceessed && ((hamming_dist(searchItem.getSimhash1(), matchCandidate.getSimhash1()) <= dynamicSimThreshold1
 									&& hamming_dist(searchItem.getSimhash2(), matchCandidate.getSimhash2()) <= dynamicSimThreshold2))){
 								
 								//check if at least clusterMembershipRatio times the existing members in the cluster are cool with this guy
-								int minFriendCount = (int) (cluster.size() * PropsUtil.getClusterMembershipRatio());
+								int minFriendCount = (int) (cluster.size() * CLUSTER_MEMBERSHIP_RATIO);
 								minFriendCount = minFriendCount < 1 ? 1: minFriendCount;
 								
 								boolean coolDude = false;
@@ -304,7 +303,7 @@ public final class CloneDetector {
 										if(/*matchCandidate.friendlist.size()*/
 												matchCandidate.friendCount == minFriendCount){ //target reached, he got the ticket to join in friends club
 											coolDude = true;
-											if(!PropsUtil.isStrictOnMembership()) break;
+											if(!STRICT_ON_MEMBERSHIP) break;
 										}
 									}
 								} //done with friendship checking
@@ -343,7 +342,7 @@ public final class CloneDetector {
 //							if(searchItem.getOneBitCount() - dynamicSimThreshold1 <= bitKey && searchItem.getOneBitCount() + dynamicSimThreshold1 >= bitKey){ //2nd level filter
 //								for(CloneFragment matchCandidate : itemListSecondLevelMap.get(bitKey)){
 //							
-//									if(!matchCandidate.isProceessed && ((hamming_dist(searchItem.getSimhash1(), matchCandidate.getSimhash2()) <= dynamicSimThreshold1
+//									if(!matchCandidate.isProceessed && ((hamming_dist(searchItem.getSimhash1(), matchCandidate.getSimhash1()) <= dynamicSimThreshold1
 //											&& hamming_dist(searchItem.getSimhash2(), matchCandidate.getSimhash2()) <= dynamicSimThreshold2))){
 //										
 //										//check if at least clusterMembershipRatio times the existing members in the cluster are cool with this guy
@@ -398,13 +397,13 @@ public final class CloneDetector {
 //				
 				
 				//cleanup noise from the friends club based on new friendship
-				if(cluster.size() > 1 && PropsUtil.isStrictOnMembership()){
+				if(cluster.size() > 1 && STRICT_ON_MEMBERSHIP){
 
 					//List<SourceItem> removedMember = new ArrayList<SourceItem>();
 					
 					//do{
 					
-						int minFriendCount = (int) (cluster.size() * PropsUtil.getClusterMembershipRatio());
+						int minFriendCount = (int) (cluster.size() * CLUSTER_MEMBERSHIP_RATIO);
 						minFriendCount = minFriendCount < 1 ? 1: minFriendCount;
 
 						//removedMember.clear();

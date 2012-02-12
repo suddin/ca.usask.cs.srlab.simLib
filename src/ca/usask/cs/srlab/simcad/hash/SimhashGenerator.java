@@ -19,11 +19,21 @@ public class SimhashGenerator {
 		this.regularHashGenerator = regularHashGenerator;
 	}
 	
+	public SimhashGenerator updateTokebBuilder(ITokenBuilder tokenBuilder){
+		this.tokenBuilder = tokenBuilder;
+		return this;
+	}
+	
+	public SimhashGenerator updateRegularHashGenerator(IRegularHashGenerator regularHashGenerator){
+		this.regularHashGenerator = regularHashGenerator;
+		return this;
+	}
+	
 	public long[] generateSimhash(CloneFragment cloneFragment){
 		int v1[]= new int [64];
 		int v2[]= new int [64];
 		
-		int seconderyHashMinFreq = 1;
+		//int seconderyHashMinFreq = ? 1 : 0;
 		
 		Multiset<String> tokenMap = HashMultiset.create(tokenBuilder.generateToken(cloneFragment));
 		
@@ -53,12 +63,12 @@ public class SimhashGenerator {
 				}
 			
 			//secondary hash for better precision
-			if(originalTokenFrequency > seconderyHashMinFreq) {
+			//if(originalTokenFrequency > seconderyHashMinFreq) {
 				tokenHash =  regularHashGenerator.generate64BitHashFor(token.getElement(), 32767l);
 				for (int c=0; c<64; c++){		
 					v2[c] += (tokenHash & (1l << c)) == 0 ? -modifiedTokenFrequency : modifiedTokenFrequency;
 				}
-			}
+			//}
 	    }
 
 		long simhash[] = { 0, 0 };

@@ -61,4 +61,17 @@ public abstract class CloneSet implements ICloneSet {
 	public void setSubsumed(boolean subsumed) {
 		this.subsumed = subsumed;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("clone class: "+ cloneSetId+"\n");
+		sb.append("number of fragments: "+ cloneFragments.size()+"\n");
+		for(CloneFragment cf : cloneFragments){
+			sb.append("\n");
+			sb.append(cf.toString());
+			sb.append("\n");
+		}
+		return sb.toString();
+	}
 }

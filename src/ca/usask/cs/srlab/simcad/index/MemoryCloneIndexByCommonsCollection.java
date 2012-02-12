@@ -58,4 +58,11 @@ public class MemoryCloneIndexByCommonsCollection implements ICloneIndex {
 		return lineBitIndex.keySet();
 	}
 
+	@Override
+	public void cleanup() {
+		if(lineBitIndex!=null)
+			lineBitIndex.clear();
+		if(filenameIndex!=null)
+			filenameIndex.clear();
+	}
 }

@@ -18,5 +18,7 @@ public interface ICloneIndex {
   void insert(CloneFragment block);
   
   public Set<IndexKey> getAllKeys();
+  
+  public void cleanup();
 
 }

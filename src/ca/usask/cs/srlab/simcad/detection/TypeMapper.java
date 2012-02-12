@@ -1,4 +1,4 @@
-package ca.usask.cs.srlab.simcad.engine;
+package ca.usask.cs.srlab.simcad.detection;
 
 import java.util.List;
 

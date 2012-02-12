@@ -1,4 +1,4 @@
-package ca.usask.cs.srlab.simcad.dataprovider;
+package ca.usask.cs.srlab.simcad.dataprovider.xml;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,34 +17,34 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import ca.usask.cs.srlab.simcad.engine.TypeMapper;
+import ca.usask.cs.srlab.simcad.dataprovider.AbstractDataProvider;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
-import ca.usask.cs.srlab.simcad.model.CloneGroup;
 import ca.usask.cs.srlab.simcad.model.FunctionCloneFragment;
-import ca.usask.cs.srlab.simcad.model.ICloneType;
 import ca.usask.cs.srlab.simcad.postprocess.DetectionSettings;
 import ca.usask.cs.srlab.simcad.util.PropsUtil;
 
-public class XMLDataProvider extends AbstractDataProvider{
+public class XMLCloneFragmentDataProvider extends AbstractDataProvider{
 	
-	private static final XMLDataProvider INSTANCE = new XMLDataProvider();
-	private String xmlFileName;
-	
-	private XMLDataProvider(){
-		super();
+	@SuppressWarnings("unused")
+	private XMLCloneFragmentDataProvider(){
 	}
 	
-	public void configure(String xmlFileName, DetectionSettings ds){
-		configure(ds);
-		this.xmlFileName = xmlFileName;
+	public XMLCloneFragmentDataProvider(XMLFragmentDataProviderConfiguration dataProviderConfig){
+		this(dataProviderConfig, null);
+	}
+	
+	public XMLCloneFragmentDataProvider(XMLFragmentDataProviderConfiguration dataProviderConfig, DetectionSettings ds){
+		super(dataProviderConfig, ds);
 	}
 	
 	public List<CloneFragment> extractFragments(){
-		List<CloneFragment> cloneFragmentList = new LinkedList<CloneFragment>();
-
-		File fileName = new File(xmlFileName);
 		
-		boolean error = false;
+		String dataSource = applyDataTransformation();
+		
+		List<CloneFragment> cloneFragmentList = new LinkedList<CloneFragment>();
+		Integer minSizeOfGranularity = PropsUtil.getMinSizeOfGranularity();
+		
+		File fileName = new File(dataSource);
 		
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try{
@@ -63,29 +63,27 @@ public class XMLDataProvider extends AbstractDataProvider{
 		Element root = doc.getDocumentElement();
 		  
 		  NodeList nl = root.getElementsByTagName("name");
-		  if(nl.getLength()>0){
-			  //projectName = nl.item(0).getFirstChild().getNodeValue();
-		  }else{
-			  error = true;
-		  }
-		  
-		  nl = root.getElementsByTagName("description");
-		  if(nl.getLength()>0){
-			  //projectDesc = nl.item(0).getChildNodes().item(0).getNodeValue();
-		  }else{
-			  error = true;
-		  }
+//		  if(nl.getLength()>0){
+//			  //projectName = nl.item(0).getFirstChild().getNodeValue();
+//		  }else{
+//			  error = true;
+//		  }
+//		  
+//		  nl = root.getElementsByTagName("description");
+//		  if(nl.getLength()>0){
+//			  //projectDesc = nl.item(0).getChildNodes().item(0).getNodeValue();
+//		  }else{
+//			  error = true;
+//		  }
 		  
 		  nl = root.getElementsByTagName("source_elements");
 		  
 		  if(nl.getLength()>0){
 			NodeList sourceList = nl.item(0).getChildNodes();
 			
-			long start = System.currentTimeMillis();
-			long items =0;
+			Integer items = 0;
 			
-			
-			for(int i =0; i < sourceList.getLength(); i++){
+			for(int i = 0; i < sourceList.getLength(); i++){
 				 Node source = sourceList.item(i);
 				 if (source.getNodeType() != Node.ELEMENT_NODE) 
 					 continue;
@@ -93,14 +91,11 @@ public class XMLDataProvider extends AbstractDataProvider{
 					String file = source.getAttributes().getNamedItem("file").getFirstChild().getNodeValue();
 					String startline = source.getAttributes().getNamedItem("startline").getFirstChild().getNodeValue();
 					String endline = source.getAttributes().getNamedItem("endline").getFirstChild().getNodeValue();
-					String content = source.getFirstChild().getTextContent();
+					String content = source.getFirstChild().getTextContent().trim();
 					
-					int loc = computeLoc(content);
+					if(CloneFragment.computeActualLineOfCode(content) < minSizeOfGranularity) continue;
 					
-					if(loc < PropsUtil.getMinSizeOfGranularity())
-						continue;
-					
-					CloneFragment cloneFragment = createNewCloneFragment(file, startline, endline, content, content, i, 0, 0);
+					CloneFragment cloneFragment = createNewCloneFragment(file, startline, endline, content, content, items, 0, 0);
 					
 					long simhash[] = simhashGenerator.generateSimhash(cloneFragment);
 					
@@ -112,7 +107,7 @@ public class XMLDataProvider extends AbstractDataProvider{
 					items++;
 			}
 
-			System.out.println("Total items processed: "+items);
+			//System.out.println("Total items processed: "+items);
 		  }
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -121,21 +116,20 @@ public class XMLDataProvider extends AbstractDataProvider{
 		return cloneFragmentList;
 	}
 
+	@Override
+	protected String applyDataTransformation() {
+		List<IXMLFragmentDataProviderTransformer> dataTransformerList = ((XMLFragmentDataProviderConfiguration)dataProviderConfig).getDataTransformer();
+		String dataSource = ((XMLFragmentDataProviderConfiguration)dataProviderConfig).getXmlFileName();
+		for (IXMLFragmentDataProviderTransformer xmlFragmentDataProviderTransformer : dataTransformerList) {
+			dataSource = xmlFragmentDataProviderTransformer.transform(dataSource);
+		}
+		return dataSource;
+	}
+	
 	private CloneFragment createNewCloneFragment(String file, String startline,
 			String endline, String originalContent, String transformedlContent, int index, long simhash1, long simhash2) {
 		//TODO: take decision on function or block
 		return new FunctionCloneFragment(file, Integer.valueOf(startline), Integer.valueOf(endline), index, originalContent, transformedlContent, simhash1, simhash2);
-	}
-	
-	private int computeLoc(String content) {
-		String []line = content.split("\n");
-		int loc=0;
-		for(String ln : line){
-			if(ln.length() > 0)
-				loc++;
-		}
-		
-		return loc;
 	}
 	
 }

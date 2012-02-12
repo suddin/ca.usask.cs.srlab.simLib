@@ -45,15 +45,14 @@ public class MemoryCloneIndexByJavaCollection implements ICloneIndex {
 			filenameIndex.put(cloneFragment.getFileName(), newList);
 		}
 		
-		IndexKey key = new IndexKey(cloneFragment.getLineOfCode(),
-				Long.bitCount(cloneFragment.getSimhash1()));
+		IndexKey key = new IndexKey(cloneFragment.getLineOfCode(), cloneFragment.getOneBitCount());
 		keySet.add(key);
 		
 		//implementation of two level map
 		if(lineBitIndex.containsKey(cloneFragment.getLineOfCode())){
 			Map<Byte, ArrayList<CloneFragment>> itemListSecondLevelMap = lineBitIndex.get(cloneFragment.getLineOfCode());
-			if(itemListSecondLevelMap.containsKey(cloneFragment.getOneBitCount())){
-				itemListSecondLevelMap.get(cloneFragment.getOneBitCount()).add(cloneFragment);
+			if(itemListSecondLevelMap.containsKey(cloneFragment.getOneBitCount().byteValue())){
+				itemListSecondLevelMap.get(cloneFragment.getOneBitCount().byteValue()).add(cloneFragment);
 			}else{
 				ArrayList<CloneFragment> itemList = new ArrayList<CloneFragment>();
 				itemList.add(cloneFragment);
@@ -93,6 +92,16 @@ public class MemoryCloneIndexByJavaCollection implements ICloneIndex {
 	@Override
 	public Set<IndexKey> getAllKeys() {
 		return keySet;
+	}
+
+	@Override
+	public void cleanup() {
+		if(lineBitIndex!=null)
+			lineBitIndex.clear();
+		if(filenameIndex!=null)
+			filenameIndex.clear();
+		if(keySet!=null)
+			keySet.clear();
 	}
 
 }

@@ -1,6 +1,7 @@
 package ca.usask.cs.srlab.simcad;
 
 import java.io.InputStream;
+import java.net.URL;
 
 import ca.usask.cs.srlab.simcad.util.PropsUtil;
 
@@ -59,6 +60,33 @@ public class Environment {
 			// " got by Environment.class.getClassLoader()");
 		}
 		return stream;
+	}
+	
+	public static String getResourcePath(String resource) {
+		String stripped = resource.startsWith("/") ? resource.substring(1)
+				: resource;
+
+		URL resourceURL = null;
+		ClassLoader classLoader = Thread.currentThread()
+				.getContextClassLoader();
+		if (classLoader != null) {
+			resourceURL = classLoader.getResource(stripped);
+			// if(stream != null)
+			// System.out.println(resource+
+			// " got by Thread.currentThread().getContextClassLoader()");
+		}
+		if (resourceURL == null) {
+			resourceURL = Environment.class.getResource(resource);
+			// if(stream != null)
+			// System.out.println(resource+ " got by Environment.class");
+		}
+		if (resourceURL == null) {
+			resourceURL = Environment.class.getClassLoader().getResource(stripped);
+			// if(stream != null)
+			// System.out.println(resource+
+			// " got by Environment.class.getClassLoader()");
+		}
+		return resourceURL !=null ? resourceURL.getPath() : null;
 	}
 
 }

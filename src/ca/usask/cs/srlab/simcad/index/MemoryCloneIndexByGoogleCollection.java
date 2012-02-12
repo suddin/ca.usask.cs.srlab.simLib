@@ -55,4 +55,12 @@ public class MemoryCloneIndexByGoogleCollection implements ICloneIndex {
 		return filenameIndex.values();
 	}
 
+
+	@Override
+	public void cleanup() {
+		if(lineBitIndex!=null)
+			lineBitIndex.clear();
+		if(filenameIndex!=null)
+			filenameIndex.clear();
+	}
 }

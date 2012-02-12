@@ -9,11 +9,13 @@ import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.token.filter.ITokenFilter;
 import ca.usask.cs.srlab.simcad.token.filter.NullFilter;
 
-public final class DefaultTokenBuilder implements ITokenBuilder {
+public final class TokenBuilderForType1Clone implements ITokenBuilder {
 
+	//private DetectionSettings detectionSettings;
+	
 	private ITokenFilter tokenFilterChain = NullFilter.INSTANCE; 
 
-	public DefaultTokenBuilder() {
+	public TokenBuilderForType1Clone() {
 		super();
 	}
 
@@ -30,53 +32,18 @@ public Collection<String> generateToken(CloneFragment cloneFragment) {
 	
 	List<String> tokenList = new ArrayList<String>();
 	
-	String tokenSeparator = cloneFragment.getLineOfCode() < 100 ? " \t\n\r\f":"\n";  //if block is big, split with line only!
+	String tokenSeparator = "\n";
 	
 	StringTokenizer stToken = new StringTokenizer(cloneFragment.getTransformedCodeBlock(), tokenSeparator);
 	
+	int lineNumberTag = 1234; //any number to start with  
+	
     while(stToken.hasMoreElements()) {
-    	
     	String superToken = stToken.nextToken();
     	//if(superToken.length() == 0){System.out.println("################gotcha!##############");continue;}
-    	
-    		//superToken.length() > 13 && 
-	    	if(superToken.contains(".")){
-	    		String[] subParts = superToken.split ("(?=[.])"); //split by .
-				for(String subToken : subParts){
-					if(subToken.length() <= 10){
-//System.out.println(subToken);
-						addToken(subToken, tokenList);
-			    	}else{  //if string is greater than 10, break it more 
-			    		String[] subSubTokens = subToken.split ("(?=[>])"); //split by camel case NOTE: removed split by _
-						for(String subSubToken : subSubTokens){
-//System.out.println(subToken);
-							addToken(subSubToken, tokenList);
-					    }
-			    	}
-			    }
-	    	}else if(superToken.length() <= 10){
-//System.out.println(superToken);
-	    		addToken(superToken, tokenList);
-	    	}else{  //if string is greater than 7, break it more 
-				
-				String[] subParts; 
-				if(superToken.matches("[A-Z0-9|_|-|\\W]+")){ //uppercase constant declaration
-					subParts = superToken.split ("(?=[_|.|>])"); //NOTE: removed split by _
-				}else
-					if(cloneFragment.getLineOfCode() < 7)
-						subParts = superToken.split ("(?=[[A-Z]|_|.|>])"); //split by camel case. NOTE: removed split by [A-Z] _
-					else
-						subParts = superToken.split ("(?=[_|.|>])"); //split by camel case. NOTE: removed split by [A-Z] _
-				
-				for(String subToken : subParts){
-//System.out.println("subToken);
-					addToken(subToken, tokenList);
-			    }
-	    
-	    	}
-	    	//if(loc<6)
-	    		//seconderyHashMinFreq = 0; //overriding the default one
-    	
+    	String modToken = superToken.trim() + lineNumberTag++ ; //to fix the bug of reordering
+    	addToken(modToken, tokenList);
+//TODO: seconderyHashMinFreq = 0; //overriding the default one
     }
 	
     return tokenList;

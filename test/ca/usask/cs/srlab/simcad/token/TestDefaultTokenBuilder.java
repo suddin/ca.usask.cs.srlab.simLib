@@ -3,6 +3,7 @@ package ca.usask.cs.srlab.simcad.token;
 import java.util.Collection;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,7 +12,6 @@ import ca.usask.cs.srlab.simcad.Constants;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.model.FunctionCloneFragment;
 import ca.usask.cs.srlab.simcad.postprocess.DetectionSettings;
-import ca.usask.cs.srlab.simcad.token.filter.ITokenFilter;
 import ca.usask.cs.srlab.simcad.token.filter.IgnoreTokenByPatternFilter;
 import ca.usask.cs.srlab.simcad.token.filter.StripTokenByPatternFilter;
 
@@ -45,8 +45,8 @@ public class TestDefaultTokenBuilder {
 	static CloneFragment cloneFragment1;
 	static CloneFragment cloneFragment2;
 	
-	static DetectionSettings detectionSettings1;
-	static DetectionSettings detectionSettings2;
+	static DetectionSettings detectionSettings_type1;
+	static DetectionSettings detectionSettings_type_nearmiss;
 	
 	static IgnoreTokenByPatternFilter filter_1;
 	static IgnoreTokenByPatternFilter filter_11;
@@ -55,8 +55,8 @@ public class TestDefaultTokenBuilder {
 	
 	@BeforeClass
 	public static void setup(){
-		detectionSettings1 = new DetectionSettings(0, Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP);
-		detectionSettings2 = new DetectionSettings(12, Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP);
+		detectionSettings_type1 = new DetectionSettings(0, Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP);
+		detectionSettings_type_nearmiss = new DetectionSettings(12, Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP);
 		
 		cloneFragment1 = new FunctionCloneFragment("fileName1", 11, 22, 1, function1, function1, 1234, 5678);
 		cloneFragment2 = new FunctionCloneFragment("fileName2", 34, 55, 1, function2, function2, 4321, 8765);
@@ -79,19 +79,19 @@ public class TestDefaultTokenBuilder {
 		System.out.println("---end test ("+ i +")---\n");
 	}
 	
-	//@Test
+	@Test
 	public void testGenerateTokenWithSettings1(){
-		tokenBuilder = TokenBuilderFactory.LoadTokenBuilder(detectionSettings1);
+		tokenBuilder = TokenBuilderFactory.LoadTokenBuilder("ca.usask.cs.srlab.simcad.token.TokenBuilderForType1Clone");
 		Collection<String> result = tokenBuilder.generateToken(cloneFragment1);
 		for (String string : result) {
 			System.out.println(string);
 		}
-		
+		Assert.assertEquals(result.size(), 9);
 	}
 	
 	@Test
 	public void testGenerateTokenWithSettings2(){
-		tokenBuilder = TokenBuilderFactory.LoadTokenBuilder(detectionSettings2);
+		tokenBuilder = TokenBuilderFactory.LoadTokenBuilder();
 		Collection<String> result = tokenBuilder.generateToken(cloneFragment1);
 		for (String string : result) {
 			System.out.println(string);
@@ -101,7 +101,7 @@ public class TestDefaultTokenBuilder {
 	
 	@Test
 	public void testGenerateTokenWithSettings2AndSingleFilter(){
-		tokenBuilder = TokenBuilderFactory.LoadTokenBuilder(detectionSettings2);
+		tokenBuilder = TokenBuilderFactory.LoadTokenBuilder();
 		tokenBuilder.setFilterChain(filter_1);
 		Collection<String> result = tokenBuilder.generateToken(cloneFragment1);
 		for (String string : result) {
@@ -111,7 +111,7 @@ public class TestDefaultTokenBuilder {
 	
 	@Test
 	public void testGenerateTokenWithSettings2AndSingleFilter11(){
-		tokenBuilder = TokenBuilderFactory.LoadTokenBuilder(detectionSettings2);
+		tokenBuilder = TokenBuilderFactory.LoadTokenBuilder();
 		tokenBuilder.setFilterChain(filter_11);
 		Collection<String> result = tokenBuilder.generateToken(cloneFragment1);
 		for (String string : result) {
@@ -121,7 +121,7 @@ public class TestDefaultTokenBuilder {
 	
 	@Test
 	public void testGenerateTokenWithSettings2AndMultipleFilter1(){
-		tokenBuilder = TokenBuilderFactory.LoadTokenBuilder(detectionSettings2);
+		tokenBuilder = TokenBuilderFactory.LoadTokenBuilder();
 		tokenBuilder.setFilterChain(filter_12);
 		Collection<String> result = tokenBuilder.generateToken(cloneFragment1);
 		for (String string : result) {
@@ -131,7 +131,7 @@ public class TestDefaultTokenBuilder {
 	
 	//@Test
 	public void testGenerateTokenWithSettings2AndMultipleFilter2(){
-		tokenBuilder = TokenBuilderFactory.LoadTokenBuilder(detectionSettings2);
+		tokenBuilder = TokenBuilderFactory.LoadTokenBuilder();
 		tokenBuilder.setFilterChain(filter_13);
 		Collection<String> result = tokenBuilder.generateToken(cloneFragment1);
 		for (String string : result) {

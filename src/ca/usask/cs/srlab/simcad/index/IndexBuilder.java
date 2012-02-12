@@ -11,6 +11,7 @@ public class IndexBuilder {
 		this.cloneFragmentDataProvider = cloneFragmentDataProvider;
 	}
 	
+	
 	public void buildCloneIndex(ICloneIndex cloneIndex){
 		for(CloneFragment cloneFragment : cloneFragmentDataProvider.extractFragments())
 			cloneIndex.insert(cloneFragment);
