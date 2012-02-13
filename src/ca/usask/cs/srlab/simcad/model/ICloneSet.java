@@ -11,6 +11,8 @@ public interface ICloneSet {
 	List<CloneFragment> getCloneFragments();
 
 	ICloneType getCloneSetType();
+	
+	void setCloneSetType(ICloneType cloneType);
 
 	Integer getCloneSetId();
 	

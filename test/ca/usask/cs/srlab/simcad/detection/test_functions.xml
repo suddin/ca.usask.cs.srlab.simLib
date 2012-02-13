@@ -52,7 +52,7 @@ doProhibit(MyStringTokenizer st) throws IOException {
 	}
 }
 </source>
-<source file="/Volumes/Data/auni_home/test_systems/dnsjava/dnsjava-0-3/update.java" startline="236" endline="255" key="">MultiKey[19, 26]
+<source file="/Volumes/Data/auni_home/test_systems/dnsjava/dnsjava-0-3/update.java" startline="236" endline="255" key="MultiKey[19, 26]">
 void
 doRequire(MyStringTokenizer st) throws IOException {
 	Record rec;
@@ -92,5 +92,13 @@ doRequire(MyStringTokenizer st) throws IOException {
 		query.addRecord(PREREQ, rec);
 		System.out.println(rec);
 	}
+}
+</source>
+<source file="/Volumes/Data/auni_home/test_systems/dnsjava/dnsjava-0-3/util.java" startline="45" endline="50" key="MultiKey[6, 22]">
+public void
+addUDP(final short port) {
+	Thread t;
+	t = new Thread(new Runnable() {public void run() {serveTCP(port);}});
+	t.start();
 }
 </source>

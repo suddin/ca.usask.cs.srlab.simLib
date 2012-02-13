@@ -27,19 +27,28 @@ public class DetectionTest {
 	static CloneDetector cloneDetector; 
 	static ICloneIndex cloneIndex;
 	static IndexBuilder indexBuilder;
-	static DetectionSettings detectionSettings_type1;
-	static DetectionSettings detectionSettings_nearmiss;
+	
+	static DetectionSettings detectionSettings_type1_group;
+	static DetectionSettings detectionSettings_nearmiss_group;
+	
+	static DetectionSettings detectionSettings_type1_pair;
+	static DetectionSettings detectionSettings_nearmiss_pair;
+	
 	
 	@BeforeClass
 	public static void setup(){
-		detectionSettings_type1 = new DetectionSettings(0, Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP);
-		detectionSettings_nearmiss = new DetectionSettings(13, Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP);
+		detectionSettings_type1_group = new DetectionSettings(0, Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP);
+		detectionSettings_nearmiss_group = new DetectionSettings(13, Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP);
+		
+		detectionSettings_type1_pair = new DetectionSettings(0, Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_PAIR);
+		detectionSettings_nearmiss_pair = new DetectionSettings(13, Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_PAIR);
+		
 		
 		cloneIndex = new MemoryCloneIndexByJavaCollection();
 		
 		String sourceFragmentFile = Environment.getResourcePath("ca/usask/cs/srlab/simcad/detection/test_functions.xml");// DetectionTest.class.getClassLoader().getResource("test_functions.xml").getPath();
 		
-		XMLFragmentDataProviderConfiguration dataProviderConfig = new XMLFragmentDataProviderConfiguration(sourceFragmentFile);
+		XMLFragmentDataProviderConfiguration dataProviderConfig = new XMLFragmentDataProviderConfiguration(sourceFragmentFile, Constants.CLONE_GRANULARITY_FUNTIONS);
 		dataProviderConfig.addDataTransformer(new FixTxlSourceFragmentOutputXML());
 		
 		ICloneFragmentDataProvider cloneFragmentDataProvider = new XMLCloneFragmentDataProvider(dataProviderConfig);
@@ -56,8 +65,8 @@ public class DetectionTest {
 	}
 	
 	@Test
-	public void testType1Clone(){
-		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_type1);
+	public void testType1CloneGroup(){
+		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_type1_group);
 		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
 		List<CloneSet> result = cloneDetector.detect(candidateFragments);
 		
@@ -66,12 +75,12 @@ public class DetectionTest {
 //		}
 		
 		Assert.assertEquals(1, result.size());
-		Assert.assertEquals(2, result.get(0).size());
+		Assert.assertEquals(3, result.get(0).size());
 	}
 	
 	@Test
-	public void testNearMissClone(){
-		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_nearmiss);
+	public void testNearMissCloneGroup(){
+		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_nearmiss_group);
 		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
 		List<CloneSet> result = cloneDetector.detect(candidateFragments);
 		
@@ -80,9 +89,34 @@ public class DetectionTest {
 //		}
 		
 		Assert.assertEquals(2, result.size());
-		Assert.assertEquals(2, result.get(0).size());
-		Assert.assertEquals(2, result.get(1).size());
+		Assert.assertEquals(3, result.get(0).size());
+		Assert.assertEquals(3, result.get(1).size());
 	}
 	
+	@Test
+	public void testType1ClonePair(){
+		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_type1_pair);
+		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
+		List<CloneSet> result = cloneDetector.detect(candidateFragments);
+		
+//		for (CloneSet cloneSet : result) {
+//			System.out.println(cloneSet);
+//		}
+		
+		Assert.assertEquals(3, result.size());
+	}
+	
+	@Test
+	public void testNearMissClonePair(){
+		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_nearmiss_pair);
+		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
+		List<CloneSet> result = cloneDetector.detect(candidateFragments);
+		
+//		for (CloneSet cloneSet : result) {
+//			System.out.println(cloneSet);
+//		}
+		
+		Assert.assertEquals(6, result.size());
+	}
 	
 }

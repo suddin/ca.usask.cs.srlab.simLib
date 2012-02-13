@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import ca.usask.cs.srlab.simcad.Constants;
 import ca.usask.cs.srlab.simcad.event.CloneFoundEvent;
 import ca.usask.cs.srlab.simcad.event.DetectionEndEvent;
 import ca.usask.cs.srlab.simcad.event.DetectionProgressEvent;
@@ -17,8 +18,8 @@ import ca.usask.cs.srlab.simcad.index.IndexKey;
 import ca.usask.cs.srlab.simcad.listener.ICloneDetectionListener;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.model.CloneGroup;
+import ca.usask.cs.srlab.simcad.model.ClonePair;
 import ca.usask.cs.srlab.simcad.model.CloneSet;
-import ca.usask.cs.srlab.simcad.model.ICloneType;
 import ca.usask.cs.srlab.simcad.postprocess.DetectionSettings;
 import ca.usask.cs.srlab.simcad.util.PropsUtil;
 
@@ -34,7 +35,10 @@ public final class CloneDetector {
 	private ICloneDetectionListener detectionListener;
 	
 	public List<CloneSet> detect(Collection<CloneFragment> candidateFragments) {
-		return this.detectClones(candidateFragments);
+		if(Constants.CLONE_SET_TYPE_GROUP.equals(detectionSettings.getCloneSetType()))
+			return this.detectCloneGroups(candidateFragments);
+		else
+			return this.detectClonePairs(candidateFragments);
 	}
 
 	public static CloneDetector setup(ICloneIndex cloneIndex, DetectionSettings detectionSettings){
@@ -62,30 +66,11 @@ public final class CloneDetector {
 		return this;
 	}
 	
-	private List<CloneSet> detectClones(Collection<CloneFragment> candidateFragments) {
+	private List<CloneSet> detectCloneGroups(Collection<CloneFragment> candidateFragments) {
 		List<CloneSet> detectedCloneSets = new LinkedList<CloneSet>();
 		
-		/*
-		//DBSCAN(D, eps, MinPts)
-		for(Entry<Integer, HashMap<Byte, ArrayList<SourceItem>>> itemListFirstLevelMapEntry : itemListFirstLevelMap.entrySet()){
-			Map<Byte, ArrayList<SourceItem>> itemListSecondLevelMap = itemListFirstLevelMapEntry.getValue();
-			for(Entry<Byte, ArrayList<SourceItem>> itemList : itemListSecondLevelMap.entrySet()){
-				for(SourceItem item : itemList.getValue()){
-					if(item.isProceessed) continue;
-					List<SourceItem> newCluster = getNeighbors (item);
-					if (newCluster.size() >= minClusterSize){
-						detectedCloneSets.add(new CloneGroup(newCluster));
-//						nGroup++;
-//						nFragment += newCluster.size(); //fragments
-						//itemList.removeAll(newCluster);
-					}
-				}
-			}
-	  	}
-		*/
-		
-		int currentProgressIndex = 0;
-		int cloneSetIndex = 0;
+		int currentProgressIndex = 1;
+		int cloneSetIndex = 1;
 		
 		fireDetectionStartEvent();
 		
@@ -95,30 +80,64 @@ public final class CloneDetector {
 			
 			if(cloneFragment.isProceessed) continue;
 			
-			List<CloneFragment> newCluster = findNeighbors(cloneFragment);
-			
-			if (newCluster.size() >= MIN_CLUSTER_SIZE){
-				CloneGroup newCloneGroup = createNewCloneGroup(newCluster, cloneSetIndex++);
-				detectedCloneSets.add(newCloneGroup);
-				fireCloneFoundEvent(newCloneGroup);
+			if(Constants.CLONE_SET_TYPE_GROUP.equals(detectionSettings.getCloneSetType())){
+				List<CloneFragment> newCluster = findNeighborsForGroup(cloneFragment);
+				
+				if (newCluster.size() >= MIN_CLUSTER_SIZE){
+					CloneGroup newCloneGroup = new CloneGroup(newCluster, null, cloneSetIndex++);
+					TypeMapper.mapTypeFor(newCloneGroup);
+					
+					detectedCloneSets.add(newCloneGroup);
+					fireCloneFoundEvent(newCloneGroup);
+				}
+			}else{
+				List<CloneFragment> clonePairElements = findNeighborsForPair(cloneFragment);
+				for(CloneFragment matchedFragment : clonePairElements){
+					ClonePair newClonePair = new ClonePair(cloneFragment, matchedFragment, null, cloneSetIndex++);
+					TypeMapper.mapTypeFor(newClonePair);
+					
+					detectedCloneSets.add(newClonePair);
+					fireCloneFoundEvent(newClonePair);
+				}
 			}
-			
-		}
+		}//for
+		
 		fireDetectionEndEvent();
 		return detectedCloneSets;
 	}
 	
 	
-	private CloneGroup createNewCloneGroup(List<CloneFragment> newCluster, Integer cloneSetIndex){
-		//TODO: decide if its a clone pair or clone group
-		ICloneType cloneType = TypeMapper.determineCloneType(newCluster);
-		return new CloneGroup(newCluster, cloneType, cloneSetIndex);
+	private List<CloneSet> detectClonePairs(Collection<CloneFragment> candidateFragments) {
+		List<CloneSet> detectedClonePairs = new LinkedList<CloneSet>();
+
+		int currentProgressIndex = 0;
+		int clonePairIndex = 1;
+		
+		fireDetectionStartEvent();
+		
+		for(CloneFragment cloneFragment : candidateFragments){
+			
+			fireDetectionProgressEvent(currentProgressIndex++);
+			
+			if(cloneFragment.isProceessed) continue;
+			
+			List<CloneFragment> clonePairElements = findNeighborsForPair(cloneFragment);
+			for(CloneFragment matchedFragment : clonePairElements){
+				
+				ClonePair newClonePair = new ClonePair(cloneFragment, matchedFragment, null, clonePairIndex++);
+				TypeMapper.mapTypeFor(newClonePair);
+				
+				detectedClonePairs.add(newClonePair);
+				fireCloneFoundEvent(newClonePair);
+			}
+		}
+		fireDetectionEndEvent();
+		return detectedClonePairs;
 	}
 	
-	
-	private void fireCloneFoundEvent(CloneGroup newCloneGroup) {
+	private void fireCloneFoundEvent(CloneSet newCloneSet) {
 		if (detectionListener != null) {
-			detectionListener.foundClone(new CloneFoundEvent(this, newCloneGroup));
+			detectionListener.foundClone(new CloneFoundEvent(this, newCloneSet));
 		}		
 	}
 
@@ -141,7 +160,7 @@ public final class CloneDetector {
 		}
 	}
 
-	private <T extends CloneFragment> List<T> findNeighbors (T item){
+	private <T extends CloneFragment> List<T> findNeighborsForGroup(T item){
 		List<T> cluster = new ArrayList<T>();
 		Set<Long> capturedHash = new HashSet<Long>();
 		
@@ -297,11 +316,9 @@ public final class CloneDetector {
 											&& hamming_dist(matchCandidate.getSimhash2(), eMember.getSimhash2()) <= dynamicSimThreshold2){
 										
 										matchCandidate.friendCount ++;
-										//matchCandidate.friendlist.add(eMember);
 										eMember.isTempFriend = true;
 										
-										if(/*matchCandidate.friendlist.size()*/
-												matchCandidate.friendCount == minFriendCount){ //target reached, he got the ticket to join in friends club
+										if(matchCandidate.friendCount == minFriendCount){ //target reached, he got the ticket to join in friends club
 											coolDude = true;
 											if(!STRICT_ON_MEMBERSHIP) break;
 										}
@@ -331,71 +348,7 @@ public final class CloneDetector {
 					
 					}
 				}
-				
-//				
-//				
-//				for(Integer locKey : lockeySet){ // 1st level index iterator
-//					if(searchItem.getLineOfCode() - (searchItem.getLineOfCode() * PropsUtil.getLocTolerance()) < locKey && searchItem.getLineOfCode() + (searchItem.getLineOfCode()+PropsUtil.getLocTolerance()) > locKey){ //first level filter
-//						Map<Byte, ArrayList<CloneFragment>> itemListSecondLevelMap = itemListFirstLevelMap.get(locKey);
-//						Set<Byte> bitKeySet = itemListSecondLevelMap.keySet();
-//						for(Byte bitKey : bitKeySet){ // 2nd level index iterator
-//							if(searchItem.getOneBitCount() - dynamicSimThreshold1 <= bitKey && searchItem.getOneBitCount() + dynamicSimThreshold1 >= bitKey){ //2nd level filter
-//								for(CloneFragment matchCandidate : itemListSecondLevelMap.get(bitKey)){
-//							
-//									if(!matchCandidate.isProceessed && ((hamming_dist(searchItem.getSimhash1(), matchCandidate.getSimhash1()) <= dynamicSimThreshold1
-//											&& hamming_dist(searchItem.getSimhash2(), matchCandidate.getSimhash2()) <= dynamicSimThreshold2))){
-//										
-//										//check if at least clusterMembershipRatio times the existing members in the cluster are cool with this guy
-//										int minFriendCount = (int) (cluster.size() * PropsUtil.getClusterMembershipRatio());
-//										minFriendCount = minFriendCount < 1 ? 1: minFriendCount;
-//										
-//										boolean coolDude = false;
-//										for(CloneFragment eMember:cluster){
-//											
-//											//set initial friendship to false
-//											eMember.isTempFriend = false;
-//											
-//											if(hamming_dist(matchCandidate.getSimhash1(), eMember.getSimhash1()) <= dynamicSimThreshold1
-//													&& hamming_dist(matchCandidate.getSimhash2(), eMember.getSimhash2()) <= dynamicSimThreshold2){
-//												
-//												matchCandidate.friendCount ++;
-//												//matchCandidate.friendlist.add(eMember);
-//												eMember.isTempFriend = true;
-//												
-//												if(/*matchCandidate.friendlist.size()*/
-//														matchCandidate.friendCount == minFriendCount){ //target reached, he got the ticket to join in friends club
-//													coolDude = true;
-//													if(!PropsUtil.isStrictOnMembership()) break;
-//												}
-//											}
-//										} //done with friendship checking
-//																
-//										if(coolDude){ //now add him to friends club
-//											
-//											matchCandidate.isProceessed=true;
-//											cluster.add((T) matchCandidate);
-//											length++;
-//											
-//											//move temp friends count to real count
-//											for(Iterator<CloneFragment> it  = (Iterator<CloneFragment>) cluster.iterator(); it.hasNext();){
-//												CloneFragment eMember = it.next();
-//												if(eMember.isTempFriend) {
-//													//eMember.friendlist.add(matchCandidate);
-//													eMember.friendCount ++;
-//												}
-//												eMember.isTempFriend=false;
-//											}
-//											
-//										}//new member add done							
-//										
-//									}
-//								}
-//							}// 2nd level filter
-//						}//for: 2nd level index iterator	
-//					}//first level filter
-//				}
-//				
-				
+						
 				//cleanup noise from the friends club based on new friendship
 				if(cluster.size() > 1 && STRICT_ON_MEMBERSHIP){
 
@@ -443,17 +396,7 @@ public final class CloneDetector {
 				}
 				
 				
-			}else{ //simthreshold1 == 0
-//				Map<Byte, ArrayList<CloneFragment>> itemListSecondLevelMap = itemListFirstLevelMap.get(searchItem.getLineOfCode());
-//				for(CloneFragment matchCandidate : itemListSecondLevelMap.get(searchItem.getOneBitCount())){
-//					if(!matchCandidate.isProceessed && searchItem.getSimhash1().equals(matchCandidate.getSimhash1())
-//							&& searchItem.getSimhash2().equals(matchCandidate.getSimhash2())){
-//						cluster.add((T) matchCandidate);
-//						length++;
-//						matchCandidate.isProceessed=true;
-//					}
-//				}
-				
+			}else{ 
 				for(CloneFragment matchCandidate : cloneIndex.getEntriesByIndex(searchItem.getLineOfCode(), searchItem.getOneBitCount())){
 					if(!matchCandidate.isProceessed && searchItem.getSimhash1().equals(matchCandidate.getSimhash1())
 							&& searchItem.getSimhash2().equals(matchCandidate.getSimhash2())){
@@ -471,6 +414,174 @@ public final class CloneDetector {
 		return cluster;
 	}
 
+	private <T extends CloneFragment> List<T> findNeighborsForPair(T searchItem){
+		List<T> neighbors = new ArrayList<T>();
+		
+		int deviation = 0; 
+		
+		int simThreshold1 = detectionSettings.getSimThreshold();
+		int simThreshold2;
+		int dynamicSimThreshold1;// = simThreshold + deviation;
+		int dynamicSimThreshold2;// = simThreshold2 + deviation;
+		
+		searchItem.isTempFriend = false;
+		searchItem.isProceessed=true;
+
+		//dynamic threshold update
+			if(simThreshold1 != 0){
+				
+				simThreshold2 = simThreshold1;
+				
+				switch(simThreshold1){
+				
+				case 6:
+					simThreshold2 = 5;
+					break;
+				
+				case 7:
+					if(searchItem.getLineOfCode() < 6){
+						deviation = -1;
+					}else if(searchItem.getLineOfCode() < 8){
+						deviation = -1;
+					}
+					simThreshold2 = 6;
+					break;
+				
+				case 8:
+					if(searchItem.getLineOfCode() < 6){
+						deviation = -2;
+					}else if(searchItem.getLineOfCode() < 8){
+						deviation = -1;
+					}
+					simThreshold2 = 7;
+					break;
+				
+				case 9:
+					if(searchItem.getLineOfCode() < 6){
+						deviation = -3;
+					}else if(searchItem.getLineOfCode() < 8){
+						deviation = -2;
+					}else if(searchItem.getLineOfCode() < 10){
+						deviation = -1;
+					}
+					simThreshold2 = 8;
+					break;
+				
+				case 10:
+					if(searchItem.getLineOfCode() < 6){
+						deviation = -3;
+					}else if(searchItem.getLineOfCode() < 8){
+						deviation = -2;
+					}else if(searchItem.getLineOfCode() < 10){
+						deviation = -2;
+					}else if(searchItem.getLineOfCode() < 20){
+						deviation = -1;
+					}
+					simThreshold2 = 8;
+					break;
+				
+				case 11:
+					if(searchItem.getLineOfCode() < 6){
+						deviation = -4;
+					}else if(searchItem.getLineOfCode() < 8){
+						deviation = -3;
+					}else if(searchItem.getLineOfCode() < 10){
+						deviation = -2;
+					}else if(searchItem.getLineOfCode() < 20){
+						deviation = -1;
+					}
+					simThreshold2 = 9;
+					break;
+				
+				case 12:
+					if(searchItem.getLineOfCode() < 6){
+						deviation = -5;
+					}else if(searchItem.getLineOfCode() < 8){
+						deviation = -4;
+					}else if(searchItem.getLineOfCode() < 10){
+						deviation = -3;
+					}else if(searchItem.getLineOfCode() < 20){
+						deviation = -2;
+					}else if(searchItem.getLineOfCode() < 30){
+						deviation = -1;
+					}	
+					simThreshold2 = 12;
+					break;
+				case 13:
+					if(searchItem.getLineOfCode() < 6){
+						deviation = -5;
+					}else if(searchItem.getLineOfCode() < 8){
+						deviation = -4;
+					}else if(searchItem.getLineOfCode() < 10){
+						deviation = -3;
+					}else if(searchItem.getLineOfCode() < 20){
+						deviation = -2;
+					}else if(searchItem.getLineOfCode() < 30){
+						deviation = -1;
+					}	
+					simThreshold2 = 13;
+					break;
+				}
+				
+				/*else if(item.lineOfCode > 40){
+					deviation = 2;
+				}else if(item.lineOfCode > 30){
+					deviation = 1;
+				}*/
+				
+				dynamicSimThreshold1 = simThreshold1 + deviation;
+				dynamicSimThreshold2 = simThreshold2 + deviation;
+				
+				Set<IndexKey> keySet = cloneIndex.getAllKeys();
+				for (IndexKey indexKey : keySet) {
+					if((searchItem.getLineOfCode() - (searchItem.getLineOfCode() * LOC_TOLERANCE) < indexKey.getLineKey().intValue() && searchItem.getLineOfCode() + (searchItem.getLineOfCode() * LOC_TOLERANCE) > indexKey.getLineKey().intValue())
+							&& (searchItem.getOneBitCount() - dynamicSimThreshold1 <= indexKey.getBitKey().intValue() && searchItem.getOneBitCount() + dynamicSimThreshold1 >= indexKey.getBitKey().intValue())){
+					
+						for(CloneFragment matchCandidate : cloneIndex.getEntriesByIndex(indexKey)){
+							
+							if(!matchCandidate.isProceessed && ((hamming_dist(searchItem.getSimhash1(), matchCandidate.getSimhash1()) <= dynamicSimThreshold1
+									&& hamming_dist(searchItem.getSimhash2(), matchCandidate.getSimhash2()) <= dynamicSimThreshold2))){
+								
+//								if(STRICT_ON_MEMBERSHIP){
+//									//check if at least clusterMembershipRatio times the existing members in the cluster are cool with this guy
+//									int minFriendCount = (int) (neighbors.size() * CLUSTER_MEMBERSHIP_RATIO);
+//									minFriendCount = minFriendCount < 1 ? 1: minFriendCount;
+//									
+//									for(CloneFragment eMember:neighbors){
+//										
+//										if(hamming_dist(matchCandidate.getSimhash1(), eMember.getSimhash1()) <= dynamicSimThreshold1
+//												&& hamming_dist(matchCandidate.getSimhash2(), eMember.getSimhash2()) <= dynamicSimThreshold2){
+//											
+//											matchCandidate.friendCount ++;
+//											
+//											if(matchCandidate.friendCount == minFriendCount){ //target reached, he got the ticket to join in friends club
+//												
+//												neighbors.add((T) matchCandidate);
+//											}
+//										}
+//									} //done with friendship checking
+//								}else
+									neighbors.add((T) matchCandidate);
+														
+							}
+						}
+					
+					}
+				}
+				
+			}else{ 
+				for(CloneFragment matchCandidate : cloneIndex.getEntriesByIndex(searchItem.getLineOfCode(), searchItem.getOneBitCount())){
+					if(!matchCandidate.isProceessed && searchItem.getSimhash1().equals(matchCandidate.getSimhash1())
+							&& searchItem.getSimhash2().equals(matchCandidate.getSimhash2())){
+						neighbors.add((T) matchCandidate);
+					}
+				}
+				
+			}
+		
+		return neighbors;
+	}
+	
 	private int hamming_dist(Long simhash1, Long simhash2) {
 		return Long.bitCount(simhash1 ^ simhash2);
 	}

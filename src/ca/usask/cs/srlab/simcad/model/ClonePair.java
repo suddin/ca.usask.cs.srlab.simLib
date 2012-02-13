@@ -1,6 +1,6 @@
 package ca.usask.cs.srlab.simcad.model;
 
-import java.util.List;
+import java.util.Arrays;
 
 /**
  * @author sharif
@@ -18,13 +18,9 @@ public class ClonePair extends CloneSet {
 		return getCloneSetId();
 	}
 
-	public ClonePair(List<CloneFragment> cloneFragments, ICloneType cloneType,
+	public ClonePair(CloneFragment cloneFragment1, CloneFragment cloneFragment2, ICloneType cloneType,
 			Integer pairId) {
-		super(pairId, cloneFragments, cloneType);
+		super(pairId, Arrays.asList(cloneFragment1, cloneFragment2), cloneType);
 	}
 	
-//	@Override
-//	public String getTitle() {
-//		return "ClonePair :" + getCloneSetId();
-//	}
 }

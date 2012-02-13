@@ -17,7 +17,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import ca.usask.cs.srlab.simcad.Constants;
 import ca.usask.cs.srlab.simcad.dataprovider.AbstractDataProvider;
+import ca.usask.cs.srlab.simcad.model.BlockCloneFragment;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.model.FunctionCloneFragment;
 import ca.usask.cs.srlab.simcad.postprocess.DetectionSettings;
@@ -128,8 +130,10 @@ public class XMLCloneFragmentDataProvider extends AbstractDataProvider{
 	
 	private CloneFragment createNewCloneFragment(String file, String startline,
 			String endline, String originalContent, String transformedlContent, int index, long simhash1, long simhash2) {
-		//TODO: take decision on function or block
-		return new FunctionCloneFragment(file, Integer.valueOf(startline), Integer.valueOf(endline), index, originalContent, transformedlContent, simhash1, simhash2);
+		if(Constants.CLONE_GRANULARITY_FUNTIONS.equals(dataProviderConfig.getCloneFragmentType()))
+			return new FunctionCloneFragment(file, Integer.valueOf(startline), Integer.valueOf(endline), index, originalContent, transformedlContent, simhash1, simhash2);
+		else
+			return new BlockCloneFragment(file, Integer.valueOf(startline), Integer.valueOf(endline), index, originalContent, transformedlContent, simhash1, simhash2);
 	}
 	
 }

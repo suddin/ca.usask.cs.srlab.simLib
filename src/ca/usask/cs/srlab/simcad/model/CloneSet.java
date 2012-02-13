@@ -35,6 +35,11 @@ public abstract class CloneSet implements ICloneSet {
 	}
 	
 	@Override
+	public void setCloneSetType(ICloneType cloneType){
+		this.cloneType = cloneType;
+	}
+	
+	@Override
 	public int size(){
 		return cloneFragments.size();
 	}
@@ -65,7 +70,7 @@ public abstract class CloneSet implements ICloneSet {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("clone class: "+ cloneSetId+"\n");
+		sb.append("clone "+ (this instanceof CloneGroup ? "group" : "pair") +": "+ cloneSetId+"\n");
 		sb.append("number of fragments: "+ cloneFragments.size()+"\n");
 		for(CloneFragment cf : cloneFragments){
 			sb.append("\n");
