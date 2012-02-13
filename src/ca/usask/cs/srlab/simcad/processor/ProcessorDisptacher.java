@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import ca.usask.cs.srlab.simcad.model.ICloneSet;
+import ca.usask.cs.srlab.simcad.model.CloneSet;
 
 public final class ProcessorDisptacher {
 
@@ -18,6 +18,7 @@ public final class ProcessorDisptacher {
 	}
 
 	public static ProcessorDisptacher getInstance() {
+		INSTANCE.cleanUp();
 		return INSTANCE;
 	}
 
@@ -36,12 +37,12 @@ public final class ProcessorDisptacher {
 		return this;
 	}
 
-	public Collection<ICloneSet> applyOn(Collection<ICloneSet> inputCloneSets) {
+	public Collection<CloneSet> applyOn(Collection<CloneSet> inputCloneSets) {
 		Iterator<IProcessor> processorIterator = processorList.listIterator();
 		for (; processorIterator.hasNext();) {
 			IProcessor processor = processorIterator.next();
 			try {
-				Collection<ICloneSet> outputCloneSets = new ArrayList<ICloneSet>();
+				Collection<CloneSet> outputCloneSets = new ArrayList<CloneSet>();
 				processor.process(inputCloneSets, outputCloneSets);
 
 				if (processorIterator.hasNext())
@@ -53,7 +54,7 @@ public final class ProcessorDisptacher {
 			} catch (Exception e) {
 				throw new IllegalStateException(
 						"A processing error occured in processor: "
-								+ processor.getNmae(), e);
+								+ processor.getName(), e);
 			}
 		}
 		return inputCloneSets;

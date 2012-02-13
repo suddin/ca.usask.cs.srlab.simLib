@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import ca.usask.cs.srlab.simcad.model.ICloneFragment;
-import ca.usask.cs.srlab.simcad.model.ICloneSet;
+import ca.usask.cs.srlab.simcad.model.CloneSet;
 import ca.usask.cs.srlab.simcad.processor.IProcessor;
 
 import com.google.common.collect.ImmutableList;
@@ -14,22 +14,22 @@ public final class SubsumeFilterProcessor implements IProcessor {
 
 	
 	@Override
-	public boolean process(Collection<ICloneSet> inputCloneSets, Collection<ICloneSet> outputCloneSets) {
+	public boolean process(Collection<CloneSet> inputCloneSets, Collection<CloneSet> outputCloneSets) {
 
 		
 		int subsumedCluster = 0;
 		int subsumedFragment = 0;
 		
-		 ImmutableList<ICloneSet> cloneSetList = ImmutableList.copyOf(outputCloneSets);
+		 ImmutableList<CloneSet> cloneSetList = ImmutableList.copyOf(outputCloneSets);
 		
 		for(int i = 0; i < outputCloneSets.size(); i++){
-			ICloneSet sourceCloneSet = cloneSetList.get(i);
+			CloneSet sourceCloneSet = cloneSetList.get(i);
 			
 			if(!sourceCloneSet.isSubsumed()){
 				for(int j = 0; j< outputCloneSets.size(); j++){
 					if (i==j) continue;
 					
-					ICloneSet targetCloneSet = cloneSetList.get(j);
+					CloneSet targetCloneSet = cloneSetList.get(j);
 					
 					
 					if(!targetCloneSet.isSubsumed() && 
@@ -113,7 +113,7 @@ public final class SubsumeFilterProcessor implements IProcessor {
 	}
 
 	@Override
-	public String getNmae() {
+	public String getName() {
 		return this.getClass().getSimpleName();
 	}
 

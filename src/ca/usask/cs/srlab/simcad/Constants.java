@@ -25,4 +25,9 @@ public class Constants {
 	public static final String CLONE_SET_TYPE_GROUP = "group";
 	public static final String CLONE_SET_TYPE_PAIR = "pair";
 	
+    public static final String CLONE_TYPE_1 = "Type-1";
+    public static final String CLONE_TYPE_2 = "Type-2";
+    public static final String CLONE_TYPE_3 = "Type-3";
+    public static final String CLONE_TYPE_4 = "Type-4";
+	
 }

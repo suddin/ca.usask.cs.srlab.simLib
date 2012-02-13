@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ca.usask.cs.srlab.simcad.index.ICloneIndex;
-import ca.usask.cs.srlab.simcad.model.ICloneSet;
+import ca.usask.cs.srlab.simcad.model.CloneSet;
 import ca.usask.cs.srlab.simcad.postprocess.DetectionSettings;
 import ca.usask.cs.srlab.simcad.postprocess.SubsumeFilterProcessor;
 import ca.usask.cs.srlab.simcad.postprocess.XmlOutputProcessor;
@@ -52,7 +52,7 @@ public class SimCad {
 
 		PrintWriter logPrinter = new PrintWriter(new FileWriter(".log"));
 
-		List<ICloneSet> detectedCloneSets = new ArrayList<ICloneSet>();
+		List<CloneSet> detectedCloneSets = new ArrayList<CloneSet>();
 
 		//find clones here
 		

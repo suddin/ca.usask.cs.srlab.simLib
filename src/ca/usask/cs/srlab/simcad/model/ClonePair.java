@@ -18,7 +18,7 @@ public class ClonePair extends CloneSet {
 		return getCloneSetId();
 	}
 
-	public ClonePair(CloneFragment cloneFragment1, CloneFragment cloneFragment2, ICloneType cloneType,
+	public ClonePair(CloneFragment cloneFragment1, CloneFragment cloneFragment2, String cloneType,
 			Integer pairId) {
 		super(pairId, Arrays.asList(cloneFragment1, cloneFragment2), cloneType);
 	}

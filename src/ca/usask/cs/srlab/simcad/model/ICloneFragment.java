@@ -8,6 +8,8 @@ public interface ICloneFragment {
 	
 	Long getId();
 	
+	Integer getProgramComponentId();
+	
 	Integer getFromLine();
 
 	Integer getToLine();

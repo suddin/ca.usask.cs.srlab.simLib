@@ -2,14 +2,14 @@ package ca.usask.cs.srlab.simcad.postprocess;
 
 import java.util.Collection;
 
-import ca.usask.cs.srlab.simcad.model.ICloneSet;
+import ca.usask.cs.srlab.simcad.model.CloneSet;
 import ca.usask.cs.srlab.simcad.processor.IProcessor;
 
 public class HtmlOutputProcessor implements IProcessor {
 
 	@Override
-	public boolean process(Collection<ICloneSet> inputCloneSets,
-			Collection<ICloneSet> outputCloneSets) {
+	public boolean process(Collection<CloneSet> inputCloneSets,
+			Collection<CloneSet> outputCloneSets) {
 		
 		
 		outputCloneSets.addAll(inputCloneSets);
@@ -17,7 +17,7 @@ public class HtmlOutputProcessor implements IProcessor {
 	}
 
 	@Override
-	public String getNmae() {
+	public String getName() {
 		return this.getClass().getSimpleName();
 	}
 

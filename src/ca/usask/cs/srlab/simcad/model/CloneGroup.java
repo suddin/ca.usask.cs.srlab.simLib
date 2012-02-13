@@ -14,7 +14,7 @@ public class CloneGroup extends CloneSet {
 		return getCloneSetId();
 	}
 
-	public CloneGroup(List<CloneFragment> cloneFragments, ICloneType cloneType,
+	public CloneGroup(List<CloneFragment> cloneFragments, String cloneType,
 			Integer groupId) {
 		super(groupId, cloneFragments, cloneType);
 	}

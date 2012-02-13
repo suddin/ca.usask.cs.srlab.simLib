@@ -24,15 +24,15 @@ import ca.usask.cs.srlab.simcad.postprocess.DetectionSettings;
 
 public class DetectionTest {
 
-	static CloneDetector cloneDetector; 
-	static ICloneIndex cloneIndex;
-	static IndexBuilder indexBuilder;
+	protected static CloneDetector cloneDetector; 
+	protected static ICloneIndex cloneIndex;
+	protected static IndexBuilder indexBuilder;
 	
-	static DetectionSettings detectionSettings_type1_group;
-	static DetectionSettings detectionSettings_nearmiss_group;
+	protected static DetectionSettings detectionSettings_type1_group;
+	protected static DetectionSettings detectionSettings_nearmiss_group;
 	
-	static DetectionSettings detectionSettings_type1_pair;
-	static DetectionSettings detectionSettings_nearmiss_pair;
+	protected static DetectionSettings detectionSettings_type1_pair;
+	protected static DetectionSettings detectionSettings_nearmiss_pair;
 	
 	
 	@BeforeClass

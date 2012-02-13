@@ -2,12 +2,12 @@ package ca.usask.cs.srlab.simcad.processor;
 
 import java.util.Collection;
 
-import ca.usask.cs.srlab.simcad.model.ICloneSet;
+import ca.usask.cs.srlab.simcad.model.CloneSet;
 
 public interface IProcessor {
 
-	public boolean process(Collection<ICloneSet> inputCloneSets, Collection<ICloneSet> outputCloneSets);
+	public boolean process(Collection<CloneSet> inputCloneSets, Collection<CloneSet> outputCloneSets);
 
-	public String getNmae();
+	public String getName();
 
 }

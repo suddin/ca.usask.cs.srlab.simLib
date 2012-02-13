@@ -14,8 +14,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import ca.usask.cs.srlab.simcad.SimcadException;
+import ca.usask.cs.srlab.simcad.model.CloneGroup;
+import ca.usask.cs.srlab.simcad.model.CloneSet;
 import ca.usask.cs.srlab.simcad.model.ICloneFragment;
-import ca.usask.cs.srlab.simcad.model.ICloneSet;
 import ca.usask.cs.srlab.simcad.processor.IProcessor;
 import ca.usask.cs.srlab.simcad.util.XMLUtil;
 
@@ -34,7 +35,7 @@ public class XmlOutputProcessor implements IProcessor {
 	}
 
 	@Override
-	public boolean process(Collection<ICloneSet> inputCloneSets, Collection<ICloneSet> outputCloneSets) {
+	public boolean process(Collection<CloneSet> inputCloneSets, Collection<CloneSet> outputCloneSets) {
 		String simThreshold = detectionSettings.getSimThreshold().toString();
 		String logFileName = outputFolderName + System.getProperty("file.separator") + "simcad_"+detectionSettings.getCloneGranularity()+"-clones-"+simThreshold+".log";
 		PrintWriter logPrinter;
@@ -46,7 +47,7 @@ public class XmlOutputProcessor implements IProcessor {
 			throw new SimcadException("Can not create output file", e);
 		}
 		
-		System.out.println("\nGenerating output file...");
+		//System.out.println("\nGenerating output file...");
 		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder docBuilder = null;
 		try {
@@ -62,31 +63,23 @@ public class XmlOutputProcessor implements IProcessor {
 		int nGroup = 0;
 		int nFragment = 0;
 	    
-		for(ICloneSet cs: inputCloneSets){
-//			if(cs.isSubsumed()) {
-//				//System.out.println("ignored subsumed clone group...");
-//				continue;
-//			}
-				
-			Node child = doc.createElement("clone_group");
+		for(CloneSet cs: inputCloneSets){
+			Node child = doc.createElement((cs instanceof CloneGroup) ? "clone_group" : "clone_pair");
 			((Element)child).setAttribute("groupid", String.valueOf(nGroup++));
 			((Element)child).setAttribute("nfragments", String.valueOf(cs.size()));
+			((Element)child).setAttribute("type", cs.getCloneSetType());
 			
 			nFragment += cs.size();
 			
-			ICloneFragment lastdisplayed = cs.getMember(0) ;
 			for(ICloneFragment cloneFragment : cs.getCloneFragments()){
-
 				Node child2 = doc.createElement("clone_fragment");
 				((Element)child2).setAttribute("file", cloneFragment.getFileName());
 				((Element)child2).setAttribute("startline", cloneFragment.getFromLine().toString());
 				((Element)child2).setAttribute("endline", cloneFragment.getToLine().toString());
-				((Element)child2).setAttribute("pcid", cloneFragment.getId().toString());
-				((Element)child2).setAttribute("hamdist", String.valueOf(Long.bitCount(cloneFragment.getSimhash1() ^ lastdisplayed.getSimhash1())));
+				((Element)child2).setAttribute("pcid", cloneFragment.getProgramComponentId().toString());
 				
-				child2.appendChild(doc.createCDATASection(cloneFragment.getOriginalCodeBlock()));
+				child2.appendChild(doc.createCDATASection("\n"+cloneFragment.getOriginalCodeBlock()+"\n"));
 				child.appendChild(child2);
-				lastdisplayed = cloneFragment;
 			}
 	        root.appendChild(child);
 		}
@@ -95,13 +88,13 @@ public class XmlOutputProcessor implements IProcessor {
 	    root.setAttribute("nfragments", Integer.toString(nFragment));
 	    root.setAttribute("hamthreshold",  simThreshold);
 	    
-	    System.out.println("Total clone class : "+ nGroup );
-	    System.out.println("Total clone frag : "+ nFragment );
+	    //System.out.println("Total clone class : "+ nGroup );
+	    //System.out.println("Total clone frag : "+ nFragment );
 	    
 	    logPrinter.println("Total clone class : "+ nGroup );
 	    logPrinter.println("Total clone frag : "+ nFragment );	
 	    
-	    System.out.println("Done!\n");
+	    //System.out.println("Done!\n");
 	    logPrinter.close();
 	    
 	    String outputFileName = outputFolderName + System.getProperty("file.separator") + "simcad_"+detectionSettings.getCloneGranularity()+"-clones-"+simThreshold+".xml";
@@ -124,7 +117,7 @@ public class XmlOutputProcessor implements IProcessor {
 	}
 
 	@Override
-	public String getNmae() {
+	public String getName() {
 		return this.getClass().getSimpleName();
 	}
 

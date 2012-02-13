@@ -10,14 +10,14 @@ public abstract class CloneSet implements ICloneSet {
 
 	private Integer cloneSetId;
 	private List<CloneFragment> cloneFragments;
-	private ICloneType cloneType;
+	private String cloneType;
 	
 	public Integer getCloneSetId(){
 		return cloneSetId;
 	}
 	
 	public CloneSet(Integer cloneSetId, List<CloneFragment> cloneFragments,
-			ICloneType cloneType) {
+			String cloneType) {
 		super();
 		this.cloneFragments = cloneFragments;
 		this.cloneType = cloneType;
@@ -30,12 +30,12 @@ public abstract class CloneSet implements ICloneSet {
 	}
 
 	@Override
-	public ICloneType getCloneSetType() {
+	public String getCloneSetType() {
 		return cloneType;
 	}
 	
 	@Override
-	public void setCloneSetType(ICloneType cloneType){
+	public void setCloneSetType(String cloneType){
 		this.cloneType = cloneType;
 	}
 	
