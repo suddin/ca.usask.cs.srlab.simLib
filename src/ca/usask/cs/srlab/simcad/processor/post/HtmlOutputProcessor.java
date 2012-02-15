@@ -1,11 +1,11 @@
-package ca.usask.cs.srlab.simcad.postprocess;
+package ca.usask.cs.srlab.simcad.processor.post;
 
 import java.util.Collection;
 
 import ca.usask.cs.srlab.simcad.model.CloneSet;
-import ca.usask.cs.srlab.simcad.processor.IProcessor;
+import ca.usask.cs.srlab.simcad.processor.AbstractProcessor;
 
-public class HtmlOutputProcessor implements IProcessor {
+public class HtmlOutputProcessor  extends AbstractProcessor {
 
 	@Override
 	public boolean process(Collection<CloneSet> inputCloneSets,
@@ -14,11 +14,6 @@ public class HtmlOutputProcessor implements IProcessor {
 		
 		outputCloneSets.addAll(inputCloneSets);
 		return false;
-	}
-
-	@Override
-	public String getName() {
-		return this.getClass().getSimpleName();
 	}
 
 }

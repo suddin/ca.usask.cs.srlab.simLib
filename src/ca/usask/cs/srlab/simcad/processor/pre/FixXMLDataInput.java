@@ -1,4 +1,4 @@
-package ca.usask.cs.srlab.simcad.preprocessor;
+package ca.usask.cs.srlab.simcad.processor.pre;
 
 
 import java.io.BufferedReader;

@@ -14,10 +14,10 @@ public class FunctionCloneFragment extends CloneFragment {
 	}
 	
 	public FunctionCloneFragment(String fileName, Integer fromLine,
-			Integer toLine, Integer programComponentId, String codeBlock, /*Long id,*/
-			String transformedCodeBlock, long simhash1, long simhash2) {
-		super(fileName, fromLine, toLine, programComponentId, codeBlock, /*id,*/ 
-				transformedCodeBlock, simhash1, simhash2);
+			Integer toLine, Integer programComponentId, String codeBlock/*, Long id,
+			String transformedCodeBlock, long simhash1, long simhash2*/) {
+		super(fileName, fromLine, toLine, programComponentId, codeBlock/*, id, 
+				transformedCodeBlock, simhash1, simhash2*/);
 		this.functionSignature = extractfunctionSignature(codeBlock);
 	}
 

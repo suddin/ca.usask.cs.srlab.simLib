@@ -1,10 +1,12 @@
 
-package ca.usask.cs.srlab.simcad.filter;
+package ca.usask.cs.srlab.simcad.processor.post;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import ca.usask.cs.srlab.simcad.model.CloneGroup;
+import ca.usask.cs.srlab.simcad.model.CloneSet;
+import ca.usask.cs.srlab.simcad.processor.AbstractProcessor;
 
 import com.google.common.collect.Lists;
 
@@ -20,38 +22,38 @@ import com.google.common.collect.Lists;
  * but we did not had an implementation with remove operation for the moment of testing.
  * </p>
  */
-final class SubsumeFilter implements IFilter{
+final class SubsumedCloneFilter2 extends AbstractProcessor{
 
   /**
    * Note that LinkedList should provide better performance here, because of use of operation remove.
    * 
-   * @see #add(CloneGroup)
+   * @see #add(CloneSet)
    */
-  private final List<CloneGroup> filtered = Lists.newLinkedList();
+  private final List<CloneSet> filtered = Lists.newLinkedList();
 
   /**
    * @return current results of filtering
    */
-  public List<CloneGroup> getResult() {
+  public List<CloneSet> getResult() {
     return filtered;
   }
 
   /**
-   * Running time - O(N*2*C), where N - number of clones, which was found earlier and C - time of {@link #containsIn(CloneGroup, CloneGroup)}.
+   * Running time - O(N*2*C), where N - number of clones, which was found earlier and C - time of {@link #containsIn(CloneSet, CloneSet)}.
    */
-  public void add(CloneGroup current) {
-    Iterator<CloneGroup> i = filtered.iterator();
+  private void add(CloneSet current) {
+    Iterator<CloneSet> i = filtered.iterator();
     while (i.hasNext()) {
-      CloneGroup earlier = i.next();
+      CloneSet earlier = i.next();
       // Note that following two conditions cannot be true together - proof by contradiction:
       // let C be the current clone and A and B were found earlier
       // then since relation is transitive - (A in C) and (C in B) => (A in B)
       // so A should be filtered earlier
-      if (SubsumeFilter.containsIn(current, earlier)) {
+      if (containsIn(current, earlier)) {
         // current clone fully covered by clone, which was found earlier
         return;
       }
-      if (SubsumeFilter.containsIn(earlier, current)) {
+      if (containsIn(earlier, current)) {
         // current clone fully covers clone, which was found earlier
         i.remove();
       }
@@ -87,15 +89,24 @@ final class SubsumeFilter implements IFilter{
    * Running time - O(|A|+|B|).
    * </p>
    */
-  static boolean containsIn(CloneGroup first, CloneGroup second) {
+  static boolean containsIn(CloneSet first, CloneSet second) {
 	return false;
-//    if (first.getCloneUnitLength() > second.getCloneUnitLength()) {
+//    if (first.size() > second.size()) {
 //      return false;
 //    }
-//    List<ClonePart> firstParts = first.getCloneParts();
-//    List<ClonePart> secondParts = second.getCloneParts();
+//    List<CloneFragment> firstParts = first.getCloneFragments();
+//    List<CloneFragment> secondParts = second.getCloneFragments();
 //    return SortedListsUtils.contains(secondParts, firstParts, new ContainsInComparator(second.getCloneUnitLength(), first.getCloneUnitLength()))
 //        && SortedListsUtils.contains(firstParts, secondParts, ContainsInComparator.RESOURCE_ID_COMPARATOR);
   }
+
+@Override
+public boolean process(Collection<CloneSet> inputCloneSets, Collection<CloneSet> outputCloneSets) {
+	for(CloneSet cloneSet : inputCloneSets){
+		add(cloneSet);
+	}
+	outputCloneSets.addAll(filtered);
+	return true;
+}
 
 }

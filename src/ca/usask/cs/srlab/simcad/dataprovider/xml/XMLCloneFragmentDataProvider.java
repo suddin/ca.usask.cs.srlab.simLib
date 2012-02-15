@@ -17,12 +17,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import ca.usask.cs.srlab.simcad.Constants;
 import ca.usask.cs.srlab.simcad.dataprovider.AbstractDataProvider;
-import ca.usask.cs.srlab.simcad.model.BlockCloneFragment;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
-import ca.usask.cs.srlab.simcad.model.FunctionCloneFragment;
-import ca.usask.cs.srlab.simcad.postprocess.DetectionSettings;
 import ca.usask.cs.srlab.simcad.util.PropsUtil;
 
 public class XMLCloneFragmentDataProvider extends AbstractDataProvider{
@@ -32,11 +28,7 @@ public class XMLCloneFragmentDataProvider extends AbstractDataProvider{
 	}
 	
 	public XMLCloneFragmentDataProvider(XMLFragmentDataProviderConfiguration dataProviderConfig){
-		this(dataProviderConfig, null);
-	}
-	
-	public XMLCloneFragmentDataProvider(XMLFragmentDataProviderConfiguration dataProviderConfig, DetectionSettings ds){
-		super(dataProviderConfig, ds);
+		super(dataProviderConfig);
 	}
 	
 	public List<CloneFragment> extractFragments(){
@@ -96,17 +88,8 @@ public class XMLCloneFragmentDataProvider extends AbstractDataProvider{
 					String content = source.getFirstChild().getTextContent().trim();
 					
 					if(CloneFragment.computeActualLineOfCode(content) < minSizeOfGranularity) continue;
-					
-					CloneFragment cloneFragment = createNewCloneFragment(file, startline, endline, content, content, items, 0, 0);
-					
-					long simhash[] = simhashGenerator.generateSimhash(cloneFragment);
-					
-					cloneFragment.setSimhash1(simhash[0]);
-					cloneFragment.setSimhash2(simhash[1]);
-					
+					CloneFragment cloneFragment = createNewCloneFragment(file, startline, endline, content, items++);
 					cloneFragmentList.add(cloneFragment);
-					
-					items++;
 			}
 
 			//System.out.println("Total items processed: "+items);
@@ -126,14 +109,6 @@ public class XMLCloneFragmentDataProvider extends AbstractDataProvider{
 			dataSource = xmlFragmentDataProviderTransformer.transform(dataSource);
 		}
 		return dataSource;
-	}
-	
-	private CloneFragment createNewCloneFragment(String file, String startline,
-			String endline, String originalContent, String transformedlContent, int index, long simhash1, long simhash2) {
-		if(Constants.CLONE_GRANULARITY_FUNTIONS.equals(dataProviderConfig.getCloneFragmentType()))
-			return new FunctionCloneFragment(file, Integer.valueOf(startline), Integer.valueOf(endline), index, originalContent, transformedlContent, simhash1, simhash2);
-		else
-			return new BlockCloneFragment(file, Integer.valueOf(startline), Integer.valueOf(endline), index, originalContent, transformedlContent, simhash1, simhash2);
 	}
 	
 }

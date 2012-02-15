@@ -25,9 +25,9 @@ addUDP(final short port) {
 <source file="/Volumes/Data/auni_home/test_systems/dnsjava/dnsjava-0-3/jnamed.java" startline="145" endline="150" pcid="359" key="MultiKey[6, 22]">
 public void
 addUDP(final short port) {
-	Thread t;
-	t = new Thread(new Runnable() {public void run() {serveTCP(port);}});
-	t.start();
+	Thread tt;
+	tt = new Thread(new Runnable() {public void run() {serveTCP(port);}});
+	tt.start();
 }
 </source>
 <source file="/Volumes/Data/auni_home/test_systems/dnsjava/dnsjava-0-3/update.java" startline="257" endline="276" key="MultiKey[19, 27]">
@@ -39,7 +39,7 @@ doProhibit(MyStringTokenizer st) throws IOException {
 	if (qualifier.equals("-r")) 
 		rec = parseRR(st, defaultClass, 0);
 	else if (qualifier.equals("-s"))
-		rec = parseSet(st, DClass.NONE);
+		rec = parseList(st, DClass.NONE);
 	else if (qualifier.equals("-n"))
 		rec = parseName(st, DClass.NONE);
 	else {

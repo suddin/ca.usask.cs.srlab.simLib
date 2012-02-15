@@ -24,9 +24,17 @@ public class AbstractMemoryIndexTest {
 	
 	public static void supersetup(ICloneIndex cloneIndexx){
 		cloneIndex = cloneIndexx;
-		cf1 = new FunctionCloneFragment("file1", 1, 4, 1, "original code", "transformed code", 1234l, 1234l);
-		cf2 = new FunctionCloneFragment("file1", 11, 44, 2, "original code2", "transformed code2", 5678l, 5678l);
-		cf3 = new FunctionCloneFragment("file3", 11, 44, 3, "original code3", "transformed code3", 4234l, 4234l);
+		cf1 = new FunctionCloneFragment("file1", 1, 4, 1, "original code1");
+		cf1.setSimhash1(1234l);
+		cf1.setSimhash2(1234l);
+
+		cf2 = new FunctionCloneFragment("file1", 11, 44, 2, "original code2");
+		cf2.setSimhash1(5678l);
+		cf2.setSimhash2(5678l);
+		
+		cf3 = new FunctionCloneFragment("file3", 11, 44, 3, "original code3");
+		cf3.setSimhash1(3267l);
+		cf3.setSimhash2(3267l);
 		
 		System.out.println("testing with : "+cloneIndex.getClass().getSimpleName());
 	}

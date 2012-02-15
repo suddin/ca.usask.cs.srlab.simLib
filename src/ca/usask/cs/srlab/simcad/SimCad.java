@@ -10,17 +10,13 @@ import java.util.List;
 
 import ca.usask.cs.srlab.simcad.index.ICloneIndex;
 import ca.usask.cs.srlab.simcad.model.CloneSet;
-import ca.usask.cs.srlab.simcad.postprocess.DetectionSettings;
-import ca.usask.cs.srlab.simcad.postprocess.SubsumeFilterProcessor;
-import ca.usask.cs.srlab.simcad.postprocess.XmlOutputProcessor;
-import ca.usask.cs.srlab.simcad.preprocessor.FixXMLDataInput;
 import ca.usask.cs.srlab.simcad.processor.ProcessorDisptacher;
+import ca.usask.cs.srlab.simcad.processor.post.SubsumedCloneFilter;
+import ca.usask.cs.srlab.simcad.processor.post.XmlOutputProcessor;
+import ca.usask.cs.srlab.simcad.processor.pre.FixXMLDataInput;
 
 public class SimCad {
 
-	public static final String CLONE_TYPE_1 = "Type 1";
-
-	
 	//simhashGenerator.applyTokenBuildStrategy(TokenBuildStrategyFactory.getStrategyInstanceFor(CLONE_TYPE_1));
 	
 	int simThreshold = 0;
@@ -61,7 +57,7 @@ public class SimCad {
 		// filter subsumed clone
 
 		if (applySubsumeFiltering) {
-			pd.addProcessor(new SubsumeFilterProcessor());
+			pd.addProcessor(new SubsumedCloneFilter());
 		}
 
 		// add post processing functions

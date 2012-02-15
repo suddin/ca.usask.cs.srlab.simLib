@@ -6,9 +6,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ca.usask.cs.srlab.simcad.Constants;
+import ca.usask.cs.srlab.simcad.DetectionSettings;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.model.FunctionCloneFragment;
-import ca.usask.cs.srlab.simcad.postprocess.DetectionSettings;
 import ca.usask.cs.srlab.simcad.token.ITokenBuilder;
 import ca.usask.cs.srlab.simcad.token.TokenBuilderFactory;
 
@@ -83,8 +83,8 @@ public class SimHashGeneratorTest {
 	
 	@BeforeClass
 	public static void setup(){
-		detectionSettings1 = new DetectionSettings(0, Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP);
-		detectionSettings2 = new DetectionSettings(13, Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP);
+		detectionSettings1 = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP, Constants.CLONE_TYPE_1);
+		detectionSettings2 = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP, Constants.CLONE_TYPE_1,  Constants.CLONE_TYPE_2,  Constants.CLONE_TYPE_3);
 	}
 	
 	@Before
@@ -101,102 +101,56 @@ public class SimHashGeneratorTest {
 	
 	@Test
 	public void testSimhashGenForSimilarCodeFragment(){
+		cloneFragment1 = new FunctionCloneFragment("fileName1", 11, 22, 1, function1);
+		cloneFragment2 = new FunctionCloneFragment("fileName2", 34, 55, 1, function1_type1);
 		
-		cloneFragment1 = new FunctionCloneFragment("fileName1", 11, 22, 1, function1, function1, 0, 0);
-		cloneFragment2 = new FunctionCloneFragment("fileName2", 34, 55, 1, function1_type1, function1_type1, 0, 0);
+		simhashGenerator.updateSimhash(cloneFragment1, function1);
+		simhashGenerator.updateSimhash(cloneFragment2, function1_type1);
 		
-		long sh1[] = simhashGenerator.generateSimhash(cloneFragment1);
-		long sh2[] = simhashGenerator.generateSimhash(cloneFragment2);
-		System.out.println(sh1[0]);
-		System.out.println(sh2[0]);
-		System.out.println(sh1[1]);
-		System.out.println(sh2[1]);
-		System.out.println("......");
-		Assert.assertArrayEquals(sh1, sh2);
-		
-		switchToHighThresholdSettings();
-		
-		sh1 = simhashGenerator.generateSimhash(cloneFragment1);
-		sh2 = simhashGenerator.generateSimhash(cloneFragment2);
-		System.out.println(sh1[0]);
-		System.out.println(sh2[0]);
-		System.out.println(sh1[1]);
-		System.out.println(sh2[1]);
-		System.out.println("......");
-		Assert.assertArrayEquals(sh1, sh2);
+		Assert.assertEquals(cloneFragment1.getSimhash1(), cloneFragment2.getSimhash1());
+		Assert.assertEquals(cloneFragment1.getSimhash2(), cloneFragment2.getSimhash2());
 	}
 	
 	@Test
 	public void testSimhashGenForNearSimilarType2CodeFragment(){
 		
-		cloneFragment1 = new FunctionCloneFragment("fileName1", 11, 22, 1, function1, function1, 0, 0);
-		cloneFragment2 = new FunctionCloneFragment("fileName2", 34, 55, 1, function1_type2, function1_type2, 0, 0);
+		cloneFragment1 = new FunctionCloneFragment("fileName1", 11, 22, 1, function1);
+		cloneFragment2 = new FunctionCloneFragment("fileName2", 34, 55, 1, function1_type2);
 		
-		switchToHighThresholdSettings();
+		simhashGenerator.updateSimhash(cloneFragment1, function1);
+		simhashGenerator.updateSimhash(cloneFragment2, function1_type2);
 		
-		long sh1[] = simhashGenerator.generateSimhash(cloneFragment1);
-		long sh2[] = simhashGenerator.generateSimhash(cloneFragment2);
-		
-		System.out.println(sh1[0]);
-		System.out.println(sh2[0]);
-		System.out.println(sh1[1]);
-		System.out.println(sh2[1]);
-		System.out.println("......");
-		Assert.assertTrue(sh1[0] != sh2[0] && sh1[1] != sh2[1]);
-		
-		System.out.println(hamming_distance(sh1[0], sh2[0]));
-		Assert.assertTrue(hamming_distance(sh1[0], sh2[0]) < 13);
-		
-		Assert.assertTrue(hamming_distance(sh1[0], sh2[0]) < 13);
+		Assert.assertTrue(cloneFragment1.getSimhash1() != cloneFragment2.getSimhash1() && cloneFragment1.getSimhash2() != cloneFragment2.getSimhash2());
+		Assert.assertTrue(hamming_distance(cloneFragment1.getSimhash1(), cloneFragment2.getSimhash1()) < 13);
 	}
 
 	
 	@Test
 	public void testSimhashGenForNearSimilarType3CodeFragment2(){
 		
-		cloneFragment1 = new FunctionCloneFragment("fileName1", 11, 22, 1, function1, function1, 0, 0);
-		cloneFragment2 = new FunctionCloneFragment("fileName2", 34, 55, 1, function1_type3, function1_type3, 0, 0);
+		cloneFragment1 = new FunctionCloneFragment("fileName1", 11, 22, 1, function1);
+		cloneFragment2 = new FunctionCloneFragment("fileName2", 34, 55, 1, function1_type3);
 		
-		switchToHighThresholdSettings();
+		simhashGenerator.updateSimhash(cloneFragment1, function1);
+		simhashGenerator.updateSimhash(cloneFragment2, function1_type3);
 		
-		long sh1[] = simhashGenerator.generateSimhash(cloneFragment1);
-		long sh2[] = simhashGenerator.generateSimhash(cloneFragment2);
-		
-		System.out.println(sh1[0]);
-		System.out.println(sh2[0]);
-		System.out.println(sh1[1]);
-		System.out.println(sh2[1]);
-		System.out.println("......");
-		Assert.assertTrue(sh1[0] != sh2[0] && sh1[1] != sh2[1]);
-		
-		System.out.println(hamming_distance(sh1[0], sh2[0]));
-		Assert.assertTrue(hamming_distance(sh1[0], sh2[0]) <= 13);
-		
-		Assert.assertTrue(hamming_distance(sh1[0], sh2[0]) <= 13);
+		Assert.assertTrue(cloneFragment1.getSimhash1() != cloneFragment2.getSimhash1() && cloneFragment1.getSimhash2() != cloneFragment2.getSimhash2());
+		Assert.assertTrue(hamming_distance(cloneFragment1.getSimhash1(), cloneFragment2.getSimhash1()) <= 13);
+		Assert.assertTrue(hamming_distance(cloneFragment1.getSimhash2(), cloneFragment2.getSimhash2()) <= 13);
 	}
 	
 	@Test
 	public void testSimhashGenForDissimilarCodeFragment(){
 		
-		cloneFragment1 = new FunctionCloneFragment("fileName1", 11, 22, 1, function1, function1, 0, 0);
-		cloneFragment2 = new FunctionCloneFragment("fileName2", 34, 55, 1, function2, function2, 0, 0);
+		cloneFragment1 = new FunctionCloneFragment("fileName1", 11, 22, 1, function1);
+		cloneFragment2 = new FunctionCloneFragment("fileName2", 34, 55, 1, function2);
 		
-		switchToHighThresholdSettings();
+		simhashGenerator.updateSimhash(cloneFragment1, function1);
+		simhashGenerator.updateSimhash(cloneFragment2, function2);
 		
-		long sh1[] = simhashGenerator.generateSimhash(cloneFragment1);
-		long sh2[] = simhashGenerator.generateSimhash(cloneFragment2);
-		
-		System.out.println(sh1[0]);
-		System.out.println(sh2[0]);
-		System.out.println(sh1[1]);
-		System.out.println(sh2[1]);
-		System.out.println("......");
-		Assert.assertTrue(sh1[0] != sh2[0] && sh1[1] != sh2[1]);
-		
-		System.out.println(hamming_distance(sh1[0], sh2[0]));
-		Assert.assertTrue(hamming_distance(sh1[0], sh2[0]) > 12);
-		
-		Assert.assertTrue(hamming_distance(sh1[0], sh2[0]) > 12);
+		Assert.assertTrue(cloneFragment1.getSimhash1() != cloneFragment2.getSimhash1() && cloneFragment1.getSimhash2() != cloneFragment2.getSimhash2());
+		Assert.assertTrue(hamming_distance(cloneFragment1.getSimhash1(), cloneFragment2.getSimhash1()) > 12);
+		Assert.assertTrue(hamming_distance(cloneFragment1.getSimhash2(), cloneFragment2.getSimhash2()) > 12);
 	}
 	
 	private long hamming_distance(long l, long r) {

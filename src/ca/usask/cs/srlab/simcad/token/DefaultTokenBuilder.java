@@ -26,13 +26,12 @@ public final class DefaultTokenBuilder implements ITokenBuilder {
  * @see ca.usask.cs.srlab.simcad.hash.ITokenBuilder#generateToken(java.lang.String)
  */
 @Override
-public Collection<String> generateToken(CloneFragment cloneFragment) {
-	
+public Collection<String> generateToken(String codeFragment) {
 	List<String> tokenList = new ArrayList<String>();
+	int loc = CloneFragment.computeActualLineOfCode(codeFragment);
+	String tokenSeparator = loc < 100 ? " \t\n\r\f":"\n";  //if block is big, split with line only!
 	
-	String tokenSeparator = cloneFragment.getLineOfCode() < 100 ? " \t\n\r\f":"\n";  //if block is big, split with line only!
-	
-	StringTokenizer stToken = new StringTokenizer(cloneFragment.getTransformedCodeBlock(), tokenSeparator);
+	StringTokenizer stToken = new StringTokenizer(codeFragment, tokenSeparator);
 	
     while(stToken.hasMoreElements()) {
     	
@@ -63,7 +62,7 @@ public Collection<String> generateToken(CloneFragment cloneFragment) {
 				if(superToken.matches("[A-Z0-9|_|-|\\W]+")){ //uppercase constant declaration
 					subParts = superToken.split ("(?=[_|.|>])"); //NOTE: removed split by _
 				}else
-					if(cloneFragment.getLineOfCode() < 7)
+					if(loc < 7)
 						subParts = superToken.split ("(?=[[A-Z]|_|.|>])"); //split by camel case. NOTE: removed split by [A-Z] _
 					else
 						subParts = superToken.split ("(?=[_|.|>])"); //split by camel case. NOTE: removed split by [A-Z] _

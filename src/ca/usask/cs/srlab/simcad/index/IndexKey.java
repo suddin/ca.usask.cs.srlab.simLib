@@ -18,7 +18,8 @@ public class IndexKey<T extends Number> implements Serializable {
 	     * @param key1  the first key
 	     * @param key2  the second key
 	     */
-	    public IndexKey(T key1, T key2) {
+	    @SuppressWarnings("unchecked")
+		public IndexKey(T key1, T key2) {
 	        this(false, key1, key2);
 	    }
 	    
@@ -82,12 +83,13 @@ public class IndexKey<T extends Number> implements Serializable {
 	     * @param other  the other object to compare to
 	     * @return true if equal
 	     */
-	    public boolean equals(Object other) {
+	    @SuppressWarnings("unchecked")
+		public boolean equals(Object other) {
 	        if (other == this) {
 	            return true;
 	        }
 	        if (other instanceof IndexKey) {
-	        	IndexKey otherMulti = (IndexKey) other;
+	        	IndexKey<T> otherMulti = (IndexKey<T>) other;
 	            return Arrays.equals(keys, otherMulti.keys);
 	        }
 	        return false;

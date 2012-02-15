@@ -43,9 +43,9 @@ public abstract class CloneFragment implements ICloneFragment {
 	@Column(length=32767)
 	private String originalCodeBlock;
 
-	@Lob
-	@Column(length=32767)
-	private String transformedCodeBlock;
+//	@Lob
+//	@Column(length=32767)
+//	private String transformedCodeBlock;
 	
 //	@ManyToOne
 //	@JoinColumn (name="BITINDEXOBJECT_ID")
@@ -56,17 +56,17 @@ public abstract class CloneFragment implements ICloneFragment {
 //	}
 	
 	public CloneFragment(String fileName, Integer fromLine, Integer toLine,
-			Integer programComponentId, String codeBlock, /*Long id,*/ 
-			String transformedCodeBlock, long simhash1, long simhash2) {
+			Integer programComponentId, String codeBlock/*, Long id,*/ 
+			/*String transformedCodeBlock, long simhash1, long simhash2*/) {
 		//this.id = id;
 		this.programComponentId = programComponentId;
 		this.fileName = fileName;
 		this.fromLine = fromLine;
 		this.toLine = toLine;
 		this.originalCodeBlock = codeBlock;
-		this.transformedCodeBlock = transformedCodeBlock;
-		this.simhash1 = simhash1;
-		this.simhash2 = simhash2;
+//		this.transformedCodeBlock = transformedCodeBlock;
+//		this.simhash1 = simhash1;
+//		this.simhash2 = simhash2;
 	}
 
 	public CloneFragment() {
@@ -107,9 +107,9 @@ public abstract class CloneFragment implements ICloneFragment {
 //		this.mappedToIndex = mappedToIndex;
 //	}
 
-	public String getTransformedCodeBlock() {
-		return transformedCodeBlock;
-	}
+//	public String getTransformedCodeBlock() {
+//		return transformedCodeBlock;
+//	}
 
 	@Override
 	public String getFileName() {
@@ -148,10 +148,11 @@ public abstract class CloneFragment implements ICloneFragment {
 		this.toLine = toLine;
 	}
 
-	public void setTransformedCodeBlock(String transformedCodeBlock) {
-		this.transformedCodeBlock = transformedCodeBlock;
-	}
+//	public void setTransformedCodeBlock(String transformedCodeBlock) {
+//		this.transformedCodeBlock = transformedCodeBlock;
+//	}
 
+	@Transient
 	private transient int bitCount;
 	
 	@Transient
@@ -161,12 +162,13 @@ public abstract class CloneFragment implements ICloneFragment {
 		return bitCount;
 	}
 	
+	@Transient
 	private transient int lineOfCode;  
 	
 	@Transient
 	public Integer getLineOfCode(){
-		if(this.lineOfCode == 0 && transformedCodeBlock != null){
-			this.lineOfCode = computeActualLineOfCode(transformedCodeBlock);
+		if(this.lineOfCode == 0 && originalCodeBlock != null){
+			this.lineOfCode = computeActualLineOfCode(originalCodeBlock);
 		}
 		return lineOfCode;
 	}
@@ -209,7 +211,7 @@ public abstract class CloneFragment implements ICloneFragment {
 	
 	@Override
 	public String toString() {
-		return fileName+" ("+fromLine+","+toLine+")\n"+originalCodeBlock;
+		return fileName+" ("+fromLine+","+toLine+")\n"+originalCodeBlock/*+"\n"+transformedCodeBlock*/;
 	}
 	
 }

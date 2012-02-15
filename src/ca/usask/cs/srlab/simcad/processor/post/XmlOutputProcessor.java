@@ -1,4 +1,4 @@
-package ca.usask.cs.srlab.simcad.postprocess;
+package ca.usask.cs.srlab.simcad.processor.post;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,14 +13,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import ca.usask.cs.srlab.simcad.DetectionSettings;
 import ca.usask.cs.srlab.simcad.SimcadException;
 import ca.usask.cs.srlab.simcad.model.CloneGroup;
 import ca.usask.cs.srlab.simcad.model.CloneSet;
 import ca.usask.cs.srlab.simcad.model.ICloneFragment;
-import ca.usask.cs.srlab.simcad.processor.IProcessor;
+import ca.usask.cs.srlab.simcad.processor.AbstractProcessor;
 import ca.usask.cs.srlab.simcad.util.XMLUtil;
 
-public class XmlOutputProcessor implements IProcessor {
+public class XmlOutputProcessor  extends AbstractProcessor {
 
 	private String outputFolderName;
 	private DetectionSettings detectionSettings;
@@ -36,8 +37,8 @@ public class XmlOutputProcessor implements IProcessor {
 
 	@Override
 	public boolean process(Collection<CloneSet> inputCloneSets, Collection<CloneSet> outputCloneSets) {
-		String simThreshold = detectionSettings.getSimThreshold().toString();
-		String logFileName = outputFolderName + System.getProperty("file.separator") + "simcad_"+detectionSettings.getCloneGranularity()+"-clones-"+simThreshold+".log";
+		//String simThreshold = detectionSettings.getSimThreshold().toString();
+		String logFileName = outputFolderName + System.getProperty("file.separator") + "simcad_"+detectionSettings.getCloneGranularity()+"-clones-"+detectionSettings.getTypeString()+".log";
 		PrintWriter logPrinter;
 		
 		try {
@@ -67,7 +68,7 @@ public class XmlOutputProcessor implements IProcessor {
 			Node child = doc.createElement((cs instanceof CloneGroup) ? "clone_group" : "clone_pair");
 			((Element)child).setAttribute("groupid", String.valueOf(nGroup++));
 			((Element)child).setAttribute("nfragments", String.valueOf(cs.size()));
-			((Element)child).setAttribute("type", cs.getCloneSetType());
+			((Element)child).setAttribute("type", cs.getCloneType());
 			
 			nFragment += cs.size();
 			
@@ -86,7 +87,7 @@ public class XmlOutputProcessor implements IProcessor {
 		
 	    root.setAttribute("ngroups", Integer.toString(nGroup));
 	    root.setAttribute("nfragments", Integer.toString(nFragment));
-	    root.setAttribute("hamthreshold",  simThreshold);
+	    root.setAttribute("cloneTypes",  detectionSettings.getCloneSetType());
 	    
 	    //System.out.println("Total clone class : "+ nGroup );
 	    //System.out.println("Total clone frag : "+ nFragment );
@@ -97,7 +98,8 @@ public class XmlOutputProcessor implements IProcessor {
 	    //System.out.println("Done!\n");
 	    logPrinter.close();
 	    
-	    String outputFileName = outputFolderName + System.getProperty("file.separator") + "simcad_"+detectionSettings.getCloneGranularity()+"-clones-"+simThreshold+".xml";
+	    String outputFileName =  "simcad_"+detectionSettings.getCloneGranularity()+"_clone-"+detectionSettings.getCloneSetType()+"s_"+detectionSettings.getTypeString()+".xml";
+	    String outputFullFileName = outputFolderName + System.getProperty("file.separator") + outputFileName;
 	    
 //	    File outputFile = new File(outputFileName);
 		try {
@@ -106,7 +108,7 @@ public class XmlOutputProcessor implements IProcessor {
 //			} else {
 //				outputFile.createNewFile();
 //			}
-			XMLUtil.writeXmlFile(doc, outputFileName);
+			XMLUtil.writeXmlFile(doc, outputFullFileName);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new SimcadException("Can not create output file", e);
@@ -114,11 +116,6 @@ public class XmlOutputProcessor implements IProcessor {
 		
 		outputCloneSets.addAll(inputCloneSets);
 		return true;
-	}
-
-	@Override
-	public String getName() {
-		return this.getClass().getSimpleName();
 	}
 
 }

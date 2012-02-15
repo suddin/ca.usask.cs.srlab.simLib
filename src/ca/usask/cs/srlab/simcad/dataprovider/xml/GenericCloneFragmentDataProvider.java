@@ -8,8 +8,6 @@ import ca.usask.cs.srlab.simcad.SimcadException;
 import ca.usask.cs.srlab.simcad.dataprovider.AbstractDataProvider;
 import ca.usask.cs.srlab.simcad.dataprovider.IFragmentDataProviderConfiguration;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
-import ca.usask.cs.srlab.simcad.model.FunctionCloneFragment;
-import ca.usask.cs.srlab.simcad.postprocess.DetectionSettings;
 import ca.usask.cs.srlab.simcad.util.PropsUtil;
 
 public class GenericCloneFragmentDataProvider extends AbstractDataProvider{
@@ -19,12 +17,12 @@ public class GenericCloneFragmentDataProvider extends AbstractDataProvider{
 	}
 	
 	public GenericCloneFragmentDataProvider(IFragmentDataProviderConfiguration dataProviderConfig){
-		this(dataProviderConfig, null);
+		super(dataProviderConfig);
 	}
 	
-	public GenericCloneFragmentDataProvider(IFragmentDataProviderConfiguration dataProviderConfig, DetectionSettings ds){
-		super(dataProviderConfig, ds);
-	}
+//	public GenericCloneFragmentDataProvider(IFragmentDataProviderConfiguration dataProviderConfig, DetectionSettings ds){
+//		super(dataProviderConfig, ds);
+//	}
 	
 	public List<CloneFragment> extractFragments() {
 
@@ -42,7 +40,7 @@ public class GenericCloneFragmentDataProvider extends AbstractDataProvider{
 				String startline = "startline";
 				String endline = "endline";
 				String originalContent = "content";
-				String transformedContent = "content";
+				String transformedContent = "transformed content";
 				//end
 				
 				int loc = computeLoc(transformedContent);
@@ -51,16 +49,8 @@ public class GenericCloneFragmentDataProvider extends AbstractDataProvider{
 					continue;
 
 				CloneFragment cloneFragment = createNewCloneFragment(fileName,
-						startline, endline, originalContent, transformedContent, items, 0, 0);
-
-				long simhash[] = simhashGenerator.generateSimhash(cloneFragment);
-
-				cloneFragment.setSimhash1(simhash[0]);
-				cloneFragment.setSimhash2(simhash[1]);
-
+						startline, endline, originalContent, transformedContent, items++);
 				cloneFragmentList.add(cloneFragment);
-
-				items++;
 			}
 
 		} catch (Exception e) {
@@ -78,12 +68,6 @@ public class GenericCloneFragmentDataProvider extends AbstractDataProvider{
 			dataSource = ixmlFragmentDataProviderTransformer.transform(dataSource);
 		}
 		return dataSource;
-	}
-
-	private CloneFragment createNewCloneFragment(String file, String startline,
-			String endline, String originalContent, String transformedlContent, int index, long simhash1, long simhash2) {
-		//TODO: take decision on function or block
-		return new FunctionCloneFragment(file, Integer.valueOf(startline), Integer.valueOf(endline), index, originalContent, transformedlContent, simhash1, simhash2);
 	}
 	
 	private int computeLoc(String content) {

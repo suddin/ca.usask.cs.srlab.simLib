@@ -6,6 +6,7 @@
 	<entry key="simcad.settings.advance.strictOnMembership">false</entry>
 	<entry key="simcad.settings.advance.clusterMembershipRatio">0.5</entry>
 	<entry key="simcad.settings.advance.locTolerance">1</entry>
+	<entry key="simcad.settings.advance.type3clone.simthreshold">13</entry>
 
 	<entry key="simcad.settings.advance.tokenFrequencyNormalization">true</entry>
 	<entry key="simcad.settings.advance.tokenFrequencyNormalizationThreshold">5</entry>

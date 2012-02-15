@@ -2,6 +2,8 @@ package ca.usask.cs.srlab.simcad.model;
 
 import java.util.List;
 
+import ca.usask.cs.srlab.simcad.util.CloneTypeMapper;
+
 /**
  * @author sharif
  *
@@ -10,7 +12,7 @@ public abstract class CloneSet implements ICloneSet {
 
 	private Integer cloneSetId;
 	private List<CloneFragment> cloneFragments;
-	private String cloneType;
+	private String cloneType;	
 	
 	public Integer getCloneSetId(){
 		return cloneSetId;
@@ -22,6 +24,8 @@ public abstract class CloneSet implements ICloneSet {
 		this.cloneFragments = cloneFragments;
 		this.cloneType = cloneType;
 		this.cloneSetId = cloneSetId;
+		
+		CloneTypeMapper.mapTypeFor(this);
 	}
 
 	@Override
@@ -30,12 +34,12 @@ public abstract class CloneSet implements ICloneSet {
 	}
 
 	@Override
-	public String getCloneSetType() {
+	public String getCloneType() {
 		return cloneType;
 	}
 	
 	@Override
-	public void setCloneSetType(String cloneType){
+	public void setCloneType(String cloneType){
 		this.cloneType = cloneType;
 	}
 	
@@ -43,12 +47,6 @@ public abstract class CloneSet implements ICloneSet {
 	public int size(){
 		return cloneFragments.size();
 	}
-
-//	@Override
-//	public String getTitle() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
 
 	@Override
 	public ICloneFragment getMember(int i) {
@@ -72,6 +70,7 @@ public abstract class CloneSet implements ICloneSet {
 		StringBuilder sb = new StringBuilder();
 		sb.append("clone "+ (this instanceof CloneGroup ? "group" : "pair") +": "+ cloneSetId+"\n");
 		sb.append("number of fragments: "+ cloneFragments.size()+"\n");
+		sb.append("clone type: "+ cloneType+"\n");
 		for(CloneFragment cf : cloneFragments){
 			sb.append("\n");
 			sb.append(cf.toString());

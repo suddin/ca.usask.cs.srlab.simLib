@@ -29,13 +29,13 @@ public class SimhashGenerator {
 		return this;
 	}
 	
-	public long[] generateSimhash(CloneFragment cloneFragment){
+	public void updateSimhash(CloneFragment cloneFragment, String transformedContent){
 		int v1[]= new int [64];
 		int v2[]= new int [64];
 		
 		//int seconderyHashMinFreq = ? 1 : 0;
 		
-		Multiset<String> tokenMap = HashMultiset.create(tokenBuilder.generateToken(cloneFragment));
+		Multiset<String> tokenMap = HashMultiset.create(tokenBuilder.generateToken(transformedContent));
 		
 		/*
 		System.out.println("########################");
@@ -78,7 +78,9 @@ public class SimhashGenerator {
 		for (int c = 0; c < 64; c++)
 			simhash[1] |= (v2[c] > 0 ? 1l : 0l) << c;
 
-		return simhash;
+		cloneFragment.setSimhash1(simhash[0]);
+		cloneFragment.setSimhash2(simhash[1]);
+		//return simhash;
 	}
 
 }

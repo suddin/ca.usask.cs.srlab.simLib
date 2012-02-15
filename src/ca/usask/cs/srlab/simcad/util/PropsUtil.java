@@ -24,6 +24,9 @@ public final class PropsUtil {
 			// overrides the local config
 			if (userConfig != null) {
 				properties.loadFromXML(userConfig);
+				
+				validateRuntimeConfiguration();
+				
 				userConfig.close();
 			}
 
@@ -36,6 +39,12 @@ public final class PropsUtil {
 	
 	private PropsUtil(){}
 	
+	private static void validateRuntimeConfiguration() {
+		if(getType3cloneSimthreshold() > Constants.TYPE3CLONE_SIMTHRESHOLD_MAX_VAL
+				|| getType3cloneSimthreshold() < Constants.TYPE3CLONE_SIMTHRESHOLD_MIM_VAL)
+			throw new SimcadException("Invalid value for property : " + Constants.TYPE3CLONE_SIMTHRESHOLD);
+	}
+
 	public static boolean isStrictOnMembership(){
 		return Boolean.valueOf(properties.getProperty(Constants.STRICT_ON_MEMBERSHIP, "false"));
 	}
@@ -54,6 +63,10 @@ public final class PropsUtil {
 	
 	public static Integer getMinSizeOfGranularity(){
 		return Integer.valueOf(properties.getProperty(Constants.MIN_SIZE_OF_GRANULARITY, "5"));
+	}
+	
+	public static Integer getType3cloneSimthreshold(){
+		return Integer.valueOf(properties.getProperty(Constants.TYPE3CLONE_SIMTHRESHOLD));
 	}
 	
 	public static String getTokenBuilderClassName(){

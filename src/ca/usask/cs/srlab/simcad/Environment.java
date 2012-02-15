@@ -23,8 +23,6 @@ public class Environment {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
-	
 
 	public static String getRegularHashGeneratorClass() {
 		return PropsUtil.getProperty(Constants.REGULAR_HASH_PROVIDER);
@@ -32,6 +30,10 @@ public class Environment {
 
 	public static String getTokenBuilderClass() {
 		return PropsUtil.getProperty(Constants.TOKEN_BUILDER);
+	}
+	
+	public static int getType3cloneSimthreshold() {
+		return PropsUtil.getType3cloneSimthreshold();
 	}
 	
 	public static InputStream getResourceAsStream(String resource) {

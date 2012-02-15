@@ -10,9 +10,9 @@ public interface ICloneSet {
 
 	List<CloneFragment> getCloneFragments();
 
-	String getCloneSetType();
+	String getCloneType();
 	
-	void setCloneSetType(String cloneType);
+	void setCloneType(String cloneType);
 
 	Integer getCloneSetId();
 	

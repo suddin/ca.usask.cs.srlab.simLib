@@ -11,7 +11,7 @@ import ca.usask.cs.srlab.simcad.detection.CloneDetector;
 import ca.usask.cs.srlab.simcad.detection.DetectionTest;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.model.CloneSet;
-import ca.usask.cs.srlab.simcad.postprocess.XmlOutputProcessor;
+import ca.usask.cs.srlab.simcad.processor.post.XmlOutputProcessor;
 
 public class TestPostProcessing extends DetectionTest{
 	
