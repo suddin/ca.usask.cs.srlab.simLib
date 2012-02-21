@@ -52,8 +52,12 @@ public final class ProcessorDisptacher {
 				if (processorIterator.hasNext())
 					inputCloneSets = Collections
 							.unmodifiableCollection(outputCloneSets);
-				else
+				else{
+					long endTime = System.currentTimeMillis();
+					long postprocessingTime  = endTime - startTime;
+					detectionSettings.getDetectionReport().setPostprocessingTime(postprocessingTime);
 					return outputCloneSets;
+				}
 
 			} catch (Exception e) {
 				throw new IllegalStateException(

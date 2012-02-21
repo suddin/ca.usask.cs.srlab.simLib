@@ -19,19 +19,13 @@ echo "source_path       = absolute path to source folder"
 echo "output_path       = absolute path to output folder : default = {source_path}_simad_clone"
 }
 
-if [ "$#" -eq 0 ]
-then
-usage
-exit 99
-fi
-
 # check we have TXL
 txlversion=`txl -V 2>&1 | grep 10.5`
 if [ "${txlversion}" = "" ]
 then
 echo "*** Error: simCad requires FreeTXL 10.5"
 echo ""
-#exit 99
+exit 99
 fi
 
 # check we have java
@@ -49,7 +43,7 @@ if [ ! -d ${lib}/tools ]
 then
 echo "*** Error: Cannot find simCad installation ${lib}"
 echo ""
-#exit 99
+exit 99
 fi
 
 # check we compiled the tools
@@ -57,7 +51,13 @@ if [ ! -x ${lib}/tools/streamprocess.x ]
 then
 echo "*** Error: Missing ${lib}/tools/streamprocess.x - type 'make' to make the simCad tools"
 echo ""
-#exit 99
+exit 99
+fi
+
+if [ "$#" -eq 0 ]
+then
+usage
+exit 99
 fi
 
 GRANULARITY="function"
@@ -74,7 +74,7 @@ case $1 in
 
 # display simcad version
 -version)
-echo "Simcad 2.0"
+echo "Simcad 2.0 (February 2012)"
 exit 0
 ;;
 
@@ -98,7 +98,7 @@ then
 shift
 else
     echo "*** ERROR: Invalid value {$1} for parameter -g (granularity). Valid options [ (block | b) | (function | f) ]"
-    usage
+#usage
     exit 99
 fi
 ;;
@@ -112,7 +112,7 @@ then
     shift
 else
     echo "*** ERROR: Invalid value {$1} for parameter -l (language). Valid options [ c | java | cs | py ]"
-    usage
+#usage
     exit 99
 fi
 ;;
@@ -133,9 +133,9 @@ then
     fi
     shift
 else
-    echo "*** ERROR: Invalid value {$1} for parameter -l (clone type)."
+    echo "*** ERROR: Invalid value {$1} for parameter -t (clone type)."
     echo "Valid options [ 1 | 2 | 3 | 12 | (23 | nearmiss) | 13 | (123 | all) : default : (123 | all) ]"
-    usage
+#usage
     exit 99
 fi
 ;;
@@ -170,8 +170,8 @@ then
     fi
     shift
 else
-echo "*** ERROR: Unknown option for -l {$1}"
-usage
+    echo "*** ERROR: Invalid value {$1} for parameter -c (clone_grouping). Valid options [ (group | cg) | (pair | cp) : default = (group | cg) ]"
+#usage
 exit 99
 fi
 ;;
@@ -193,8 +193,8 @@ then
     fi
     shift
 else
-echo "*** ERROR: Unknown option for -l {$1}"
-usage
+    echo "*** ERROR: Invalid value {$1} for parameter -x (source_transform). Valid options [ (generous | g) | (greedy | G) : default = (generous | g) ]"
+#usage
 exit 99
 fi
 ;;
@@ -255,12 +255,13 @@ echo "clone-type=${CLONE_TYPE}"
 echo "output-dir=${OUTPUT_DIR}"
 echo "source-transform=${SOURCE_TRANSFORM}"
 echo "clone_grouping=${CLONE_GROUPING}"
+echo ""
 
 #Detect Clone
 #echo ""
-#echo "java -jar ${lib}/tools/simCad.jar ${VERBOSE} ${SOURCE_DIR} ${LANGUAGE} ${GRANULARITY} ${CLONE_TYPE} ${CLONE_GROUPING} ${SOURCE_TRANSFORM} ${OUTPUT_DIR}"
+#echo "java -jar ${lib}/tools/simCad2.jar ${VERBOSE} ${SOURCE_DIR} ${LANGUAGE} ${GRANULARITY} ${CLONE_TYPE} ${CLONE_GROUPING} ${SOURCE_TRANSFORM} ${OUTPUT_DIR}"
 
-java -jar ${lib}/tools/simCad.jar ${VERBOSE} ${SOURCE_DIR} ${LANGUAGE} ${GRANULARITY} ${CLONE_TYPE} ${CLONE_GROUPING} ${SOURCE_TRANSFORM} ${OUTPUT_DIR} 2>&1
+java -jar ${lib}/tools/simCad2.jar ${VERBOSE} ${SOURCE_DIR} ${LANGUAGE} ${GRANULARITY} ${CLONE_TYPE} ${CLONE_GROUPING} ${SOURCE_TRANSFORM} ${OUTPUT_DIR} 2>&1
 
 exit 0
 

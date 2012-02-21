@@ -152,9 +152,11 @@ public class SimCad {
 			SubsumedCloneFilter sbsmfilter = new SubsumedCloneFilter(detectionSettings);
 			processorDisptacher.addProcessor(sbsmfilter);
 		}
-		
-		IProcessor xmlOutputProcessor = new XmlOutputProcessor(detectionSettings, output_dir);
 
+		//post-processing : write clones to xml file
+		IProcessor xmlOutputProcessor = new XmlOutputProcessor(detectionSettings, output_dir);
+		processorDisptacher.addProcessor(xmlOutputProcessor).applyOn(result, detectionSettings);
+		
 		//log printer
 		String logFileName = output_dir + System.getProperty("file.separator") + "simcad_"+detectionSettings.getCloneGranularity()+"-clones-"+detectionSettings.getTypeString()+".log";
 		PrintWriter logPrinter;
@@ -169,8 +171,10 @@ public class SimCad {
 		//console printer 
 		PrintWriter consolePrinter = new PrintWriter(System.out, true);
 		IProcessor consoleWriter = new DetectionSummaryPrinter(detectionSettings, consolePrinter);
-		
-		processorDisptacher.addProcessor(xmlOutputProcessor).addProcessor(logWriter).addProcessor(consoleWriter).applyOn(result, detectionSettings);
+	
+		//display/write detection summary
+		processorDisptacher.cleanUp();
+		processorDisptacher.addProcessor(logWriter).addProcessor(consoleWriter).applyOn(result, detectionSettings);
 	}
 	
 	private static void printUsage() {

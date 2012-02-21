@@ -3,18 +3,18 @@ package ca.usask.cs.srlab.simcad;
 
 public class DetectionReport {
 
-	String sourceFolder;
-	String outputFolder;
+	private String sourceFolder;
+	private String outputFolder;
 	
-	long preprocessingTime;
-	long detectionTime;
-	long postprocessingTime;
+	private long preprocessingTime;
+	private long detectionTime;
+	private long postprocessingTime;
 	
-	int nxCodeFragment;	//extracted
-	int nfCodeFragment; //filtered
+	private int nxCodeFragment;	//extracted
+	private int nfCodeFragment; //filtered
 	
-	int nCloneSet;
-    int nCloneFragment;
+	private int nCloneSet;
+	private  int nCloneFragment;
 	
     public String getPreprocessingTime() {
 		return formatTime(preprocessingTime);

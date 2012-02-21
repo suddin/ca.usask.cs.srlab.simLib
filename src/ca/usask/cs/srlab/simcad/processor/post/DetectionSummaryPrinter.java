@@ -54,11 +54,12 @@ public class DetectionSummaryPrinter extends AbstractProcessor {
 
 	    printWriter.println("Pre-Processing time : " +detectionSettings.getDetectionReport().getPreprocessingTime());
 	    printWriter.println("Detection time : " +detectionSettings.getDetectionReport().getDetectionTime());
-	    printWriter.println("Post-Processing time : " +detectionSettings.getDetectionReport().getPreprocessingTime());
-	    
+	    printWriter.println("Post-Processing time : " +detectionSettings.getDetectionReport().getPostprocessingTime());
+	    printWriter.println("");
 	    printWriter.close();
 		
 		outputCloneSets.addAll(inputCloneSets);
+		
 		return true;
 	}
 
