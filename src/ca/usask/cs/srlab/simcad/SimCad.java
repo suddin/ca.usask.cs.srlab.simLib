@@ -20,6 +20,7 @@ import ca.usask.cs.srlab.simcad.model.CloneSet;
 import ca.usask.cs.srlab.simcad.processor.IProcessor;
 import ca.usask.cs.srlab.simcad.processor.ProcessorDisptacher;
 import ca.usask.cs.srlab.simcad.processor.post.DetectionSummaryPrinter;
+import ca.usask.cs.srlab.simcad.processor.post.SubsumedCloneFilter;
 import ca.usask.cs.srlab.simcad.processor.post.XmlOutputProcessor;
 import ca.usask.cs.srlab.simcad.util.CloneTypeMapper;
 import ca.usask.cs.srlab.simcad.util.FileUtil;
@@ -146,6 +147,12 @@ public class SimCad {
 		
 		//post-processing
 		ProcessorDisptacher processorDisptacher = ProcessorDisptacher.getInstance();
+
+		if(detectionSettings.getCloneGranularity().equals(Constants.CLONE_GRANULARITY_BLOCK)){
+			SubsumedCloneFilter sbsmfilter = new SubsumedCloneFilter(detectionSettings);
+			processorDisptacher.addProcessor(sbsmfilter);
+		}
+		
 		IProcessor xmlOutputProcessor = new XmlOutputProcessor(detectionSettings, output_dir);
 
 		//log printer

@@ -2,6 +2,7 @@ package ca.usask.cs.srlab.simcad.processor.post;
 
 import java.util.Collection;
 
+import ca.usask.cs.srlab.simcad.DetectionSettings;
 import ca.usask.cs.srlab.simcad.model.CloneSet;
 import ca.usask.cs.srlab.simcad.model.ICloneFragment;
 import ca.usask.cs.srlab.simcad.processor.IProcessor;
@@ -9,6 +10,15 @@ import ca.usask.cs.srlab.simcad.processor.IProcessor;
 import com.google.common.collect.ImmutableList;
 
 public final class SubsumedCloneFilter implements IProcessor {
+	
+	
+	private DetectionSettings detectionSettings;
+	
+	private SubsumedCloneFilter(){};
+	
+	public SubsumedCloneFilter(DetectionSettings detectionSettings){
+		this.detectionSettings = detectionSettings;
+	}
 	
 	@Override
 	public boolean process(Collection<CloneSet> inputCloneSets, Collection<CloneSet> outputCloneSets) {
@@ -69,13 +79,22 @@ public final class SubsumedCloneFilter implements IProcessor {
 			}
 		}
 		
-		System.out.println("Subsumed clusters: "+subsumedCluster);
-		System.out.println("Subsumed fragments: "+subsumedFragment);
+		//System.out.println("Subsumed clusters: "+subsumedCluster);
+		//System.out.println("Subsumed fragments: "+subsumedFragment+"\n");
 		
+		int newCloneSetIndex = 1; 
 		for(CloneSet cloneSet : cloneSetList){
-			if(!cloneSet.isSubsumed())
-			outputCloneSets.add(cloneSet);
+			if(!cloneSet.isSubsumed()){
+				cloneSet.reSetCloneSetId(newCloneSetIndex++);
+				outputCloneSets.add(cloneSet);
+			}
+//			else{
+//				System.out.println("got one...");
+//			}
 		}
+		
+		detectionSettings.getDetectionReport().setnCloneFragment(detectionSettings.getDetectionReport().getnCloneFragment()-subsumedFragment);
+		detectionSettings.getDetectionReport().setnCloneSet(detectionSettings.getDetectionReport().getnCloneSet()-subsumedCluster);
 		
 		return true;
 	}

@@ -40,6 +40,11 @@ public class DetectionSummaryPrinter extends AbstractProcessor {
 		printWriter.println("----Detection Summary-----");
 		printWriter.println("Date/Time : "+ new SimpleDateFormat("yyyy/MMM/dd HH:mm:ss").format(Calendar.getInstance().getTime()) );
 		
+		printWriter.println("Source Location : "+ detectionSettings.getDetectionReport().getSourceFolder());
+		printWriter.println("Output Location : "+ detectionSettings.getDetectionReport().getOutputFolder());
+
+		printWriter.println("Source fragment type : "+ detectionSettings.getCloneGranularity());
+		
 		printWriter.println("Clone type : "+ detectionSettings.getTypeStringDetail());
 		printWriter.println("Clone grouping type : "+ detectionSettings.getCloneSetType());
 		//printWriter.println("Total extracted fragment : "+ detectionSettings.getDetectionReport().getnxCodeFragment());	

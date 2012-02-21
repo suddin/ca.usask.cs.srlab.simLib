@@ -18,6 +18,10 @@ public abstract class CloneSet implements ICloneSet {
 		return cloneSetId;
 	}
 	
+	public void reSetCloneSetId(int cloneSetId) {
+		this.cloneSetId = cloneSetId;
+	}
+	
 	public CloneSet(Integer cloneSetId, List<CloneFragment> cloneFragments,
 			String cloneType) {
 		super();
@@ -78,4 +82,5 @@ public abstract class CloneSet implements ICloneSet {
 		}
 		return sb.toString();
 	}
+
 }
