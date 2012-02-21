@@ -83,8 +83,8 @@ public class SimHashGeneratorTest {
 	
 	@BeforeClass
 	public static void setup(){
-		detectionSettings1 = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP, Constants.CLONE_TYPE_1);
-		detectionSettings2 = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP, Constants.CLONE_TYPE_1,  Constants.CLONE_TYPE_2,  Constants.CLONE_TYPE_3);
+		detectionSettings1 = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTION, Constants.CLONE_SET_TYPE_GROUP, false, Constants.CLONE_TYPE_1);
+		detectionSettings2 = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTION, Constants.CLONE_SET_TYPE_GROUP, false, Constants.CLONE_TYPE_1,  Constants.CLONE_TYPE_2,  Constants.CLONE_TYPE_3);
 	}
 	
 	@Before

@@ -1,5 +1,9 @@
 package ca.usask.cs.srlab.simcad.util;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import ca.usask.cs.srlab.simcad.Constants;
 import ca.usask.cs.srlab.simcad.model.CloneSet;
 import ca.usask.cs.srlab.simcad.model.ICloneFragment;
@@ -39,6 +43,21 @@ public class CloneTypeMapper {
          }
          
          cloneSet.setCloneType(cloneType);
+	}
+
+	public static String[] getTypeFromString(String typeString) {
+		Set<String> types = new HashSet<String>(3);
+		if(typeString.contains("1"))
+			types.add(Constants.CLONE_TYPE_1);
+		if(typeString.contains("2"))
+			types.add(Constants.CLONE_TYPE_2);
+		if(typeString.contains("3"))
+			types.add(Constants.CLONE_TYPE_3);
+		if(typeString.equals("nearmiss"))
+			types.addAll(Arrays.asList(Constants.CLONE_TYPE_NEARMISS));
+		if(typeString.equals("all"))
+			types.addAll(Arrays.asList(Constants.CLONE_TYPE_ALL));
+		return types.toArray(new String[0]);
 	}
 
 }

@@ -77,12 +77,12 @@ public final class PropsUtil {
 		return properties.getProperty(Constants.REGULAR_HASH_PROVIDER);
 	}
 	
-	public static String getIndexBuilderClassName(){
+	public static String getIndexHolderClassName(){
 		return properties.getProperty(Constants.INDEX_HOLDER);
 	}
 	
-	public static String getTxlScriptUrl(){
-		return properties.getProperty(Constants.TXL_SCRIPT_URL);
+	public static String getSimcadInstallUrl(){
+		return properties.getProperty(Constants.SIMCAD_INSTALL_URL);
 	}
 	
 	public static String getProperty(String key){

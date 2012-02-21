@@ -10,15 +10,15 @@ import ca.usask.cs.srlab.simcad.model.FunctionCloneFragment;
 import ca.usask.cs.srlab.simcad.token.ITokenBuilder;
 import ca.usask.cs.srlab.simcad.token.TokenBuilderFactory;
 
-public abstract class AbstractDataProvider implements ICloneFragmentDataProvider{
+public abstract class AbstractFragmentDataProvider implements IFragmentDataProvider{
 
 	protected IFragmentDataProviderConfiguration dataProviderConfig;
 	protected SimhashGenerator simhashGenerator;
 	
-	protected AbstractDataProvider() {
+	protected AbstractFragmentDataProvider() {
 	}
 	
-	protected AbstractDataProvider(IFragmentDataProviderConfiguration dataProviderConfig/*, DetectionSettings ds*/) {
+	protected AbstractFragmentDataProvider(IFragmentDataProviderConfiguration dataProviderConfig/*, DetectionSettings ds*/) {
 		ITokenBuilder tokenBuilder;
 //		if(ds != null )
 //			tokenBuilder = TokenBuilderFactory.LoadTokenBuilder(ds);
@@ -29,7 +29,7 @@ public abstract class AbstractDataProvider implements ICloneFragmentDataProvider
 		this.simhashGenerator = new SimhashGenerator(tokenBuilder, regularHashgenerator);
 	}
 	
-	protected abstract Object applyDataTransformation();
+	//protected abstract Object applyDataTransformation();
 	
 	public CloneFragment createNewCloneFragment(String file, String startline,
 			String endline, String originalContent, int index /*, long simhash1, long simhash2*/) {
@@ -41,7 +41,7 @@ public abstract class AbstractDataProvider implements ICloneFragmentDataProvider
 		
 		CloneFragment cloneFragment;
 		
-		if(Constants.CLONE_GRANULARITY_FUNTIONS.equals(dataProviderConfig.getCloneFragmentType()))
+		if(Constants.CLONE_GRANULARITY_FUNTION.equals(dataProviderConfig.getSourceFragmentType()))
 			cloneFragment = new FunctionCloneFragment(file, Integer.valueOf(startline), Integer.valueOf(endline), index, originalContent/*, transformedlContent, simhash1, simhash2*/);
 		else
 			cloneFragment = new BlockCloneFragment(file, Integer.valueOf(startline), Integer.valueOf(endline), index, originalContent/*, transformedlContent, simhash1, simhash2*/);

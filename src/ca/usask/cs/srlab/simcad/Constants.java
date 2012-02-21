@@ -6,7 +6,8 @@ public class Constants {
 
 	public static final String EXTERNAL_CONFIGURATION_FILE 	= "simcad.cfg.xml";
 	public static final String LOCAL_CONFIGURATION_FILE 	= "default.cfg.xml";
-
+	public static final String DEFAULT_OUTPUT_FOLDER_SUFFIX = "_simcad_clones";
+	
 	public static final String STRICT_ON_MEMBERSHIP 	= "simcad.settings.advance.strictOnMembership";
 	public static final String CLUSTER_MEMBERSHIP_RATIO = "simcad.settings.advance.clusterMembershipRatio";
 	public static final String LOC_TOLERANCE 			= "simcad.settings.advance.locTolerance";
@@ -20,10 +21,10 @@ public class Constants {
 	public static final String REGULAR_HASH_PROVIDER 	= "simcad.settings.general.preprocess.regularhash_class";
 	public static final String TOKEN_BUILDER	 		= "simcad.settings.general.preprocess.tokenbuilder_class";
 	public static final String INDEX_HOLDER 			= "simcad.settings.general.index.indexholder_class";
-	public static final String TXL_SCRIPT_URL 			= "simcad.settings.general.preprocess.txlscript.url";
+	public static final String SIMCAD_INSTALL_URL 		= "simcad.settings.general.install.url";
 
-	public static final String CLONE_GRANULARITY_FUNTIONS 	= "functions";
-	public static final String CLONE_GRANULARITY_BLOCKS 	= "blocks";
+	public static final String CLONE_GRANULARITY_FUNTION 	= "function";
+	public static final String CLONE_GRANULARITY_BLOCK 	= "block";
 
 	public static final String CLONE_SET_TYPE_GROUP = "group";
 	public static final String CLONE_SET_TYPE_PAIR 	= "pair";
@@ -43,5 +44,15 @@ public class Constants {
 	public static final String[] CLONE_TYPE_123 = new String[] {CLONE_TYPE_1, CLONE_TYPE_2, CLONE_TYPE_3};
 	public static final String[] CLONE_TYPE_ALL = CLONE_TYPE_123;
 	
+	public static final String LANGUAGE_JAVA = "java";
+	public static final String LANGUAGE_C = "c";
+	public static final String LANGUAGE_CS = "cs";
+	public static final String LANGUAGE_PYTHON = "py";
+	
+	public static final String SOURCE_TRANSFORMATION_APPROACH_GREEDY = "greedy";
+	public static final String SOURCE_TRANSFORMATION_APPROACH_GENEROUS = "generous";
+
+	public static final String SOURCE_TRANSFORMATION_ACTION_BLIND = "blind";
+	public static final String SOURCE_TRANSFORMATION_ACTION_CONSISTENT = "consistent";
 
 }

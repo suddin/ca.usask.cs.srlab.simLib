@@ -68,14 +68,18 @@ public final class CloneDetector {
 	private List<CloneSet> detectClones(Collection<CloneFragment> candidateFragments) {
 		List<CloneSet> detectedCloneSets = new LinkedList<CloneSet>();
 		
+		int nCodeFragment = candidateFragments.size();
+		int nCloneFragment = 0;
 		int currentProgressIndex = 1;
 		int cloneSetIndex = 1;
 		
 		fireDetectionStartEvent();
 		
+		long startTime = System.currentTimeMillis();
+		
 		for(CloneFragment cloneFragment : candidateFragments){
 			
-			fireDetectionProgressEvent(currentProgressIndex++);
+			fireDetectionProgressEvent(currentProgressIndex++, nCodeFragment);
 			
 			if(cloneFragment.isProceessed) continue;
 			
@@ -84,18 +88,28 @@ public final class CloneDetector {
 				
 				if (newCluster.size() >= MIN_CLUSTER_SIZE){
 					CloneGroup newCloneGroup = new CloneGroup(newCluster, null, cloneSetIndex++);
-					if(filterByTypeInDetectionSettings(detectedCloneSets, newCloneGroup))
+					if(filterByTypeInDetectionSettings(detectedCloneSets, newCloneGroup)){
 						fireCloneFoundEvent(newCloneGroup);
+						nCloneFragment += newCloneGroup.size();
+					}
 				}
 			}else{
 				List<CloneFragment> clonePairElements = findNeighborsForPair(cloneFragment);
 				for(CloneFragment matchedFragment : clonePairElements){
 					ClonePair newClonePair = new ClonePair(cloneFragment, matchedFragment, null, cloneSetIndex++);
-					if(filterByTypeInDetectionSettings(detectedCloneSets, newClonePair))
+					if(filterByTypeInDetectionSettings(detectedCloneSets, newClonePair)){
 						fireCloneFoundEvent(newClonePair);
+						nCloneFragment += newClonePair.size();
+					}
 				}
 			}
 		}//for
+		
+		long endTime = System.currentTimeMillis();
+		long diff  = endTime - startTime;
+		detectionSettings.getDetectionReport().setDetectionTime(diff);
+		detectionSettings.getDetectionReport().setnCloneFragment(nCloneFragment);
+		detectionSettings.getDetectionReport().setnCloneSet(cloneSetIndex-1);
 		
 		fireDetectionEndEvent();
 		return detectedCloneSets;
@@ -116,24 +130,32 @@ public final class CloneDetector {
 	}
 	
 	private void fireCloneFoundEvent(CloneSet newCloneSet) {
+		if(detectionSettings.isVerbose())
+			System.out.println("Found new clone "+detectionSettings.getCloneSetType()+". Current Total : " + newCloneSet.getCloneSetId());
 		if (detectionListener != null) {
 			detectionListener.foundClone(new CloneFoundEvent(this, newCloneSet));
 		}		
 	}
 	
-	private void fireDetectionProgressEvent(int currentIndex) {
+	private void fireDetectionProgressEvent(int currentIndex, int of) {
+		if(detectionSettings.isVerbose())
+			System.out.println("Processing item "+currentIndex+" of "+of);
 		if (detectionListener != null) {
 			detectionListener.progressDetection(new DetectionProgressEvent(this, currentIndex));
 		}		
 	}
 
 	private void fireDetectionEndEvent() {
+		//if(detectionSettings.isVerbose())
+			System.out.println("Detection process completed...\n");
 		if (detectionListener != null) {
 			detectionListener.endDetection(new DetectionEndEvent(this));
 		}	
 	}
 
 	private void fireDetectionStartEvent() {
+		//if(detectionSettings.isVerbose())
+			System.out.println("Starting detection process...\n");
 		if (detectionListener != null) {
 			detectionListener.startDetection(new DetectionStartEvent(this));
 		}

@@ -31,6 +31,10 @@ public class Environment {
 	public static String getTokenBuilderClass() {
 		return PropsUtil.getProperty(Constants.TOKEN_BUILDER);
 	}
+
+	public static String getIndexHolderClass() {
+		return PropsUtil.getIndexHolderClassName();
+	}
 	
 	public static int getType3cloneSimthreshold() {
 		return PropsUtil.getType3cloneSimthreshold();

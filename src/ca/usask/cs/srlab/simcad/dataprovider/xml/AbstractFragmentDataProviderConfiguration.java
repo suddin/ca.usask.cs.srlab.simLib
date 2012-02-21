@@ -15,7 +15,7 @@ public abstract class AbstractFragmentDataProviderConfiguration  implements IFra
 	}
 
 	@Override
-	public String getCloneFragmentType(){
+	public String getSourceFragmentType(){
 		return cloneFragmentType;
 	}
 }

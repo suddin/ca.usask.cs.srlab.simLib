@@ -4,17 +4,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
+import ca.usask.cs.srlab.simcad.DetectionSettings;
 import ca.usask.cs.srlab.simcad.model.CloneSet;
 
 public final class ProcessorDisptacher {
 
 	private static final ProcessorDisptacher INSTANCE = new ProcessorDisptacher();
-	private List<IProcessor> processorList;
+	private Set<IProcessor> processorList;
 
 	private ProcessorDisptacher() {
-		processorList = new ArrayList<IProcessor>();
+		processorList = new LinkedHashSet<IProcessor>();
 	}
 
 	public static ProcessorDisptacher getInstance() {
@@ -37,8 +39,10 @@ public final class ProcessorDisptacher {
 		return this;
 	}
 
-	public Collection<CloneSet> applyOn(Collection<CloneSet> inputCloneSets) {
-		Iterator<IProcessor> processorIterator = processorList.listIterator();
+	public Collection<CloneSet> applyOn(Collection<CloneSet> inputCloneSets, DetectionSettings detectionSettings) {
+		Iterator<IProcessor> processorIterator = processorList.iterator();
+		long startTime = System.currentTimeMillis();
+		
 		for (; processorIterator.hasNext();) {
 			IProcessor processor = processorIterator.next();
 			try {
@@ -57,6 +61,9 @@ public final class ProcessorDisptacher {
 								+ processor.getName(), e);
 			}
 		}
+		long endTime = System.currentTimeMillis();
+		long postprocessingTime  = endTime - startTime;
+		detectionSettings.getDetectionReport().setPostprocessingTime(postprocessingTime);
 		return inputCloneSets;
 	}
 

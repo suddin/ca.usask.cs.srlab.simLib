@@ -17,11 +17,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import ca.usask.cs.srlab.simcad.dataprovider.AbstractDataProvider;
+import ca.usask.cs.srlab.simcad.dataprovider.AbstractFragmentDataProvider;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.util.PropsUtil;
 
-public class XMLCloneFragmentDataProvider extends AbstractDataProvider{
+public class XMLCloneFragmentDataProvider extends AbstractFragmentDataProvider{
 	
 	@SuppressWarnings("unused")
 	private XMLCloneFragmentDataProvider(){
@@ -101,7 +101,7 @@ public class XMLCloneFragmentDataProvider extends AbstractDataProvider{
 		return cloneFragmentList;
 	}
 
-	@Override
+	//@Override
 	protected String applyDataTransformation() {
 		List<IXMLFragmentDataProviderTransformer> dataTransformerList = ((XMLFragmentDataProviderConfiguration)dataProviderConfig).getDataTransformer();
 		String dataSource = ((XMLFragmentDataProviderConfiguration)dataProviderConfig).getXmlFileName();

@@ -5,184 +5,176 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import ca.usask.cs.srlab.simcad.dataprovider.IFragmentDataProvider;
+import ca.usask.cs.srlab.simcad.dataprovider.filesystem.FileSystemFragmentDataProvider;
+import ca.usask.cs.srlab.simcad.dataprovider.filesystem.FileSystemFragmentDataProviderConfiguration;
+import ca.usask.cs.srlab.simcad.detection.CloneDetector;
 import ca.usask.cs.srlab.simcad.index.ICloneIndex;
+import ca.usask.cs.srlab.simcad.index.IndexBuilder;
+import ca.usask.cs.srlab.simcad.index.IndexFactory;
+import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.model.CloneSet;
+import ca.usask.cs.srlab.simcad.processor.IProcessor;
 import ca.usask.cs.srlab.simcad.processor.ProcessorDisptacher;
-import ca.usask.cs.srlab.simcad.processor.post.SubsumedCloneFilter;
+import ca.usask.cs.srlab.simcad.processor.post.DetectionSummaryPrinter;
 import ca.usask.cs.srlab.simcad.processor.post.XmlOutputProcessor;
-import ca.usask.cs.srlab.simcad.processor.pre.FixXMLDataInput;
+import ca.usask.cs.srlab.simcad.util.CloneTypeMapper;
+import ca.usask.cs.srlab.simcad.util.FileUtil;
 
 public class SimCad {
-
-	//simhashGenerator.applyTokenBuildStrategy(TokenBuildStrategyFactory.getStrategyInstanceFor(CLONE_TYPE_1));
-	
-	int simThreshold = 0;
-	
-//	boolean strictOnMembership = false;
-//	double clusterMembershipRatio = 0.5;	//for a candidate item, it is the ratio of how many items are matched are matched vs total items in a cluster 
-	double locTolerance = 1;
-//	
-//	int minClusterSize = 2;
-//	int minSizeOfGranularity = 5;
-	int simThreshold2;
-	
-	int nGroup = 0;
-	int nFragment =0; //fragments
-	
-	boolean applySubsumeFiltering;
-	
-	private DetectionSettings detectionSettings;
-
-	public SimCad(int simThreshold, boolean applySubsumeFiltering) {
-		super();
-		this.simThreshold = simThreshold;
-		this.applySubsumeFiltering = applySubsumeFiltering;
-	}
-
-	//@Before
-	public void findClone(String rawFunctionsFileName, ICloneIndex cloneIndex,
-			String cloneOutputFolder) throws IOException {
-
-		PrintWriter logPrinter = new PrintWriter(new FileWriter(".log"));
-
-		List<CloneSet> detectedCloneSets = new ArrayList<CloneSet>();
-
-		//find clones here
-		
-		ProcessorDisptacher pd = ProcessorDisptacher.getInstance().cleanUp();
-
-		// filter subsumed clone
-
-		if (applySubsumeFiltering) {
-			pd.addProcessor(new SubsumedCloneFilter());
-		}
-
-		// add post processing functions
-		XmlOutputProcessor xop = new XmlOutputProcessor(detectionSettings,
-				cloneOutputFolder);
-		pd.addProcessor(xop).applyOn(detectedCloneSets);
-
-	}
-	
-	
-	//SimcadCloneDetector source-dir granularity simthreshold transformation
 	
 	public static void main(String args[]) throws IOException{
 		
-		if(args.length < 3){
+		if(args.length < 6){
 			printUsage();
 			return;
 		}
 		
+		boolean verbose = false;
 		String source_dir = null;
+		String output_dir = null;
+		String language = null;
 		String granularity = null;
-		int simThreshold = 0;
-		String transformation = "";
+		String cloneType [] = null;
+		String cloneGrouping =null;
+		String transformation = null;
 		
-		if(isDirExist(args[0])){
-			source_dir = args[0];
+		int argIndex = 0;
+		
+		if((args[argIndex]).equals("-v")){
+			verbose = true;
+			argIndex++;
+		}
+		
+		if(FileUtil.isDirExist(args[argIndex])){
+			source_dir = args[argIndex++];
 		}else{
-			System.out.println("First argument \""+args[0]+"\" must be a valid source directory");
+			System.out.println("First argument \""+args[argIndex]+"\" must be a valid source directory");
 			printUsage();
 			return;
 		}
 		
-		
-		if(args[1] != null && (args[1].equals("functions") || args[1].equals("blocks") ) ){
-			granularity = args[1];
+		if(args[argIndex] != null && (args[argIndex].equals(Constants.LANGUAGE_C) || args[argIndex].equals(Constants.LANGUAGE_CS) ||
+				args[argIndex].equals(Constants.LANGUAGE_JAVA) || args[argIndex].equals(Constants.LANGUAGE_PYTHON) ) ){
+			language = args[argIndex++];
 		}else{
-			System.out.println("Second argument \""+args[1]+"\" must be either \"functions\" or \"blocks\"");
+			System.out.println("Second argument \""+args[argIndex]+"\" must be one of : c | java | cs | py");
 			printUsage();
 			return;
 		}
 		
-		
-		if(args[2] != null && isInteger(args[2]) && Integer.parseInt(args[2]) >= 0 && Integer.parseInt(args[2]) <= 13 ){
-			simThreshold = Integer.parseInt(args[2]);
+		if(args[argIndex] != null && (args[argIndex].equals(Constants.CLONE_GRANULARITY_FUNTION) || args[argIndex].equals(Constants.CLONE_GRANULARITY_BLOCK) ) ){
+			granularity = args[argIndex++];
 		}else{
-			System.out.println("Third argument \""+args[2]+"\" must be an integer between 0 to 13");
+			System.out.println("Third argument \""+args[argIndex]+"\" must be either \"function\" or \"block\"");
 			printUsage();
 			return;
 		}
 		
-		if(args.length > 3 )
-			if(args[3].equals("blind") || args[3].equals("consistent")){
-				transformation = "-"+args[3];
-			}else if (!args[3].equals("none")){
-				System.out.println("Fourth argument \""+args[3]+"\" must be either \"blind\" or \"consistent\"");
+		if(args[argIndex] != null && (args[argIndex].equals("1") || args[argIndex].equals("2") || args[argIndex].equals("3")
+				|| args[argIndex].equals("12") || args[argIndex].equals("23") || args[argIndex].equals("nearmiss") || args[argIndex].equals("13")
+				|| args[argIndex].equals("123")|| args[argIndex].equals("all"))){
+			cloneType = CloneTypeMapper.getTypeFromString(args[argIndex++]);
+		}else{
+			System.out.println("Fourth argument \""+args[argIndex]+"\" must be one of : 1 | 2 | 3 | 12 | (23 | nearmiss) | 13 | (123 | all)");
+			printUsage();
+			return;
+		}
+		
+		if(args[argIndex] != null && (args[argIndex].equals(Constants.CLONE_SET_TYPE_GROUP) || args[argIndex].equals(Constants.CLONE_SET_TYPE_PAIR))){
+				cloneGrouping = args[argIndex++];
+		}else{
+			System.out.println("Fifth argument \""+args[argIndex]+"\" must be one of : group | pair");
+			printUsage();
+			return;
+		}
+		
+		if(args[argIndex].equals(Constants.SOURCE_TRANSFORMATION_APPROACH_GENEROUS) || args[argIndex].equals(Constants.SOURCE_TRANSFORMATION_APPROACH_GREEDY)){
+			if(args[argIndex].equals(Constants.SOURCE_TRANSFORMATION_APPROACH_GENEROUS))
+				transformation = Constants.SOURCE_TRANSFORMATION_ACTION_CONSISTENT;
+			else
+				transformation = Constants.SOURCE_TRANSFORMATION_ACTION_BLIND;
+			argIndex++;
+		}else if (!args[argIndex].equals("none")){
+			System.out.println("Sixth argument \""+args[argIndex]+"\" must be either \"generous\" or \"greedy\"");
+			printUsage();
+			return;
+		}
+		
+		if(argIndex < args.length){
+			if(FileUtil.isDirExist(args[argIndex])){
+				output_dir = args[argIndex];
+			}else{
+				System.out.println("Seventh argument \""+args[argIndex]+"\" must be a valid directory");
 				printUsage();
 				return;
 			}
-		
-		String projectName = source_dir.contains(System.getProperty("file.separator")) ? source_dir.substring(source_dir.lastIndexOf(System.getProperty("file.separator"))+1) : source_dir;
-		
-		String cloneFragmentFileName = source_dir.substring(0, source_dir.lastIndexOf(System.getProperty("file.separator"))+1)+projectName+"/"+granularity+".xml";
-		
-		String cloneOutputFolder = source_dir.substring(0, source_dir.lastIndexOf(System.getProperty("file.separator"))+1)+projectName+"/"+granularity+transformation+"-clones";
-		
-		String cloneFragmentFixFileName = cloneFragmentFileName.subSequence(0, cloneFragmentFileName.lastIndexOf('.'))+"_fix.xml";
-		
-		if(!isFileExist(cloneFragmentFixFileName))
-			FixXMLDataInput.processFile(cloneFragmentFileName);
-		
-		ICloneIndex cloneIndex = null;
-		
-		SimCad scad = new SimCad(simThreshold, granularity.equals("blocks") ? true : false);
-		
-		scad.findClone(cloneFragmentFixFileName, cloneIndex, cloneOutputFolder);
-		
-		/*
-		String cloneFragmentFixFileName = "/Users/sharif/Documents/workspace/simcad/src/ca/usask/cs/srlab/util/EIRC_functionsOLD_fix.xml";
-		String cloneOutputFolder = "/Users/sharif/Documents/workspace/simcad/src/ca/usask/cs/srlab/util";
-		
-		int simThreshold = 13;
-		String granularity = "functions";
-		SimCadCloneDetector scad = new SimCadCloneDetector(simThreshold, granularity.equals("blocks") ? true : false);
-		scad.findClone(cloneFragmentFixFileName, cloneOutputFolder);
-		*/
-		
-	}
-		
-	private static boolean isDirExist(String dirname) {
-		return (new File(dirname)).isDirectory();
-	}
-
-	private static boolean isFileExist(String filename) {
-		return (new File(filename)).isFile();
-	}
-	
-	public static boolean isFilenameValid(String file) {
-		  File f = new File(file);
-		  try {
-		    f.getCanonicalPath();
-		    return true;
-		  } catch (IOException e) {
-		    return false;
-		  }
 		}
-	
-	public static boolean isInteger( String input )  
-	{  
-	   try  
-	   {  
-	      Integer.parseInt( input );  
-	      return true;  
-	   }  
-	   catch( Exception e)  
-	   {  
-	      return false;  
-	   }  
+		
+		if(output_dir == null){
+			output_dir = source_dir + Constants.DEFAULT_OUTPUT_FOLDER_SUFFIX;
+			if(!new File(output_dir).exists()){
+				new File(output_dir).mkdir();
+			}
+		}
+		
+		//clone detection settings 
+		DetectionSettings detectionSettings = new DetectionSettings(granularity, cloneGrouping, verbose, cloneType);
+		
+		detectionSettings.getDetectionReport().setSourceFolder(source_dir);
+		detectionSettings.getDetectionReport().setOutputFolder(output_dir);
+		
+		
+		//source data extraction
+		FileSystemFragmentDataProviderConfiguration dataProviderConfig = new FileSystemFragmentDataProviderConfiguration(source_dir, output_dir, language, transformation, granularity);
+		IFragmentDataProvider cloneFragmentDataProvider = new FileSystemFragmentDataProvider(dataProviderConfig);
+		
+		//index generation
+		ICloneIndex cloneIndex = IndexFactory.LoadIndexHolder();
+		IndexBuilder indexBuilder = new IndexBuilder(cloneFragmentDataProvider);
+		indexBuilder.buildCloneIndex(cloneIndex, detectionSettings);
+		
+		//prepare input for clone detection: here the whole project is the input
+		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
+		
+		//detection
+		CloneDetector cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings);
+		List<CloneSet> result = cloneDetector.detect(candidateFragments);
+		
+		//post-processing
+		ProcessorDisptacher processorDisptacher = ProcessorDisptacher.getInstance();
+		IProcessor xmlOutputProcessor = new XmlOutputProcessor(detectionSettings, output_dir);
+
+		//log printer
+		String logFileName = output_dir + System.getProperty("file.separator") + "simcad_"+detectionSettings.getCloneGranularity()+"-clones-"+detectionSettings.getTypeString()+".log";
+		PrintWriter logPrinter;
+		try {
+			logPrinter = new PrintWriter(new FileWriter(logFileName));
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new SimcadException("Can not create output file", e);
+		}
+		IProcessor logWriter = new DetectionSummaryPrinter(detectionSettings, logPrinter, "Writing log file...");
+		
+		//console printer 
+		PrintWriter consolePrinter = new PrintWriter(System.out, true);
+		IProcessor consoleWriter = new DetectionSummaryPrinter(detectionSettings, consolePrinter);
+		
+		processorDisptacher.addProcessor(xmlOutputProcessor).addProcessor(logWriter).addProcessor(consoleWriter).applyOn(result, detectionSettings);
 	}
 	
 	private static void printUsage() {
-		System.out.println("\nUsage: SimcadCloneDetector source-dir granularity simthreshold [transformation]\n\n");
+		System.out.println("Usage: Simcad [-v] source_path language granularity clone_type clone_grouping source_transform [output_path]\n");
+		System.out.println("-v                = verbose mode, shows the detection in progress");
+		System.out.println("language          = c | java | cs | py");
+		System.out.println("granularity       = (block | b ) | (function | f) : default = (function | f)");
+		System.out.println("clone_type        = 1 | 2 | 3 | 12 | (23 | nearmiss) | 13 | (123 | all) : default = (123 | all)");
+		System.out.println("clone_grouping    = (group | cg) | (pair | cp) : default = (group | cg)");
+		System.out.println("source_transform  = (generous | g) | (greedy | G) : default = (generous | g)");
+		System.out.println("source_path       = absolute path to source folder");
+		System.out.println("output_path       = absolute path to output folder : default = {source_path}_simad_clone");
 	}
-
-	int hamming_dist( long a1, long a2){		
-		return Long.bitCount(a1^a2);
-	}
-	
 }

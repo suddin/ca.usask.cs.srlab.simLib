@@ -24,21 +24,21 @@ public class TestPostProcessing extends DetectionTest{
 		ProcessorDisptacher pd = ProcessorDisptacher.getInstance();
 		IProcessor processor = new XmlOutputProcessor(detectionSettings_type1_group, Environment.getResourcePath("./"));
 		
-		Collection<CloneSet> afterProcessResult = pd.addProcessor(processor).applyOn(result);
+		Collection<CloneSet> afterProcessResult = pd.addProcessor(processor).applyOn(result, detectionSettings_type1_group);
 		Assert.assertArrayEquals(result.toArray(), afterProcessResult.toArray());
 		
 	}
 	
 	@Test
 	public void testNearMissCloneOutputToXML(){
-		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_nearmiss_pair);
+		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_type1_group);
 		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
 		List<CloneSet> result = cloneDetector.detect(candidateFragments);
 		
 		ProcessorDisptacher pd = ProcessorDisptacher.getInstance();
-		IProcessor processor = new XmlOutputProcessor(detectionSettings_nearmiss_pair, Environment.getResourcePath("./"));
+		IProcessor processor = new XmlOutputProcessor(detectionSettings_type1_group, Environment.getResourcePath("./"));
 
-		Collection<CloneSet> afterProcessResult = pd.addProcessor(processor).applyOn(result);
+		Collection<CloneSet> afterProcessResult = pd.addProcessor(processor).applyOn(result, detectionSettings_type1_group);
 		Assert.assertArrayEquals(result.toArray(), afterProcessResult.toArray());
 		
 	}

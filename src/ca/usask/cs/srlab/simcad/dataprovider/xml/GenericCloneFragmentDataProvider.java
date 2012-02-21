@@ -5,12 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ca.usask.cs.srlab.simcad.SimcadException;
-import ca.usask.cs.srlab.simcad.dataprovider.AbstractDataProvider;
+import ca.usask.cs.srlab.simcad.dataprovider.AbstractFragmentDataProvider;
 import ca.usask.cs.srlab.simcad.dataprovider.IFragmentDataProviderConfiguration;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.util.PropsUtil;
 
-public class GenericCloneFragmentDataProvider extends AbstractDataProvider{
+public class GenericCloneFragmentDataProvider extends AbstractFragmentDataProvider{
 	
 	@SuppressWarnings("unused")
 	private GenericCloneFragmentDataProvider(){

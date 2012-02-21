@@ -1,8 +1,5 @@
 package ca.usask.cs.srlab.simcad.processor.post;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Collection;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -21,8 +18,7 @@ import ca.usask.cs.srlab.simcad.model.ICloneFragment;
 import ca.usask.cs.srlab.simcad.processor.AbstractProcessor;
 import ca.usask.cs.srlab.simcad.util.XMLUtil;
 
-public class XmlOutputProcessor  extends AbstractProcessor {
-
+public class XmlOutputProcessor extends AbstractProcessor {
 	private String outputFolderName;
 	private DetectionSettings detectionSettings;
 	
@@ -37,18 +33,9 @@ public class XmlOutputProcessor  extends AbstractProcessor {
 
 	@Override
 	public boolean process(Collection<CloneSet> inputCloneSets, Collection<CloneSet> outputCloneSets) {
-		//String simThreshold = detectionSettings.getSimThreshold().toString();
-		String logFileName = outputFolderName + System.getProperty("file.separator") + "simcad_"+detectionSettings.getCloneGranularity()+"-clones-"+detectionSettings.getTypeString()+".log";
-		PrintWriter logPrinter;
+		//if(detectionSettings.isVerbose())
+			System.out.println("Generating output xml file...\n");
 		
-		try {
-			logPrinter = new PrintWriter(new FileWriter(logFileName));
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new SimcadException("Can not create output file", e);
-		}
-		
-		//System.out.println("\nGenerating output file...");
 		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder docBuilder = null;
 		try {
@@ -56,21 +43,28 @@ public class XmlOutputProcessor  extends AbstractProcessor {
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		}
-	    Document doc = docBuilder.newDocument();
 	    
-	    Element root = doc.createElement("clones");
+		Document doc = docBuilder.newDocument();
+	    //with source
+		writeXmlDocument(inputCloneSets, doc, true);
+	    
+	    doc = docBuilder.newDocument();
+	    //without source
+	    writeXmlDocument(inputCloneSets, doc, false);
+	   
+		outputCloneSets.addAll(inputCloneSets);
+		return true;
+	}
+
+	public void writeXmlDocument(Collection<CloneSet> inputCloneSets, Document doc, boolean withSource) {
+		Element root = doc.createElement("clones");
 	    doc.appendChild(root);
 
-		int nGroup = 0;
-		int nFragment = 0;
-	    
 		for(CloneSet cs: inputCloneSets){
 			Node child = doc.createElement((cs instanceof CloneGroup) ? "clone_group" : "clone_pair");
-			((Element)child).setAttribute("groupid", String.valueOf(nGroup++));
+			((Element)child).setAttribute("groupid", cs.getCloneSetId().toString());
 			((Element)child).setAttribute("nfragments", String.valueOf(cs.size()));
 			((Element)child).setAttribute("type", cs.getCloneType());
-			
-			nFragment += cs.size();
 			
 			for(ICloneFragment cloneFragment : cs.getCloneFragments()){
 				Node child2 = doc.createElement("clone_fragment");
@@ -79,43 +73,34 @@ public class XmlOutputProcessor  extends AbstractProcessor {
 				((Element)child2).setAttribute("endline", cloneFragment.getToLine().toString());
 				((Element)child2).setAttribute("pcid", cloneFragment.getProgramComponentId().toString());
 				
-				child2.appendChild(doc.createCDATASection("\n"+cloneFragment.getOriginalCodeBlock()+"\n"));
+				if(withSource)
+					child2.appendChild(doc.createCDATASection("\n"+cloneFragment.getOriginalCodeBlock()+"\n"));
+				
 				child.appendChild(child2);
 			}
 	        root.appendChild(child);
 		}
 		
-	    root.setAttribute("ngroups", Integer.toString(nGroup));
-	    root.setAttribute("nfragments", Integer.toString(nFragment));
+	    root.setAttribute("ngroups", Integer.toString(detectionSettings.getDetectionReport().getnCloneSet()));
+	    root.setAttribute("nfragments", Integer.toString(detectionSettings.getDetectionReport().getnCloneFragment()));
 	    root.setAttribute("cloneTypes",  detectionSettings.getCloneSetType());
 	    
 	    //System.out.println("Total clone class : "+ nGroup );
 	    //System.out.println("Total clone frag : "+ nFragment );
 	    
-	    logPrinter.println("Total clone class : "+ nGroup );
-	    logPrinter.println("Total clone frag : "+ nFragment );	
-	    
-	    //System.out.println("Done!\n");
-	    logPrinter.close();
-	    
-	    String outputFileName =  "simcad_"+detectionSettings.getCloneGranularity()+"_clone-"+detectionSettings.getCloneSetType()+"s_"+detectionSettings.getTypeString()+".xml";
-	    String outputFullFileName = outputFolderName + System.getProperty("file.separator") + outputFileName;
-	    
+	    String outputFileName =  "simcad_"+detectionSettings.getCloneGranularity()+"_clone-"+detectionSettings.getCloneSetType()+"s_"+detectionSettings.getTypeString()+(withSource?"_withsource":"")+".xml";
+	    String outputFullFileName = outputFolderName + (outputFolderName.endsWith(System.getProperty("file.separator")) ?"":System.getProperty("file.separator"))+ outputFileName;
+	   
 //	    File outputFile = new File(outputFileName);
 		try {
-//			if (outputFile.exists()) {
-//				outputFile.delete();
-//			} else {
-//				outputFile.createNewFile();
-//			}
 			XMLUtil.writeXmlFile(doc, outputFullFileName);
+			//if(detectionSettings.isVerbose())
+				//System.out.println(outputFullFileName);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new SimcadException("Can not create output file", e);
 		}
-		
-		outputCloneSets.addAll(inputCloneSets);
-		return true;
+
 	}
 
 }

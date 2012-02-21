@@ -1,6 +1,7 @@
 package ca.usask.cs.srlab.simcad.util;
 
 import java.io.File;
+import java.io.IOException;
 
 public class FileUtil {
 
@@ -20,6 +21,24 @@ public class FileUtil {
 			}
 		}
 		return (path.delete());
+	}
+	
+	public static boolean isDirExist(String dirname) {
+		return (new File(dirname)).isDirectory();
+	}
+
+	public static boolean isFileExist(String filename) {
+		return (new File(filename)).isFile();
+	}
+
+	public static boolean isFilenameValid(String file) {
+		File f = new File(file);
+		try {
+			f.getCanonicalPath();
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
 	}
 
 }

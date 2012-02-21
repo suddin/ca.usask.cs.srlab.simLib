@@ -12,14 +12,13 @@ import org.junit.Test;
 import ca.usask.cs.srlab.simcad.Constants;
 import ca.usask.cs.srlab.simcad.DetectionSettings;
 import ca.usask.cs.srlab.simcad.Environment;
-import ca.usask.cs.srlab.simcad.dataprovider.ICloneFragmentDataProvider;
+import ca.usask.cs.srlab.simcad.dataprovider.IFragmentDataProvider;
 import ca.usask.cs.srlab.simcad.dataprovider.xml.FixTxlSourceFragmentOutputXML;
-import ca.usask.cs.srlab.simcad.dataprovider.xml.XMLMultiSourceCloneFragmentDataProvider;
+import ca.usask.cs.srlab.simcad.dataprovider.xml.XMLMultiSourceFragmentDataProvider;
 import ca.usask.cs.srlab.simcad.dataprovider.xml.XMLMultiSourceFragmentDataProviderConfiguration;
 import ca.usask.cs.srlab.simcad.index.ICloneIndex;
 import ca.usask.cs.srlab.simcad.index.IndexBuilder;
 import ca.usask.cs.srlab.simcad.index.MemoryCloneIndexByGoogleCollection;
-import ca.usask.cs.srlab.simcad.index.MemoryCloneIndexByJavaCollection;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.model.CloneSet;
 
@@ -46,13 +45,13 @@ public class DetectionTest {
 	
 	@BeforeClass
 	public static void setup(){
-		detectionSettings_type1_group = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP, Constants.CLONE_TYPE_1);
-		detectionSettings_type2_group = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP, Constants.CLONE_TYPE_2);
-		detectionSettings_type3_group = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP, Constants.CLONE_TYPE_3);
-		detectionSettings_type12_group = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP, Constants.CLONE_TYPE_12);
-		detectionSettings_type23_group = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP, Constants.CLONE_TYPE_23);
-		detectionSettings_type13_group = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP, Constants.CLONE_TYPE_13);
-		detectionSettings_type123_group = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP, Constants.CLONE_TYPE_123);
+		detectionSettings_type1_group = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTION, Constants.CLONE_SET_TYPE_GROUP, true, Constants.CLONE_TYPE_1);
+		detectionSettings_type2_group = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTION, Constants.CLONE_SET_TYPE_GROUP, false, Constants.CLONE_TYPE_2);
+		detectionSettings_type3_group = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTION, Constants.CLONE_SET_TYPE_GROUP, false, Constants.CLONE_TYPE_3);
+		detectionSettings_type12_group = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTION, Constants.CLONE_SET_TYPE_GROUP, false, Constants.CLONE_TYPE_12);
+		detectionSettings_type23_group = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTION, Constants.CLONE_SET_TYPE_GROUP, false, Constants.CLONE_TYPE_23);
+		detectionSettings_type13_group = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTION, Constants.CLONE_SET_TYPE_GROUP, false, Constants.CLONE_TYPE_13);
+		detectionSettings_type123_group = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTION, Constants.CLONE_SET_TYPE_GROUP, true,  Constants.CLONE_TYPE_123);
 		
 		//detectionSettings_nearmiss_group = new DetectionSettings(13, Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_GROUP);
 		//detectionSettings_type1_pair = new DetectionSettings(0, Constants.CLONE_GRANULARITY_FUNTIONS, Constants.CLONE_SET_TYPE_PAIR);
@@ -72,10 +71,10 @@ public class DetectionTest {
 		String sourceFragmentFile = Environment.getResourcePath("ca/usask/cs/srlab/simcad/detection/test_functions.xml");
 		String transformedSourceFragmentFile = Environment.getResourcePath("ca/usask/cs/srlab/simcad/detection/test_transformed_functions.xml");
 		
-		XMLMultiSourceFragmentDataProviderConfiguration dataProviderConfig = new XMLMultiSourceFragmentDataProviderConfiguration(sourceFragmentFile, transformedSourceFragmentFile, Constants.CLONE_GRANULARITY_FUNTIONS);
+		XMLMultiSourceFragmentDataProviderConfiguration dataProviderConfig = new XMLMultiSourceFragmentDataProviderConfiguration(sourceFragmentFile, transformedSourceFragmentFile, Constants.CLONE_GRANULARITY_FUNTION);
 		dataProviderConfig.addDataTransformer(new FixTxlSourceFragmentOutputXML());
 		
-		ICloneFragmentDataProvider cloneFragmentDataProvider = new XMLMultiSourceCloneFragmentDataProvider(dataProviderConfig);
+		IFragmentDataProvider cloneFragmentDataProvider = new XMLMultiSourceFragmentDataProvider(dataProviderConfig);
 		
 		indexBuilder = new IndexBuilder(cloneFragmentDataProvider);
 		
@@ -84,11 +83,11 @@ public class DetectionTest {
 	@Before
 	public void subsetup(){
 		cloneIndex.cleanup();
-		indexBuilder.buildCloneIndex(cloneIndex);
 	}
 	
 	@Test
 	public void testType1CloneGroup(){
+		indexBuilder.buildCloneIndex(cloneIndex, detectionSettings_type1_group);
 		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_type1_group);
 		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
 		List<CloneSet> result = cloneDetector.detect(candidateFragments);
@@ -103,6 +102,7 @@ public class DetectionTest {
 	
 	@Test
 	public void testType2CloneGroup(){
+		indexBuilder.buildCloneIndex(cloneIndex, detectionSettings_type2_group);
 		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_type2_group);
 		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
 		List<CloneSet> result = cloneDetector.detect(candidateFragments);
@@ -118,6 +118,7 @@ public class DetectionTest {
 	
 	@Test
 	public void testType3CloneGroup(){
+		indexBuilder.buildCloneIndex(cloneIndex, detectionSettings_type3_group);
 		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_type3_group);
 		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
 		List<CloneSet> result = cloneDetector.detect(candidateFragments);
@@ -133,6 +134,7 @@ public class DetectionTest {
 	
 	@Test
 	public void testType12CloneGroup(){
+		indexBuilder.buildCloneIndex(cloneIndex, detectionSettings_type12_group);
 		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_type12_group);
 		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
 		List<CloneSet> result = cloneDetector.detect(candidateFragments);
@@ -148,6 +150,7 @@ public class DetectionTest {
 	
 	@Test
 	public void testType23CloneGroup(){
+		indexBuilder.buildCloneIndex(cloneIndex, detectionSettings_type23_group);
 		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_type23_group);
 		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
 		List<CloneSet> result = cloneDetector.detect(candidateFragments);
@@ -164,6 +167,7 @@ public class DetectionTest {
 	
 	@Test
 	public void testType123CloneGroup(){
+		indexBuilder.buildCloneIndex(cloneIndex, detectionSettings_type123_group);
 		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_type123_group);
 		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
 		List<CloneSet> result = cloneDetector.detect(candidateFragments);

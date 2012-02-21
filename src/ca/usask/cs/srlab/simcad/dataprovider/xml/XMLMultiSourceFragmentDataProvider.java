@@ -17,11 +17,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import ca.usask.cs.srlab.simcad.SimcadException;
-import ca.usask.cs.srlab.simcad.dataprovider.AbstractDataProvider;
+import ca.usask.cs.srlab.simcad.dataprovider.AbstractFragmentDataProvider;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.util.PropsUtil;
 
-public class XMLMultiSourceCloneFragmentDataProvider extends AbstractDataProvider{
+public class XMLMultiSourceFragmentDataProvider extends AbstractFragmentDataProvider{
 	
 	private class NodeListIterator{
 		private int currentIndex;
@@ -57,10 +57,10 @@ public class XMLMultiSourceCloneFragmentDataProvider extends AbstractDataProvide
 	
 	
 	@SuppressWarnings("unused")
-	private XMLMultiSourceCloneFragmentDataProvider(){
+	private XMLMultiSourceFragmentDataProvider(){
 	}
 	
-	public XMLMultiSourceCloneFragmentDataProvider(XMLMultiSourceFragmentDataProviderConfiguration dataProviderConfig){
+	public XMLMultiSourceFragmentDataProvider(XMLMultiSourceFragmentDataProviderConfiguration dataProviderConfig){
 		super(dataProviderConfig);
 	}
 	
@@ -162,7 +162,7 @@ public class XMLMultiSourceCloneFragmentDataProvider extends AbstractDataProvide
 		return cloneFragmentList;
 	}
 
-	@Override
+	//@Override
 	protected String[] applyDataTransformation() {
 		List<IXMLFragmentDataProviderTransformer> dataTransformerList = ((XMLMultiSourceFragmentDataProviderConfiguration)dataProviderConfig).getDataTransformer();
 		String dataSource1 = ((XMLMultiSourceFragmentDataProviderConfiguration)dataProviderConfig).getOriginalSourceXmlFileName();
