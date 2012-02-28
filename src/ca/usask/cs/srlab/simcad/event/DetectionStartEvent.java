@@ -6,7 +6,14 @@ public class DetectionStartEvent extends EventObject {
 
 	private static final long serialVersionUID = -1456518832133968826L;
 
-	public DetectionStartEvent(Object source) {
+	private int inputSize;
+	
+	public DetectionStartEvent(Object source, int inputSize) {
 		super(source);
+		this.inputSize = inputSize;
+	}
+
+	public int getInputSize() {
+		return inputSize;
 	}
 }

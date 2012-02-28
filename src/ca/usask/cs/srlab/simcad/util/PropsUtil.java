@@ -6,6 +6,7 @@ import java.util.Properties;
 import ca.usask.cs.srlab.simcad.Constants;
 import ca.usask.cs.srlab.simcad.Environment;
 import ca.usask.cs.srlab.simcad.SimcadException;
+import ca.usask.cs.srlab.simcad.dataprovider.filesystem.SimCadCommandRunner;
 
 public final class PropsUtil {
 		
@@ -15,19 +16,27 @@ public final class PropsUtil {
 		InputStream userConfig = Environment.getResourceAsStream(Constants.EXTERNAL_CONFIGURATION_FILE);
 		InputStream localConfig = Environment.getResourceAsStream(Constants.LOCAL_CONFIGURATION_FILE);
 			if(localConfig == null)
-				throw new RuntimeException("Unable to load default config file :"+Constants.LOCAL_CONFIGURATION_FILE);
+				throw new RuntimeException("Unable to load default simcad configuration file :"+Constants.LOCAL_CONFIGURATION_FILE);
 
 		try {
 			properties.loadFromXML(localConfig);
 			localConfig.close();
 
-			// overrides the local config
+			// overrides the local configuration
 			if (userConfig != null) {
-				properties.loadFromXML(userConfig);
-				
-				validateRuntimeConfiguration();
-				
-				userConfig.close();
+				try{
+					System.out.println("Found external simcad configuration, overriding defaults...\n");
+					properties.loadFromXML(userConfig);
+					
+					validateRuntimeConfiguration();
+					
+					userConfig.close();
+					
+				}catch (Exception e) {
+					throw new SimcadException("Unable to load external simcad configuration", e);
+				}
+			}else{
+				System.out.println("No external simcad configuration available, using default configuration...\n");
 			}
 
 		} catch (IOException e) {
@@ -35,6 +44,7 @@ public final class PropsUtil {
 			throw new SimcadException(e);
 		}
 
+		//validateRuntimeConfiguration();
 	}	
 	
 	private PropsUtil(){}
@@ -43,6 +53,35 @@ public final class PropsUtil {
 		if(getType3cloneSimthreshold() > Constants.TYPE3CLONE_SIMTHRESHOLD_MAX_VAL
 				|| getType3cloneSimthreshold() < Constants.TYPE3CLONE_SIMTHRESHOLD_MIM_VAL)
 			throw new SimcadException("Invalid value for property : " + Constants.TYPE3CLONE_SIMTHRESHOLD);
+		
+		String simcadInstallationUrl = PropsUtil.getSimcadInstallUrl();
+		String simLibRoot = Environment.getSimLibRoot();//Environment.getResourcePath("");//Environment.getSimLibRoot();
+		String[] cmd = {
+				"/bin/sh",
+				"-c",
+				"cd "+simLibRoot +
+				"\ncd "+simcadInstallationUrl+
+				"\n ./simcad2 -version"
+				};
+		try {
+			int exitVal = SimCadCommandRunner.INSTANCE.executeCommand(cmd, false);
+			
+			if(exitVal == 127){
+				throw new SimcadException("Invalid simcad location on configuration file, location must be absolute ot relative to simcad2.jar");
+			}
+			
+			if(exitVal > 99){
+				throw new SimcadException("Incomplete simcad installation, please review the installation");
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new SimcadException(e);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			throw new SimcadException(e);
+		}
+		
 	}
 
 	public static boolean isStrictOnMembership(){
@@ -63,6 +102,10 @@ public final class PropsUtil {
 	
 	public static Integer getMinSizeOfGranularity(){
 		return Integer.valueOf(properties.getProperty(Constants.MIN_SIZE_OF_GRANULARITY, "5"));
+	}
+	
+	public static Boolean getIsFragmentFileRelativeURL(){
+		return Boolean.valueOf(properties.getProperty(Constants.FRAGMENT_FILE_RELATIVEURL, "true"));
 	}
 	
 	public static Integer getType3cloneSimthreshold(){

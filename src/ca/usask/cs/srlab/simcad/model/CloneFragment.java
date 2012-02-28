@@ -16,7 +16,7 @@ import javax.persistence.Transient;
  */
 @Entity
 @Inheritance(strategy=InheritanceType.JOINED)
-public abstract class CloneFragment implements ICloneFragment {
+public abstract class CloneFragment implements ICloneFragment, Cloneable {
 
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
@@ -54,6 +54,20 @@ public abstract class CloneFragment implements ICloneFragment {
 //	public CloneFragment(){
 //		
 //	}
+	
+	/**
+	 * copy constructor
+	 */
+	public CloneFragment(CloneFragment cloneFragment) {
+		this.programComponentId = cloneFragment.programComponentId;
+		this.fileName = cloneFragment.fileName;
+		this.fromLine = cloneFragment.fromLine;
+		this.toLine = cloneFragment.toLine;
+		this.id = cloneFragment.id;
+		this.simhash1 = cloneFragment.simhash1;
+		this.simhash2 = cloneFragment.simhash2;
+		this.originalCodeBlock = cloneFragment.originalCodeBlock;
+	}
 	
 	public CloneFragment(String fileName, Integer fromLine, Integer toLine,
 			Integer programComponentId, String codeBlock/*, Long id,*/ 
@@ -212,6 +226,11 @@ public abstract class CloneFragment implements ICloneFragment {
 	@Override
 	public String toString() {
 		return fileName+" ("+fromLine+","+toLine+")\n"+originalCodeBlock/*+"\n"+transformedCodeBlock*/;
+	}
+	
+	@Override
+	public CloneFragment clone() throws CloneNotSupportedException {
+		return (CloneFragment) super.clone();
 	}
 	
 }

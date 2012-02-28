@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: ca.usask.cs.srlab.simcad.SimCad
-Class-Path: lib/commons-collections-3.2.1.jar lib/guava-10.0.1.jar
-

@@ -14,6 +14,7 @@
 
 	<entry key="simcad.settings.general.minClusterSize">2</entry>
 	<entry key="simcad.settings.general.minSizeOfGranularity">5</entry>
+	<entry key="simcad.settings.general.fragment.file.relativeURL">true</entry>
 
 	<entry key="simcad.settings.general.preprocess.regularhash_class">ca.usask.cs.srlab.simcad.hash.DefaultRegularHashGenerator</entry>
 	<entry key="simcad.settings.general.preprocess.tokenbuilder_class">ca.usask.cs.srlab.simcad.token.DefaultTokenBuilder</entry>

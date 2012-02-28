@@ -17,7 +17,7 @@ public class TestPostProcessing extends DetectionTest{
 	
 	@Test
 	public void testType1CloneOutputToXML(){
-		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_type1_group);
+		cloneDetector = CloneDetector.getInstance(cloneIndex, detectionSettings_type1_group);
 		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
 		List<CloneSet> result = cloneDetector.detect(candidateFragments);
 		
@@ -31,7 +31,7 @@ public class TestPostProcessing extends DetectionTest{
 	
 	@Test
 	public void testNearMissCloneOutputToXML(){
-		cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings_type1_group);
+		cloneDetector = CloneDetector.getInstance(cloneIndex, detectionSettings_type1_group);
 		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
 		List<CloneSet> result = cloneDetector.detect(candidateFragments);
 		

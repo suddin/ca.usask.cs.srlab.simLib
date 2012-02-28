@@ -85,7 +85,7 @@ public final class SubsumedCloneFilter implements IProcessor {
 		int newCloneSetIndex = 1; 
 		for(CloneSet cloneSet : cloneSetList){
 			if(!cloneSet.isSubsumed()){
-				cloneSet.reSetCloneSetId(newCloneSetIndex++);
+				cloneSet.setCloneSetId(newCloneSetIndex++);
 				outputCloneSets.add(cloneSet);
 			}
 //			else{

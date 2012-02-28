@@ -22,7 +22,7 @@ public class TestXMLMultiSourceCloneFragmentDataProvider {
 		String sourceFragmentFile = Environment.getResourcePath("ca/usask/cs/srlab/simcad/detection/test_functions.xml");// DetectionTest.class.getClassLoader().getResource("test_functions.xml").getPath();
 		String transformedSourceFragmentFile = Environment.getResourcePath("ca/usask/cs/srlab/simcad/detection/test_transformed_functions.xml");// DetectionTest.class.getClassLoader().getResource("test_functions.xml").getPath();
 		
-		XMLMultiSourceFragmentDataProviderConfiguration dataProviderConfig = new XMLMultiSourceFragmentDataProviderConfiguration(sourceFragmentFile, transformedSourceFragmentFile, Constants.CLONE_GRANULARITY_FUNTION);
+		XMLMultiSourceFragmentDataProviderConfiguration dataProviderConfig = new XMLMultiSourceFragmentDataProviderConfiguration(sourceFragmentFile, transformedSourceFragmentFile, Environment.getResourcePath(""), Constants.CLONE_GRANULARITY_FUNTION);
 		dataProviderConfig.addDataTransformer(new FixTxlSourceFragmentOutputXML());
 		
 		cloneFragmentDataProvider = new XMLMultiSourceFragmentDataProvider(dataProviderConfig);

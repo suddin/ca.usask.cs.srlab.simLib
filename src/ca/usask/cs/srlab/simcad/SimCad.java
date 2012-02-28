@@ -1,7 +1,6 @@
 package ca.usask.cs.srlab.simcad;
 
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -22,7 +21,6 @@ import ca.usask.cs.srlab.simcad.processor.ProcessorDisptacher;
 import ca.usask.cs.srlab.simcad.processor.post.DetectionSummaryPrinter;
 import ca.usask.cs.srlab.simcad.processor.post.SubsumedCloneFilter;
 import ca.usask.cs.srlab.simcad.processor.post.XmlOutputProcessor;
-import ca.usask.cs.srlab.simcad.util.CloneTypeMapper;
 import ca.usask.cs.srlab.simcad.util.FileUtil;
 
 public class SimCad {
@@ -78,7 +76,7 @@ public class SimCad {
 		if(args[argIndex] != null && (args[argIndex].equals("1") || args[argIndex].equals("2") || args[argIndex].equals("3")
 				|| args[argIndex].equals("12") || args[argIndex].equals("23") || args[argIndex].equals("nearmiss") || args[argIndex].equals("13")
 				|| args[argIndex].equals("123")|| args[argIndex].equals("all"))){
-			cloneType = CloneTypeMapper.getTypeFromString(args[argIndex++]);
+			cloneType = CloneSet.CloneTypeMapper.getTypeFromString(args[argIndex++]);
 		}else{
 			System.out.println("Fourth argument \""+args[argIndex]+"\" must be one of : 1 | 2 | 3 | 12 | (23 | nearmiss) | 13 | (123 | all)");
 			printUsage();
@@ -93,37 +91,45 @@ public class SimCad {
 			return;
 		}
 		
-		if(args[argIndex].equals(Constants.SOURCE_TRANSFORMATION_APPROACH_GENEROUS) || args[argIndex].equals(Constants.SOURCE_TRANSFORMATION_APPROACH_GREEDY)){
-			if(args[argIndex].equals(Constants.SOURCE_TRANSFORMATION_APPROACH_GENEROUS))
-				transformation = Constants.SOURCE_TRANSFORMATION_ACTION_CONSISTENT;
-			else
-				transformation = Constants.SOURCE_TRANSFORMATION_ACTION_BLIND;
-			argIndex++;
-		}else if (!args[argIndex].equals("none")){
+		if(args[argIndex] != null && (args[argIndex].equals(Constants.SOURCE_TRANSFORMATION_APPROACH_GENEROUS) || args[argIndex].equals(Constants.SOURCE_TRANSFORMATION_APPROACH_GREEDY))){
+//			if(args[argIndex].equals(Constants.SOURCE_TRANSFORMATION_APPROACH_GENEROUS))
+//				transformation = Constants.SOURCE_TRANSFORMATION_ACTION_CONSISTENT;
+//			else
+//				transformation = Constants.SOURCE_TRANSFORMATION_ACTION_BLIND;
+//			argIndex++;
+			transformation = args[argIndex++];
+		}else{
 			System.out.println("Sixth argument \""+args[argIndex]+"\" must be either \"generous\" or \"greedy\"");
 			printUsage();
 			return;
 		}
 		
 		if(argIndex < args.length){
-			if(FileUtil.isDirExist(args[argIndex])){
-				output_dir = args[argIndex];
-			}else{
-				System.out.println("Seventh argument \""+args[argIndex]+"\" must be a valid directory");
-				printUsage();
-				return;
+			output_dir = args[argIndex];
+			if(!FileUtil.isDirExist(output_dir)){
+				try{ //trying to create the output directory
+					FileUtil.createDirs(output_dir);
+				}catch (Exception e) {
+					System.out.println("Error creating output directory \""+args[argIndex]+"\", argument must be a valid directory path");
+					printUsage();
+					return;		
+				}
 			}
 		}
 		
 		if(output_dir == null){
 			output_dir = source_dir + Constants.DEFAULT_OUTPUT_FOLDER_SUFFIX;
-			if(!new File(output_dir).exists()){
-				new File(output_dir).mkdir();
+			try{ //trying to create the output directory
+				FileUtil.createDirs(output_dir);
+			}catch (Exception e) {
+				System.out.println("Error creating output directory \""+args[argIndex]+"\", argument must be a valid directory path");
+				printUsage();
+				return;		
 			}
 		}
 		
 		//clone detection settings 
-		DetectionSettings detectionSettings = new DetectionSettings(granularity, cloneGrouping, verbose, cloneType);
+		DetectionSettings detectionSettings = new DetectionSettings(language, granularity, cloneGrouping, transformation, verbose, cloneType);
 		
 		detectionSettings.getDetectionReport().setSourceFolder(source_dir);
 		detectionSettings.getDetectionReport().setOutputFolder(output_dir);
@@ -142,7 +148,7 @@ public class SimCad {
 		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
 		
 		//detection
-		CloneDetector cloneDetector = CloneDetector.setup(cloneIndex, detectionSettings);
+		CloneDetector cloneDetector = CloneDetector.getInstance(cloneIndex, detectionSettings);
 		List<CloneSet> result = cloneDetector.detect(candidateFragments);
 		
 		//post-processing

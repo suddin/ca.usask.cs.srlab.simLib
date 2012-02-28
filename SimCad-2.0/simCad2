@@ -19,11 +19,14 @@ echo "source_path       = absolute path to source folder"
 echo "output_path       = absolute path to output folder : default = {source_path}_simad_clone"
 }
 
+simcad_version="SimCad 2.0 (February 2012) : University of Saskatchewan, Canada"
+debug_mode="false"
+
 # check we have TXL
 txlversion=`txl -V 2>&1 | grep 10.5`
 if [ "${txlversion}" = "" ]
 then
-echo "*** Error: simCad requires FreeTXL 10.5"
+echo "*** Error:  simCad requires FreeTXL 10.5"
 echo ""
 exit 99
 fi
@@ -74,7 +77,7 @@ case $1 in
 
 # display simcad version
 -version)
-echo "Simcad 2.0 (February 2012)"
+echo "${simcad_version}"
 exit 0
 ;;
 
@@ -246,7 +249,11 @@ then
 	chmod +rw ${OUTPUT_DIR} 
 fi
 
+echo ""
+echo "${simcad_version}"
 
+if [ "${debug_mode}" = "true" ]
+then
 echo "verbose=${VERBOSE}"
 echo "source-dir=${SOURCE_DIR}"
 echo "granularity=${GRANULARITY}"
@@ -255,13 +262,15 @@ echo "clone-type=${CLONE_TYPE}"
 echo "output-dir=${OUTPUT_DIR}"
 echo "source-transform=${SOURCE_TRANSFORM}"
 echo "clone_grouping=${CLONE_GROUPING}"
+fi
 echo ""
+
 
 #Detect Clone
 #echo ""
-#echo "java -jar ${lib}/tools/simCad2.jar ${VERBOSE} ${SOURCE_DIR} ${LANGUAGE} ${GRANULARITY} ${CLONE_TYPE} ${CLONE_GROUPING} ${SOURCE_TRANSFORM} ${OUTPUT_DIR}"
+#echo "java -Xmx1024m -jar ${lib}/tools/simCad2.jar ${VERBOSE} ${SOURCE_DIR} ${LANGUAGE} ${GRANULARITY} ${CLONE_TYPE} ${CLONE_GROUPING} ${SOURCE_TRANSFORM} ${OUTPUT_DIR}"
 
-java -jar ${lib}/tools/simCad2.jar ${VERBOSE} ${SOURCE_DIR} ${LANGUAGE} ${GRANULARITY} ${CLONE_TYPE} ${CLONE_GROUPING} ${SOURCE_TRANSFORM} ${OUTPUT_DIR} 2>&1
+java -Xmx1024m -jar ${lib}/tools/simCad2.jar ${VERBOSE} ${SOURCE_DIR} ${LANGUAGE} ${GRANULARITY} ${CLONE_TYPE} ${CLONE_GROUPING} ${SOURCE_TRANSFORM} ${OUTPUT_DIR} 2>&1
 
 exit 0
 

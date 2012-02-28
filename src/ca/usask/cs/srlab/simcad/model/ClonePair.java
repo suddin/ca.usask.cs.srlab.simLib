@@ -8,17 +8,11 @@ import java.util.Arrays;
  */
 public class ClonePair extends CloneSet {
 
-	private Long id;
-
-	public Long getId() {
-		return id;
-	}
-
 	public Integer getPairId() {
 		return getCloneSetId();
 	}
 
-	public ClonePair(CloneFragment cloneFragment1, CloneFragment cloneFragment2, String cloneType,
+	public ClonePair(ICloneFragment cloneFragment1, ICloneFragment cloneFragment2, String cloneType,
 			Integer pairId) {
 		super(pairId, Arrays.asList(cloneFragment1, cloneFragment2), cloneType);
 	}

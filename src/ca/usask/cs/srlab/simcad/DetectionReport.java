@@ -14,7 +14,7 @@ public class DetectionReport {
 	private int nfCodeFragment; //filtered
 	
 	private int nCloneSet;
-	private  int nCloneFragment;
+	private int nCloneFragment;
 	
     public String getPreprocessingTime() {
 		return formatTime(preprocessingTime);
@@ -87,8 +87,7 @@ public class DetectionReport {
 		this.outputFolder = outputFolder;
 	}
 	private String formatTime(long time) {
-		return (time / 1000) / 60 + " min, " + (time / 1000) % 60 + " sec, "
-				+ (time % 1000) + " ms";
+		return (time / 1000) / 60 + " min, " + (time / 1000) % 60 + " sec, "+ (time % 1000) + " ms";
 	}
 //	long start = System.currentTimeMillis();
 //	

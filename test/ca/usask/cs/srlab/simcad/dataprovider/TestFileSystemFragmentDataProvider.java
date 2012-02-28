@@ -18,7 +18,7 @@ public class TestFileSystemFragmentDataProvider {
 	@BeforeClass
 	public static void setup(){
 		String sourceFolder = "/Users/sharif/Documents/workspaces/pmd/MyLib";// DetectionTest.class.getClassLoader().getResource("test_functions.xml").getPath();
-		FileSystemFragmentDataProviderConfiguration dataProviderConfig = new FileSystemFragmentDataProviderConfiguration(sourceFolder, sourceFolder+Constants.DEFAULT_OUTPUT_FOLDER_SUFFIX, Constants.LANGUAGE_JAVA, Constants.SOURCE_TRANSFORMATION_ACTION_BLIND, Constants.CLONE_GRANULARITY_FUNTION);
+		FileSystemFragmentDataProviderConfiguration dataProviderConfig = new FileSystemFragmentDataProviderConfiguration(sourceFolder, sourceFolder+Constants.DEFAULT_OUTPUT_FOLDER_SUFFIX, Constants.LANGUAGE_JAVA, Constants.SOURCE_TRANSFORMATION_APPROACH_GENEROUS, Constants.CLONE_GRANULARITY_FUNTION);
 		cloneFragmentDataProvider = new FileSystemFragmentDataProvider(dataProviderConfig);
 	}
 	

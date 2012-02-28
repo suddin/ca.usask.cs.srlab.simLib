@@ -68,30 +68,12 @@ else
     shift
 fi
 
-
 #check output_dir
-if [ "$1" = "." ] || [ "$1" = "" ]
-then 
-    output_dir=${system}/.simcad
-    if [ ! -d "${output_dir}" ]
-    then
-        mkdir -p 777 ${output_dir}        
-    fi
-    shift
-else
-    if [ -d "$1" ]
-    then
-        output_dir=$1
-    else
-        mkdir -p 777 $1
-    fi
-    output_dir=$1
-    shift
-fi
-
-if [ "$1" = "." ] || [ "$1" = "./" ] || [ "$1" = "" ]
+if [ "$1" = "" ]
 then 
     output_dir=${system}_simcad_clones
+else
+    output_dir=$1
 fi
 
 if [ ! -d "${output_dir}" ]
@@ -100,7 +82,6 @@ then
 	mkdir -p -m 777 ${output_dir}
 	#chmod +rw ${output_dir} 
 fi
-
 
 result=$?
 echo ""

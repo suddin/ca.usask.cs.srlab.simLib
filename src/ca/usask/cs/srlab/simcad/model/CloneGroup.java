@@ -4,17 +4,11 @@ import java.util.List;
 
 public class CloneGroup extends CloneSet {
 
-	private Long id;
-
-	public Long getId() {
-		return id;
-	}
-
 	public Integer getGroupId() {
 		return getCloneSetId();
 	}
 
-	public CloneGroup(List<CloneFragment> cloneFragments, String cloneType,
+	public CloneGroup(List<ICloneFragment> cloneFragments, String cloneType,
 			Integer groupId) {
 		super(groupId, cloneFragments, cloneType);
 	}

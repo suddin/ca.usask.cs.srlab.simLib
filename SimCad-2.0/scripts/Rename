@@ -24,6 +24,7 @@ then
     granularity=$1
     shift
 else
+	echo "error in granularity parameter"
     echo "Usage:  Rename granularity language pcfile.xml renaming "
     echo "          where  granularity is one of:  { functions blocks }"
     echo "          and    language    is one of:  { c java cs py }"
@@ -38,6 +39,7 @@ then
     language=$1
     shift
 else
+	echo "error in language parameter"
     echo "Usage:  Rename granularity language pcfile.xml renaming "
     echo "          where  granularity is one of:  { functions blocks }"
     echo "          and    language    is one of:  { c java cs py }"
@@ -57,6 +59,7 @@ fi
 
 if [ ! -s "${pcfile}.xml" ]
 then
+	echo "clone file ${pcfile}.xml not exist"
     echo "Usage:  Rename granularity language pcfile.xml renaming "
     echo "          where  granularity is one of:  { functions blocks }"
     echo "          and    language    is one of:  { c java cs py }"
@@ -71,6 +74,7 @@ then
     renaming=$1
     shift
 else
+	echo "error in renaming parameter"
     echo "Usage:  Rename granularity language pcfile.xml renaming "
     echo "          where  granularity is one of:  { functions blocks }"
     echo "          and    language    is one of:  { c java cs py }"

@@ -11,6 +11,7 @@ import java.util.Set;
 import ca.usask.cs.srlab.simcad.Constants;
 import ca.usask.cs.srlab.simcad.DetectionSettings;
 import ca.usask.cs.srlab.simcad.Environment;
+import ca.usask.cs.srlab.simcad.SimcadException;
 import ca.usask.cs.srlab.simcad.event.CloneFoundEvent;
 import ca.usask.cs.srlab.simcad.event.DetectionEndEvent;
 import ca.usask.cs.srlab.simcad.event.DetectionProgressEvent;
@@ -22,6 +23,7 @@ import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.model.CloneGroup;
 import ca.usask.cs.srlab.simcad.model.ClonePair;
 import ca.usask.cs.srlab.simcad.model.CloneSet;
+import ca.usask.cs.srlab.simcad.model.ICloneFragment;
 import ca.usask.cs.srlab.simcad.util.FastStringComparator;
 import ca.usask.cs.srlab.simcad.util.PropsUtil;
 
@@ -37,14 +39,16 @@ public final class CloneDetector {
 	private ICloneDetectionListener detectionListener;
 	
 	public List<CloneSet> detect(Collection<CloneFragment> candidateFragments) {
+		if(candidateFragments == null || candidateFragments.size() == 0)
+			throw new SimcadException("The detection request is empty");
 		return this.detectClones(candidateFragments);
 	}
 
-	public static CloneDetector setup(ICloneIndex cloneIndex, DetectionSettings detectionSettings){
+	public static CloneDetector getInstance(ICloneIndex cloneIndex, DetectionSettings detectionSettings){
 		return new CloneDetector(cloneIndex, detectionSettings);	
 	}
 	
-	public static CloneDetector setup(ICloneIndex cloneIndex, DetectionSettings detectionSettings, ICloneDetectionListener detectionListener){
+	public static CloneDetector getInstance(ICloneIndex cloneIndex, DetectionSettings detectionSettings, ICloneDetectionListener detectionListener){
 		return new CloneDetector(cloneIndex, detectionSettings, detectionListener);	
 	}
 
@@ -73,7 +77,7 @@ public final class CloneDetector {
 		int currentProgressIndex = 1;
 		int cloneSetIndex = 1;
 		
-		fireDetectionStartEvent();
+		fireDetectionStartEvent(nCodeFragment);
 		
 		long startTime = System.currentTimeMillis();
 		
@@ -84,7 +88,7 @@ public final class CloneDetector {
 			if(cloneFragment.isProceessed) continue;
 			
 			if(Constants.CLONE_SET_TYPE_GROUP.equals(detectionSettings.getCloneSetType())){
-				List<CloneFragment> newCluster = findNeighborsForGroup(cloneFragment);
+				List<ICloneFragment> newCluster = findNeighborsForGroup(cloneFragment);
 				
 				if (newCluster.size() >= MIN_CLUSTER_SIZE){
 					CloneGroup newCloneGroup = new CloneGroup(newCluster, null, cloneSetIndex++);
@@ -153,23 +157,23 @@ public final class CloneDetector {
 		}	
 	}
 
-	private void fireDetectionStartEvent() {
+	private void fireDetectionStartEvent(int nCodeFragment) {
 		//if(detectionSettings.isVerbose())
 			System.out.println("Starting detection process...\n");
 		if (detectionListener != null) {
-			detectionListener.startDetection(new DetectionStartEvent(this));
+			detectionListener.startDetection(new DetectionStartEvent(this, nCodeFragment));
 		}
 	}
 
-	private <T extends CloneFragment> List<T> findNeighborsForGroup(T item){
-		List<T> neighbors = new ArrayList<T>();
+	private <T extends CloneFragment> List<ICloneFragment> findNeighborsForGroup(T item){
+		List<ICloneFragment> neighbors = new ArrayList<ICloneFragment>();
 		Set<Long> capturedHash = new HashSet<Long>();
 		
 		int deviation = 0; 
 		
 		int simThreshold1 = 0;
 		
-		if(detectionSettings.containsType(Constants.CLONE_TYPE_3)){
+		if(detectionSettings.containsType(CloneSet.CLONE_TYPE_3)){
 			simThreshold1 = Environment.getType3cloneSimthreshold();
 		}
 		
@@ -184,7 +188,7 @@ public final class CloneDetector {
 		
 		int length = neighbors.size();
 		for(int i = 0; i < length; i++) {
-			CloneFragment searchItem = neighbors.get(i);
+			ICloneFragment searchItem = neighbors.get(i);
 			//an additional check to save more computation
 			if(capturedHash.contains(searchItem.getSimhash1())) {
 				continue;// its result already picked up by someone else earlier, so just ignore
@@ -310,8 +314,9 @@ public final class CloneDetector {
 								minFriendCount = minFriendCount < 1 ? 1: minFriendCount;
 								
 								boolean coolDude = false;
-								for(CloneFragment eMember:neighbors){
-									
+								//for(ICloneFragment eMember : neighbors){
+								for(Iterator<ICloneFragment> it  = (Iterator<ICloneFragment>) neighbors.iterator(); it.hasNext();){	
+									CloneFragment eMember = (CloneFragment) it.next();
 									//set initial friendship to false
 									eMember.isTempFriend = false;
 									
@@ -335,8 +340,8 @@ public final class CloneDetector {
 									length++;
 									
 									//move temp friends count to real count
-									for(Iterator<CloneFragment> it  = (Iterator<CloneFragment>) neighbors.iterator(); it.hasNext();){
-										CloneFragment eMember = it.next();
+									for(Iterator<ICloneFragment> it  = (Iterator<ICloneFragment>) neighbors.iterator(); it.hasNext();){
+										CloneFragment eMember = (CloneFragment) it.next();
 										if(eMember.isTempFriend) {
 											//eMember.friendlist.add(matchCandidate);
 											eMember.friendCount ++;
@@ -363,8 +368,8 @@ public final class CloneDetector {
 
 						//removedMember.clear();
 						
-						for(Iterator<CloneFragment> it  = (Iterator<CloneFragment>) neighbors.iterator(); it.hasNext();){
-							CloneFragment eMember = it.next();
+						for(Iterator<ICloneFragment> it  = (Iterator<ICloneFragment>) neighbors.iterator(); it.hasNext();){
+							CloneFragment eMember = (CloneFragment) it.next();
 							
 							if(eMember.friendCount/*eMember.friendlist.size()*/ < minFriendCount){ 
 								//get him outta here!
@@ -403,7 +408,7 @@ public final class CloneDetector {
 					if(!matchCandidate.isProceessed && searchItem.getSimhash1().equals(matchCandidate.getSimhash1())
 							&& searchItem.getSimhash2().equals(matchCandidate.getSimhash2())){
 						
-						if(detectionSettings.containsType(Constants.CLONE_TYPE_2)){
+						if(detectionSettings.containsType(CloneSet.CLONE_TYPE_2)){
 							neighbors.add((T) matchCandidate);
 							length++;
 						}else{ //only type-1 is searched for
@@ -432,7 +437,7 @@ public final class CloneDetector {
 		
 		int simThreshold1 = 0;
 		
-		if(detectionSettings.containsType(Constants.CLONE_TYPE_3)){
+		if(detectionSettings.containsType(CloneSet.CLONE_TYPE_3)){
 			simThreshold1 = Environment.getType3cloneSimthreshold();
 		}
 		
@@ -578,7 +583,7 @@ public final class CloneDetector {
 //									} //done with friendship checking
 //								}else
 									neighbors.add((T) matchCandidate);
-									matchCandidate.isProceessed = true;
+									//matchCandidate.isProceessed = true;
 														
 							}
 						}
@@ -591,14 +596,14 @@ public final class CloneDetector {
 					if(!matchCandidate.isProceessed && searchItem.getSimhash1().equals(matchCandidate.getSimhash1())
 							&& searchItem.getSimhash2().equals(matchCandidate.getSimhash2())){
 						
-						if(detectionSettings.containsType(Constants.CLONE_TYPE_2))
+						if(detectionSettings.containsType(CloneSet.CLONE_TYPE_2))
 							neighbors.add((T) matchCandidate);
 						else{ //only type-1 is searched for
 							if(FastStringComparator.INSTANCE.compare(searchItem.getOriginalCodeBlock(), matchCandidate.getOriginalCodeBlock()) == 0)
 								neighbors.add((T) matchCandidate);
 						}
 						
-						matchCandidate.isProceessed = true;
+						//matchCandidate.isProceessed = true;
 					}
 				}
 			}

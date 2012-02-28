@@ -8,8 +8,10 @@ import java.util.List;
  */
 public interface ICloneSet {
 
-	List<CloneFragment> getCloneFragments();
-
+	List<ICloneFragment> getCloneFragments();
+	
+	void setCloneFragments(List<? extends ICloneFragment> cloneFragments);
+	
 	String getCloneType();
 	
 	void setCloneType(String cloneType);

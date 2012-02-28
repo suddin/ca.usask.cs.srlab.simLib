@@ -16,7 +16,7 @@ if [ ! -d ${lib}/tools ]
 then
     echo "*** Error:  cannot find simCad installation ${lib}"
     echo ""
-#    exit 99
+    exit 99
 fi
  
 # check we compiled the tools
@@ -24,7 +24,7 @@ if [ ! -x ${lib}/tools/streamprocess.x ]
 then
     echo "*** Error:  Missing ${lib}/tools/streamprocess.x - type 'make' to make the simCad tools"
     echo ""
-#exit 99
+exit 99
 fi
 
 # check granularity
@@ -88,10 +88,9 @@ else
 fi
 
 #echo "system=${system}"
+#echo "output-dir=${output_dir}"
 #echo "granularity=${granularity}"
 #echo "language=${language}"
-#echo "simthreshold=${simthreshold}"
-#echo "output-dir=${output_dir}"
 #echo "rename=${rename}"
 #echo ""
 

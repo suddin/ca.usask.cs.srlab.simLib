@@ -18,6 +18,7 @@ import org.xml.sax.InputSource;
 
 import ca.usask.cs.srlab.simcad.SimcadException;
 import ca.usask.cs.srlab.simcad.dataprovider.AbstractFragmentDataProvider;
+import ca.usask.cs.srlab.simcad.dataprovider.filesystem.FileSystemFragmentDataProviderConfiguration;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.util.PropsUtil;
 
@@ -122,6 +123,7 @@ public class XMLMultiSourceFragmentDataProvider extends AbstractFragmentDataProv
 		
 		List<CloneFragment> cloneFragmentList = new LinkedList<CloneFragment>();
 		Integer minSizeOfGranularity = PropsUtil.getMinSizeOfGranularity();
+		boolean fileUrlRelative = PropsUtil.getIsFragmentFileRelativeURL();
 		
 		Integer items = 0;
 		
@@ -152,6 +154,10 @@ public class XMLMultiSourceFragmentDataProvider extends AbstractFragmentDataProv
 				throw new SimcadException("Original and transformed source are not synced to each other");
 			}if(!endline.equals(endlineT)){
 				throw new SimcadException("Original and transformed source are not synced to each other");
+			}
+			
+			if(fileUrlRelative){
+				file = file.replace(dataProviderConfig.getSourceDaraRootUrl(), "");
 			}
 			
 			String transformedContent = transformedSource.getFirstChild().getTextContent().trim();

@@ -1,9 +1,7 @@
 package ca.usask.cs.srlab.simcad.dataprovider.filesystem;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.List;
 
 import ca.usask.cs.srlab.simcad.Environment;
@@ -29,7 +27,7 @@ public class FileSystemFragmentDataProvider extends AbstractFragmentDataProvider
 	
 	private void initDataSource(){
 		String dataSource[] = extractDataFromFilesystem();
-		XMLMultiSourceFragmentDataProviderConfiguration xmlDataProviderConfig = new XMLMultiSourceFragmentDataProviderConfiguration(dataSource[0], dataSource[1],  this.dataProviderConfig.getSourceFragmentType());
+		XMLMultiSourceFragmentDataProviderConfiguration xmlDataProviderConfig = new XMLMultiSourceFragmentDataProviderConfiguration(dataSource[0], dataSource[1], this.dataProviderConfig.getSourceDaraRootUrl(), this.dataProviderConfig.getSourceFragmentType());
 		xmlDataProviderConfig.addDataTransformer(new FixTxlSourceFragmentOutputXML());
 		xmlMultiSourceFragmentDataProvider = new XMLMultiSourceFragmentDataProvider(xmlDataProviderConfig);
 	}
@@ -40,8 +38,13 @@ public class FileSystemFragmentDataProvider extends AbstractFragmentDataProvider
 	}
 	
 	private String[] extractDataFromFilesystem() {
-		String classpathRoot = Environment.getResourcePath("");
+		
+		String simLibRoot = Environment.getSimLibRoot();
 		String simcadInstallationUrl = PropsUtil.getSimcadInstallUrl();
+		
+//		System.err.println("simlib container root: "+simLibRoot);
+//		System.err.println("simcad installation: "+simcadInstallationUrl);
+		
 		String output_dir=null;
 		int exitVal = 0;
 		
@@ -56,37 +59,26 @@ public class FileSystemFragmentDataProvider extends AbstractFragmentDataProvider
 		    String[] cmd = {
 					"/bin/sh",
 					"-c",
-					"cd "+classpathRoot+
+					"cd "+simLibRoot+
 					"\ncd "+simcadInstallationUrl+
-					"\n ./scripts/ExtractAndRename "+config.getSourceFragmentType()+" "+config.getLanguage()+" "+config.getTransformation()+" "+config.getSourceFolder()+" "+output_dir
+					"\n ./scripts/ExtractAndRename "+config.getSourceFragmentType()+" "+config.getLanguage()+" "+config.getTransformationAction()+" "+config.getSourceFolder()+" "+output_dir
 					};
 
-		    Process proc = Runtime.getRuntime().exec(cmd);
-		    
-		    BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-
-            // read the output from the command
-		    String s = null;
-            while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
-            }
-            
-            stdInput.close();
-		    exitVal = proc.waitFor();
+		    exitVal = SimCadCommandRunner.INSTANCE.executeCommand(cmd, true);
 	        
 		} catch (IOException e) {
-			throw new SimcadException("Error occured during extraction...", e);
+			throw new SimcadException("Error occured during extraction...see log in :" +config.getOutputFolder(), e);
 		}catch (InterruptedException e) {
 			e.printStackTrace();
-			throw new SimcadException("Error occured during extraction...", e);
+			throw new SimcadException("Error occured during extraction...see log in :" +config.getOutputFolder(), e);
 		}	
 		
 		if(exitVal > 0){
-			throw new SimcadException("Error occured during extraction...");
+			throw new SimcadException("Error occured during extraction...see log in :" +config.getOutputFolder());
 		}
 		
 		String sourceFragmentFileName = output_dir+System.getProperty("file.separator")+config.getSourceFragmentType()+"s.xml";
-		String transformedFragmentFileName = output_dir+System.getProperty("file.separator")+config.getSourceFragmentType()+"s-"+config.getTransformation()+".xml";
+		String transformedFragmentFileName = output_dir+System.getProperty("file.separator")+config.getSourceFragmentType()+"s-"+config.getTransformationAction()+".xml";
 		
 		return new String[]{sourceFragmentFileName, transformedFragmentFileName};
 	}

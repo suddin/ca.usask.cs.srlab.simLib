@@ -1,7 +1,12 @@
 package ca.usask.cs.srlab.simcad;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.CodeSource;
 
 import ca.usask.cs.srlab.simcad.util.PropsUtil;
 
@@ -65,6 +70,16 @@ public class Environment {
 			// System.out.println(resource+
 			// " got by Environment.class.getClassLoader()");
 		}
+		
+		if(stream == null){
+			//System.out.println(resource + " not available in classpath, checking outside classpath...");
+			String path = getExternalResourcePath(stripped);
+			if(path!=null)
+				try {
+					stream = new FileInputStream(path);
+				} catch (FileNotFoundException e) {
+				}
+		}
 		return stream;
 	}
 	
@@ -94,5 +109,54 @@ public class Environment {
 		}
 		return resourceURL !=null ? resourceURL.getPath() : null;
 	}
+	
+	public static String getExternalResourcePath(String resource) {
+		String stripped = resource.startsWith("/") ? resource.substring(1) : resource;
+		String resourceURL = null;
+		
+		URL baseUrl = Environment.class.getProtectionDomain().getCodeSource().getLocation();
+		if(baseUrl == null){
+			baseUrl = ClassLoader.getSystemClassLoader().getResource(".");
+			if(baseUrl == null){
+				baseUrl = Environment.class.getClassLoader().getResource(".");
+				if(baseUrl == null){
+					return null;
+				}
+			}
+		}
+		
+		File base = new File(baseUrl.getFile());
+		
+		do{
+			resourceURL = base.getPath().concat(System.getProperty("file.separator") + stripped);
+			if(new File(resourceURL).exists())
+				return resourceURL;
+			else{
+				if(base.getParent()==null || base.getParent().isEmpty())
+					break;
+				else{
+					base = new File(base.getParent());
+					//System.out.println(base.getPath());
+				}
+			}
+		}while(true);
+		
+		return null;
+	}
 
+	public static String getSimLibRoot() {
+		try {
+			CodeSource codeSource = Environment.class.getProtectionDomain().getCodeSource();
+			File root = new File(codeSource.getLocation().toURI().getPath());
+			if(root.isDirectory())
+				return root.getAbsolutePath();
+			else
+				return root.getParent();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			throw new SimcadException(e);
+		}
+		//return new File(".").getAbsoluteFile().getParent();
+	}
+	
 }

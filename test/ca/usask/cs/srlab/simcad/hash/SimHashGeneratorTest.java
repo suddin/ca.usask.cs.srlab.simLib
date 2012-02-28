@@ -8,6 +8,7 @@ import org.junit.Test;
 import ca.usask.cs.srlab.simcad.Constants;
 import ca.usask.cs.srlab.simcad.DetectionSettings;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
+import ca.usask.cs.srlab.simcad.model.CloneSet;
 import ca.usask.cs.srlab.simcad.model.FunctionCloneFragment;
 import ca.usask.cs.srlab.simcad.token.ITokenBuilder;
 import ca.usask.cs.srlab.simcad.token.TokenBuilderFactory;
@@ -83,8 +84,8 @@ public class SimHashGeneratorTest {
 	
 	@BeforeClass
 	public static void setup(){
-		detectionSettings1 = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTION, Constants.CLONE_SET_TYPE_GROUP, false, Constants.CLONE_TYPE_1);
-		detectionSettings2 = new DetectionSettings(Constants.CLONE_GRANULARITY_FUNTION, Constants.CLONE_SET_TYPE_GROUP, false, Constants.CLONE_TYPE_1,  Constants.CLONE_TYPE_2,  Constants.CLONE_TYPE_3);
+		detectionSettings1 = new DetectionSettings(Constants.LANGUAGE_JAVA, Constants.CLONE_GRANULARITY_FUNTION, Constants.CLONE_SET_TYPE_GROUP,  Constants.SOURCE_TRANSFORMATION_APPROACH_GENEROUS, false, CloneSet.CLONE_TYPE_1);
+		detectionSettings2 = new DetectionSettings(Constants.LANGUAGE_JAVA, Constants.CLONE_GRANULARITY_FUNTION, Constants.CLONE_SET_TYPE_GROUP,  Constants.SOURCE_TRANSFORMATION_APPROACH_GENEROUS, false, CloneSet.CLONE_TYPE_1,  CloneSet.CLONE_TYPE_2,  CloneSet.CLONE_TYPE_3);
 	}
 	
 	@Before
