@@ -47,7 +47,7 @@ Installation Steps
 		clone_grouping    = (group | cg) | (pair | cp) : default = group
 		source_transform  = (generous | g) | (greedy | G) : default = generous
 		source_path       = absolute path to source folder
-		output_path       = absolute path to output folder : default = {source_path}_simad_clone
+		output_path       = absolute path to output folder : default = {source_path}_simcad_clones
 		
 	4.3 example
 		$ ./simCad2 -s /Users/foo/Documents/workspaces/my-project -l java

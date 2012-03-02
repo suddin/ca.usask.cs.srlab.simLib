@@ -16,7 +16,7 @@ echo "clone_type        = 1 | 2 | 3 | 12 | (23 | nearmiss) | 13 | (123 | all) : 
 echo "clone_grouping    = (group | cg) | (pair | cp) : default = (group | cg)"
 echo "source_transform  = (generous | g) | (greedy | G) : default = (generous | g)"
 echo "source_path       = absolute path to source folder"
-echo "output_path       = absolute path to output folder : default = {source_path}_simad_clone"
+echo "output_path       = absolute path to output folder : default = {source_path}_simcad_clones"
 }
 
 simcad_version="SimCad 2.0 (February 2012) : University of Saskatchewan, Canada"
