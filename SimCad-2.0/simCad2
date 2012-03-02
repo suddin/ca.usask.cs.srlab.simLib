@@ -92,7 +92,7 @@ shift
 if [ "$1" = "block" ] || [ "$1" = "function" ] || [ "$1" = "b" ] || [ "$1" = "f" ]
 then
     GRANULARITY=$1
-    if [ "${GRANULARITY}" = "b" ]
+    if [ "${GRANULARITY}" = "b" ] || [ "${GRANULARITY}" = "block" ]
     then
         GRANULARITY="block"
     else
@@ -262,15 +262,16 @@ echo "clone-type=${CLONE_TYPE}"
 echo "output-dir=${OUTPUT_DIR}"
 echo "source-transform=${SOURCE_TRANSFORM}"
 echo "clone_grouping=${CLONE_GROUPING}"
+exit 0
 fi
 echo ""
 
 
 #Detect Clone
 #echo ""
-#echo "java -Xmx1024m -jar ${lib}/tools/simCad2.jar ${VERBOSE} ${SOURCE_DIR} ${LANGUAGE} ${GRANULARITY} ${CLONE_TYPE} ${CLONE_GROUPING} ${SOURCE_TRANSFORM} ${OUTPUT_DIR}"
+#echo "java -Xmx1024m -jar ${lib}/tools/simLib.jar ${VERBOSE} ${SOURCE_DIR} ${LANGUAGE} ${GRANULARITY} ${CLONE_TYPE} ${CLONE_GROUPING} ${SOURCE_TRANSFORM} ${OUTPUT_DIR}"
 
-java -Xmx1024m -jar ${lib}/tools/simCad2.jar ${VERBOSE} ${SOURCE_DIR} ${LANGUAGE} ${GRANULARITY} ${CLONE_TYPE} ${CLONE_GROUPING} ${SOURCE_TRANSFORM} ${OUTPUT_DIR} 2>&1
+java -Xmx1024m -jar ${lib}/tools/simLib.jar ${VERBOSE} ${SOURCE_DIR} ${LANGUAGE} ${GRANULARITY} ${CLONE_TYPE} ${CLONE_GROUPING} ${SOURCE_TRANSFORM} ${OUTPUT_DIR} 2>&1
 
 exit 0
 
