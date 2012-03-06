@@ -191,23 +191,7 @@ public abstract class CloneSet implements ICloneSet, Cloneable {
 		}
 		
 		public static String getTypeStringFromArray(String cloneTypes[]){
-			String typeString = null;
-			Collection<String> cloneTypeList = Arrays.asList(cloneTypes);
-			
-			if(cloneTypeList.contains(CLONE_TYPE_1))
-				typeString = "1";
-			if(cloneTypeList.contains(CLONE_TYPE_2)){
-				if(typeString == null)
-					typeString = "2";
-				else
-					typeString = typeString+"2";
-			}
-			if(cloneTypeList.contains(CLONE_TYPE_3))
-				if(typeString == null)
-					typeString = "3";
-				else
-					typeString = typeString+"3";
-			return typeString;
+			return getTypeStringFromCollection(Arrays.asList(cloneTypes));
 		}
 	}
 	

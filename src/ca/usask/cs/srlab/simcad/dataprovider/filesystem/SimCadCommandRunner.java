@@ -24,28 +24,7 @@ public final class  SimCadCommandRunner {
 	
 	public int executeCommand(String[] cmd, boolean printOutput) throws IOException,
 			InterruptedException {
-
-		scriptExecutionListener.executionStarted();
-
-		Process proc = Runtime.getRuntime().exec(cmd);
-		
-		BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-
-		String s = null;
-		while ((s = stdInput.readLine()) != null) {
-			scriptExecutionListener.nextLineOfExecutionOutput(s);
-			if (printOutput)
-				System.out.println(s);
-		}
-
-		if (stdInput != null)
-			stdInput.close();
-
-		int exitVal = proc.waitFor();
-
-		scriptExecutionListener.executionEnded(exitVal);
-
-		return exitVal;
+		return executeCommand(cmd, printOutput, null);
 	}
 	
 	public int executeCommand(String cmd, boolean printOutput, String context) throws IOException,
@@ -57,8 +36,12 @@ public final class  SimCadCommandRunner {
 	InterruptedException {
 
 		scriptExecutionListener.executionStarted();
-		
-		Process proc = Runtime.getRuntime().exec(cmd, new String[]{}, new File(context));
+
+		Process proc = null;
+		if(context == null)
+			proc = Runtime.getRuntime().exec(cmd);
+		else
+			proc = Runtime.getRuntime().exec(cmd, new String[]{}, new File(context));
 		
 		BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 		
