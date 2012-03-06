@@ -64,100 +64,86 @@ public class ApacheHash {
    * @param initval  initial value to fold into the hash
    * @return  the 32 bit hash code
    */
-  @SuppressWarnings("fallthrough")
-  public static int lookup3(char[] k, int offset, int length, int initval) {
-    int a,b,c;
-    a = b = c = 0xdeadbeef + (length<<2) + initval;
+	@SuppressWarnings("fallthrough")
+	public static int lookup3(char[] k, int offset, int length, int initval) {
+		int[] abc = lookup3_base(k, offset, length, initval);
+		return abc[2];
+	}
+  
+	public static long lookup3_64(char[] k, int offset, int length, int initval) {
+		int[] abc = lookup3_base(k, offset, length, initval);
+		return abc[2] + (((long) abc[1]) << 32);
+	}
 
-    int i=offset;
-    while (length > 3)
-    {
-      a += k[i];
-      b += k[i+1];
-      c += k[i+2];
+	public static int[] lookup3_base(char[] k, int offset, int length, int initval) {
+		int a, b, c;
+		a = b = c = 0xdeadbeef + (length << 2) + initval;
 
-      // mix(a,b,c)... Java needs "out" parameters!!!
-      // Note: recent JVMs (Sun JDK6) turn pairs of shifts (needed to do a rotate)
-      // into real x86 rotate instructions.
-      {
-        a -= c;  a ^= (c<<4)|(c>>>-4);   c += b;
-        b -= a;  b ^= (a<<6)|(a>>>-6);   a += c;
-        c -= b;  c ^= (b<<8)|(b>>>-8);   b += a;
-        a -= c;  a ^= (c<<16)|(c>>>-16); c += b;
-        b -= a;  b ^= (a<<19)|(a>>>-19); a += c;
-        c -= b;  c ^= (b<<4)|(b>>>-4);   b += a;
-      }
+		int i = offset;
+		while (length > 3) {
+			a += k[i];
+			b += k[i + 1];
+			c += k[i + 2];
 
-      length -= 3;
-      i += 3;
-    }
+			// mix(a,b,c)... Java needs "out" parameters!!!
+			// Note: recent JVMs (Sun JDK6) turn pairs of shifts (needed to do a
+			// rotate)
+			// into real x86 rotate instructions.
+			{
+				a -= c;
+				a ^= (c << 4) | (c >>> -4);
+				c += b;
+				b -= a;
+				b ^= (a << 6) | (a >>> -6);
+				a += c;
+				c -= b;
+				c ^= (b << 8) | (b >>> -8);
+				b += a;
+				a -= c;
+				a ^= (c << 16) | (c >>> -16);
+				c += b;
+				b -= a;
+				b ^= (a << 19) | (a >>> -19);
+				a += c;
+				c -= b;
+				c ^= (b << 4) | (b >>> -4);
+				b += a;
+			}
 
-    switch(length) {
-      case 3 : c+=k[i+2];  // fall through
-      case 2 : b+=k[i+1];  // fall through
-      case 1 : a+=k[i+0];  // fall through
-        // final(a,b,c);
-      {
-        c ^= b; c -= (b<<14)|(b>>>-14);
-        a ^= c; a -= (c<<11)|(c>>>-11);
-        b ^= a; b -= (a<<25)|(a>>>-25);
-        c ^= b; c -= (b<<16)|(b>>>-16);
-        a ^= c; a -= (c<<4)|(c>>>-4);
-        b ^= a; b -= (a<<14)|(a>>>-14);
-        c ^= b; c -= (b<<24)|(b>>>-24);
-      }
-      case 0:
-        break;
-    }
-    return c;
-  }
+			length -= 3;
+			i += 3;
+		}
 
-  public static long lookup3_64(char[] k, int offset, int length, int initval) {
-	    int a,b,c;
-	    a = b = c = 0xdeadbeef + (length<<2) + initval;
+		switch (length) {
+		case 3:
+			c += k[i + 2]; // fall through
+		case 2:
+			b += k[i + 1]; // fall through
+		case 1:
+			a += k[i + 0]; // fall through
+			// final(a,b,c);
+			{
+				c ^= b;
+				c -= (b << 14) | (b >>> -14);
+				a ^= c;
+				a -= (c << 11) | (c >>> -11);
+				b ^= a;
+				b -= (a << 25) | (a >>> -25);
+				c ^= b;
+				c -= (b << 16) | (b >>> -16);
+				a ^= c;
+				a -= (c << 4) | (c >>> -4);
+				b ^= a;
+				b -= (a << 14) | (a >>> -14);
+				c ^= b;
+				c -= (b << 24) | (b >>> -24);
+			}
+		case 0:
+			break;
+		}
+		return new int[] { a, b, c };
+	}
 
-	    int i=offset;
-	    while (length > 3)
-	    {
-	      a += k[i];
-	      b += k[i+1];
-	      c += k[i+2];
-
-	      // mix(a,b,c)... Java needs "out" parameters!!!
-	      // Note: recent JVMs (Sun JDK6) turn pairs of shifts (needed to do a rotate)
-	      // into real x86 rotate instructions.
-	      {
-	        a -= c;  a ^= (c<<4)|(c>>>-4);   c += b;
-	        b -= a;  b ^= (a<<6)|(a>>>-6);   a += c;
-	        c -= b;  c ^= (b<<8)|(b>>>-8);   b += a;
-	        a -= c;  a ^= (c<<16)|(c>>>-16); c += b;
-	        b -= a;  b ^= (a<<19)|(a>>>-19); a += c;
-	        c -= b;  c ^= (b<<4)|(b>>>-4);   b += a;
-	      }
-
-	      length -= 3;
-	      i += 3;
-	    }
-
-	    switch(length) {
-	      case 3 : c+=k[i+2];  // fall through
-	      case 2 : b+=k[i+1];  // fall through
-	      case 1 : a+=k[i+0];  // fall through
-	        // final(a,b,c);
-	      {
-	        c ^= b; c -= (b<<14)|(b>>>-14);
-	        a ^= c; a -= (c<<11)|(c>>>-11);
-	        b ^= a; b -= (a<<25)|(a>>>-25);
-	        c ^= b; c -= (b<<16)|(b>>>-16);
-	        a ^= c; a -= (c<<4)|(c>>>-4);
-	        b ^= a; b -= (a<<14)|(a>>>-14);
-	        c ^= b; c -= (b<<24)|(b>>>-24);
-	      }
-	      case 0:
-	        break;
-	    }
-	    return c + (((long)b) << 32);
-	  }
 
   /**
    * Identical to lookup3, except initval is biased by -(length&lt;&lt;2).
@@ -179,57 +165,16 @@ public class ApacheHash {
    * generate the same hash as the original lookup3
    * via {@code lookup3ycs(s, start, end, initval+(numCodePoints<<2))}
    */
-  public static int lookup3ycs(CharSequence s, int start, int end, int initval) {
-    int a,b,c;
-    a = b = c = 0xdeadbeef + initval;
-    // only difference from lookup3 is that "+ (length<<2)" is missing
-    // since we don't know the number of code points to start with,
-    // and don't want to have to pre-scan the string to find out.
+	public static int lookup3ycs(CharSequence s, int start, int end, int initval) {
+		int a, b, c;
+		a = b = c = 0xdeadbeef + initval;
+		// only difference from lookup3 is that "+ (length<<2)" is missing
+		// since we don't know the number of code points to start with,
+		// and don't want to have to pre-scan the string to find out.
 
-    int i=start;
-    boolean mixed=true;  // have the 3 state variables been adequately mixed?
-    for(;;) {
-      if (i>= end) break;
-      mixed=false;
-      char ch;
-      ch = s.charAt(i++);
-      a += Character.isHighSurrogate(ch) && i< end ? Character.toCodePoint(ch, s.charAt(i++)) : ch;
-      if (i>= end) break;
-      ch = s.charAt(i++);
-      b += Character.isHighSurrogate(ch) && i< end ? Character.toCodePoint(ch, s.charAt(i++)) : ch;
-      if (i>= end) break;
-      ch = s.charAt(i++);
-      c += Character.isHighSurrogate(ch) && i< end ? Character.toCodePoint(ch, s.charAt(i++)) : ch;
-      if (i>= end) break;
-
-      // mix(a,b,c)... Java needs "out" parameters!!!
-      // Note: recent JVMs (Sun JDK6) turn pairs of shifts (needed to do a rotate)
-      // into real x86 rotate instructions.
-      {
-        a -= c;  a ^= (c<<4)|(c>>>-4);   c += b;
-        b -= a;  b ^= (a<<6)|(a>>>-6);   a += c;
-        c -= b;  c ^= (b<<8)|(b>>>-8);   b += a;
-        a -= c;  a ^= (c<<16)|(c>>>-16); c += b;
-        b -= a;  b ^= (a<<19)|(a>>>-19); a += c;
-        c -= b;  c ^= (b<<4)|(b>>>-4);   b += a;
-      }
-      mixed=true;
-    }
-
-
-    if (!mixed) {
-      // final(a,b,c)
-        c ^= b; c -= (b<<14)|(b>>>-14);
-        a ^= c; a -= (c<<11)|(c>>>-11);
-        b ^= a; b -= (a<<25)|(a>>>-25);
-        c ^= b; c -= (b<<16)|(b>>>-16);
-        a ^= c; a -= (c<<4)|(c>>>-4);
-        b ^= a; b -= (a<<14)|(a>>>-14);
-        c ^= b; c -= (b<<24)|(b>>>-24);
-    }
-
-    return c;
-  }
+		int[] abc = lookup3ycs_base(s, start, end, a, b, c);
+		return abc[2];
+	}
 
 
   /**<p>This is the 64 bit version of lookup3ycs, corresponding to Bob Jenkin's
@@ -238,59 +183,92 @@ public class ApacheHash {
    * result will be the same as lookup3ycs.
    * </p>
    */
-  public static long lookup3ycs64(CharSequence s, int start, int end, long initval) {
-    int a,b,c;
-    a = b = c = 0xdeadbeef + (int)initval;
-    c += (int)(initval>>>32);
-    // only difference from lookup3 is that "+ (length<<2)" is missing
-    // since we don't know the number of code points to start with,
-    // and don't want to have to pre-scan the string to find out.
+	public static long lookup3ycs64(CharSequence s, int start, int end,
+			long initval) {
+		int a, b, c;
+		a = b = c = 0xdeadbeef + (int) initval;
+		c += (int) (initval >>> 32);
+		// only difference from lookup3 is that "+ (length<<2)" is missing
+		// since we don't know the number of code points to start with,
+		// and don't want to have to pre-scan the string to find out.
 
-    int i=start;
-    boolean mixed=true;  // have the 3 state variables been adequately mixed?
-    for(;;) {
-      if (i>= end) break;
-      mixed=false;
-      char ch;
-      ch = s.charAt(i++);
-      a += Character.isHighSurrogate(ch) && i< end ? Character.toCodePoint(ch, s.charAt(i++)) : ch;
-      if (i>= end) break;
-      ch = s.charAt(i++);
-      b += Character.isHighSurrogate(ch) && i< end ? Character.toCodePoint(ch, s.charAt(i++)) : ch;
-      if (i>= end) break;
-      ch = s.charAt(i++);
-      c += Character.isHighSurrogate(ch) && i< end ? Character.toCodePoint(ch, s.charAt(i++)) : ch;
-      if (i>= end) break;
+		int[] abc = lookup3ycs_base(s, start, end, a, b, c);
+		return abc[2] + (((long) abc[2]) << 32);
+	}
 
-      // mix(a,b,c)... Java needs "out" parameters!!!
-      // Note: recent JVMs (Sun JDK6) turn pairs of shifts (needed to do a rotate)
-      // into real x86 rotate instructions.
-      {
-        a -= c;  a ^= (c<<4)|(c>>>-4);   c += b;
-        b -= a;  b ^= (a<<6)|(a>>>-6);   a += c;
-        c -= b;  c ^= (b<<8)|(b>>>-8);   b += a;
-        a -= c;  a ^= (c<<16)|(c>>>-16); c += b;
-        b -= a;  b ^= (a<<19)|(a>>>-19); a += c;
-        c -= b;  c ^= (b<<4)|(b>>>-4);   b += a;
-      }
-      mixed=true;
-    }
+	public static int[] lookup3ycs_base(CharSequence s, int start, int end,
+			int a, int b, int c) {
+		int i = start;
+		boolean mixed = true; // have the 3 state variables been adequately
+								// mixed?
+		for (;;) {
+			if (i >= end)
+				break;
+			mixed = false;
+			char ch;
+			ch = s.charAt(i++);
+			a += Character.isHighSurrogate(ch) && i < end ? Character
+					.toCodePoint(ch, s.charAt(i++)) : ch;
+			if (i >= end)
+				break;
+			ch = s.charAt(i++);
+			b += Character.isHighSurrogate(ch) && i < end ? Character
+					.toCodePoint(ch, s.charAt(i++)) : ch;
+			if (i >= end)
+				break;
+			ch = s.charAt(i++);
+			c += Character.isHighSurrogate(ch) && i < end ? Character
+					.toCodePoint(ch, s.charAt(i++)) : ch;
+			if (i >= end)
+				break;
 
+			// mix(a,b,c)... Java needs "out" parameters!!!
+			// Note: recent JVMs (Sun JDK6) turn pairs of shifts (needed to do a
+			// rotate)
+			// into real x86 rotate instructions.
+			{
+				a -= c;
+				a ^= (c << 4) | (c >>> -4);
+				c += b;
+				b -= a;
+				b ^= (a << 6) | (a >>> -6);
+				a += c;
+				c -= b;
+				c ^= (b << 8) | (b >>> -8);
+				b += a;
+				a -= c;
+				a ^= (c << 16) | (c >>> -16);
+				c += b;
+				b -= a;
+				b ^= (a << 19) | (a >>> -19);
+				a += c;
+				c -= b;
+				c ^= (b << 4) | (b >>> -4);
+				b += a;
+			}
+			mixed = true;
+		}
 
-    if (!mixed) {
-      // final(a,b,c)
-        c ^= b; c -= (b<<14)|(b>>>-14);
-        a ^= c; a -= (c<<11)|(c>>>-11);
-        b ^= a; b -= (a<<25)|(a>>>-25);
-        c ^= b; c -= (b<<16)|(b>>>-16);
-        a ^= c; a -= (c<<4)|(c>>>-4);
-        b ^= a; b -= (a<<14)|(a>>>-14);
-        c ^= b; c -= (b<<24)|(b>>>-24);
-    }
-
-    return c + (((long)b) << 32);
-  }
-
+		if (!mixed) {
+			// final(a,b,c)
+			c ^= b;
+			c -= (b << 14) | (b >>> -14);
+			a ^= c;
+			a -= (c << 11) | (c >>> -11);
+			b ^= a;
+			b -= (a << 25) | (a >>> -25);
+			c ^= b;
+			c -= (b << 16) | (b >>> -16);
+			a ^= c;
+			a -= (c << 4) | (c >>> -4);
+			b ^= a;
+			b -= (a << 14) | (a >>> -14);
+			c ^= b;
+			c -= (b << 24) | (b >>> -24);
+		}
+		return new int[] { a, b, c };
+	}
+  
   public static void main(String[] args) throws IOException {
 	    /*if (args.length != 1) {
 	      System.err.println("Usage: JenkinsHash filename");

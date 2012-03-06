@@ -33,8 +33,10 @@ public class XmlOutputProcessor extends AbstractProcessor {
 
 	@Override
 	public boolean process(Collection<CloneSet> inputCloneSets, Collection<CloneSet> outputCloneSets) {
+		super.process(inputCloneSets, outputCloneSets);	
+		
 		//if(detectionSettings.isVerbose())
-			System.out.println("Generating output xml file...\n");
+		System.out.println("Generating output xml file...\n");
 		
 		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder docBuilder = null;

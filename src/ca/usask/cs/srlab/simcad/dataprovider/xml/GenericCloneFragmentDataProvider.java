@@ -43,7 +43,7 @@ public class GenericCloneFragmentDataProvider extends AbstractFragmentDataProvid
 				String transformedContent = "transformed content";
 				//end
 				
-				int loc = computeLoc(transformedContent);
+				int loc = CloneFragment.computeActualLineOfCode(transformedContent);
 
 				if (loc < PropsUtil.getMinSizeOfGranularity())
 					continue;
@@ -68,16 +68,6 @@ public class GenericCloneFragmentDataProvider extends AbstractFragmentDataProvid
 			dataSource = ixmlFragmentDataProviderTransformer.transform(dataSource);
 		}
 		return dataSource;
-	}
-	
-	private int computeLoc(String content) {
-		String []line = content.split("\n");
-		int loc=0;
-		for(String ln : line){
-			if(ln.length() > 0)
-				loc++;
-		}
-		return loc;
 	}
 	
 }

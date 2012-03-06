@@ -10,7 +10,7 @@ public class DatabaseOutputProcessor extends AbstractProcessor {
 	@Override
 	public boolean process(Collection<CloneSet> inputCloneSets,
 			Collection<CloneSet> outputCloneSets) {
-		
+		super.process(inputCloneSets, outputCloneSets);
 		
 		outputCloneSets.addAll(inputCloneSets);
 		return false;

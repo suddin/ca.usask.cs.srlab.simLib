@@ -180,46 +180,5 @@ public class DetectionTest {
 		Assert.assertEquals(3, result.get(0).size());
 		Assert.assertEquals(3, result.get(1).size());
 	}
-	
-	//@Test
-	public void testNearMissCloneGroup(){
-		cloneDetector = CloneDetector.getInstance(cloneIndex, detectionSettings_nearmiss_group);
-		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
-		List<CloneSet> result = cloneDetector.detect(candidateFragments);
 		
-//		for (CloneSet cloneSet : result) {
-//			System.out.println(cloneSet);
-//		}
-		
-		Assert.assertEquals(2, result.size());
-		Assert.assertEquals(3, result.get(0).size());
-		Assert.assertEquals(3, result.get(1).size());
-	}
-	
-	//@Test
-	public void testType1ClonePair(){
-		cloneDetector = CloneDetector.getInstance(cloneIndex, detectionSettings_type1_pair);
-		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
-		List<CloneSet> result = cloneDetector.detect(candidateFragments);
-		
-//		for (CloneSet cloneSet : result) {
-//			System.out.println(cloneSet);
-//		}
-		
-		Assert.assertEquals(3, result.size());
-	}
-	
-	//@Test
-	public void testNearMissClonePair(){
-		cloneDetector = CloneDetector.getInstance(cloneIndex, detectionSettings_nearmiss_pair);
-		Collection<CloneFragment> candidateFragments = cloneIndex.getAllEntries();
-		List<CloneSet> result = cloneDetector.detect(candidateFragments);
-		
-//		for (CloneSet cloneSet : result) {
-//			System.out.println(cloneSet);
-//		}
-		
-		Assert.assertEquals(6, result.size());
-	}
-	
 }

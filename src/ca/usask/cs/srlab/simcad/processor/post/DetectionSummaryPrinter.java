@@ -11,7 +11,6 @@ import ca.usask.cs.srlab.simcad.processor.AbstractProcessor;
 
 public class DetectionSummaryPrinter extends AbstractProcessor {
 
-	private String message;
 	private PrintWriter printWriter;
 	private DetectionSettings detectionSettings;
 	
@@ -20,22 +19,18 @@ public class DetectionSummaryPrinter extends AbstractProcessor {
 	private DetectionSummaryPrinter(){}
 	
 	public DetectionSummaryPrinter(DetectionSettings detectionSettings, PrintWriter printWriter) {
-		super();
-		this.detectionSettings = detectionSettings;
-		this.printWriter = printWriter;
+		this(detectionSettings, printWriter, null);
 	}
 	
 	public DetectionSummaryPrinter(DetectionSettings detectionSettings, PrintWriter printWriter, String message) {
-		super();
+		super(message);
 		this.detectionSettings = detectionSettings;
 		this.printWriter = printWriter;
-		this.message = message;
 	}
 	
 	@Override
 	public boolean process(Collection<CloneSet> inputCloneSets,	Collection<CloneSet> outputCloneSets) {
-		if(message!=null)
-			System.out.println(message+"\n");
+		super.process(inputCloneSets, outputCloneSets);
 			
 		printWriter.println("----------Detection Summary----------");
 		printWriter.println("Date/Time	: "+ new SimpleDateFormat("yyyy/MMM/dd HH:mm:ss").format(Calendar.getInstance().getTime()) );
