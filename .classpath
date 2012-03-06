@@ -7,5 +7,7 @@
 	<classpathentry kind="lib" path="lib/guava-10.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-collections-3.2.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ca.usask.cs.srlab.kopa"/>
+	<classpathentry exported="true" kind="lib" path="/ca.usask.cs.srlab.kopa/lib/ejb3-persistence.jar"/>
+	<classpathentry exported="true" kind="lib" path="/ca.usask.cs.srlab.kopa/lib/hibernate3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
