@@ -39,6 +39,7 @@ public class DetectionSummaryPrinter extends AbstractProcessor {
 		printWriter.println("Output Location	: "+ detectionSettings.getDetectionReport().getOutputFolder());
 
 		printWriter.println("Source fragment type	: "+ detectionSettings.getCloneGranularity());
+		printWriter.println("Source transformation	: "+ detectionSettings.getSourceTransformation());
 		
 		printWriter.println("Clone type		: "+ detectionSettings.getTypeStringDetail());
 		printWriter.println("Clone grouping type	: "+ detectionSettings.getCloneSetType());

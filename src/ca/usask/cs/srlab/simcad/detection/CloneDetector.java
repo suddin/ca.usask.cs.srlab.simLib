@@ -29,10 +29,11 @@ import ca.usask.cs.srlab.simcad.util.PropsUtil;
 
 public final class CloneDetector {
 	
-	private static final Integer MIN_CLUSTER_SIZE = PropsUtil.getMinClusterSize();
-	private static final boolean STRICT_ON_MEMBERSHIP = PropsUtil.isStrictOnMembership();
-	private static final Double CLUSTER_MEMBERSHIP_RATIO = PropsUtil.getClusterMembershipRatio();
-	private static final Double LOC_TOLERANCE = PropsUtil.getLocTolerance();
+	private static final Integer	MIN_CLUSTER_SIZE = PropsUtil.getMinClusterSize();
+	private static final boolean 	STRICT_ON_MEMBERSHIP = PropsUtil.isStrictOnMembership();
+	private static final Double 	CLUSTER_MEMBERSHIP_RATIO = PropsUtil.getClusterMembershipRatio();
+	private static final Double 	LOC_TOLERANCE = PropsUtil.getLocTolerance();
+	private static final Double 	THRESHOLD_STABILIZATION_VALUE_FOR_GREEDY_TRANSFORM = PropsUtil.thresholdStabilizationValueForGreedyTransform();
 	
 	private ICloneIndex cloneIndex;
 	private DetectionSettings detectionSettings;
@@ -299,6 +300,12 @@ public final class CloneDetector {
 				dynamicSimThreshold1 = simThreshold1 + deviation;
 				dynamicSimThreshold2 = simThreshold2 + deviation;
 				
+				if(detectionSettings.getSourceTransformation() !=null &&
+						 Constants.SOURCE_TRANSFORMATION_APPROACH_GREEDY.equals(detectionSettings.getSourceTransformation())){
+					dynamicSimThreshold1 -= dynamicSimThreshold1 * THRESHOLD_STABILIZATION_VALUE_FOR_GREEDY_TRANSFORM;
+					dynamicSimThreshold2 -= dynamicSimThreshold2 * THRESHOLD_STABILIZATION_VALUE_FOR_GREEDY_TRANSFORM;
+				}				
+				
 				Set<IndexKey> keySet = cloneIndex.getAllKeys();
 				for (IndexKey indexKey : keySet) {
 					if((searchItem.getLineOfCode() - (searchItem.getLineOfCode() * LOC_TOLERANCE) < indexKey.getLineKey().intValue() && searchItem.getLineOfCode() + (searchItem.getLineOfCode() * LOC_TOLERANCE) > indexKey.getLineKey().intValue())
@@ -553,6 +560,12 @@ public final class CloneDetector {
 				dynamicSimThreshold1 = simThreshold1 + deviation;
 				dynamicSimThreshold2 = simThreshold2 + deviation;
 				
+				if(detectionSettings.getSourceTransformation() !=null &&
+						 Constants.SOURCE_TRANSFORMATION_APPROACH_GREEDY.equals(detectionSettings.getSourceTransformation())){
+					dynamicSimThreshold1 -= dynamicSimThreshold1 * THRESHOLD_STABILIZATION_VALUE_FOR_GREEDY_TRANSFORM;
+					dynamicSimThreshold2 -= dynamicSimThreshold2 * THRESHOLD_STABILIZATION_VALUE_FOR_GREEDY_TRANSFORM;
+				}
+
 				Set<IndexKey> keySet = cloneIndex.getAllKeys();
 				for (IndexKey indexKey : keySet) {
 					if((searchItem.getLineOfCode() - (searchItem.getLineOfCode() * LOC_TOLERANCE) < indexKey.getLineKey().intValue() && searchItem.getLineOfCode() + (searchItem.getLineOfCode() * LOC_TOLERANCE) > indexKey.getLineKey().intValue())

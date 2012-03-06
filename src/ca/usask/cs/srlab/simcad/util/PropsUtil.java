@@ -131,4 +131,8 @@ public final class PropsUtil {
 	public static String getProperty(String key){
 		return properties.getProperty(key);
 	}
+
+	public static Double thresholdStabilizationValueForGreedyTransform() {
+		return Double.valueOf(properties.getProperty(Constants.THRESHOLD_STABILIZATION_VALUE_FOR_GREEDY_TRANSFORM, "0.3"));
+	}
 }

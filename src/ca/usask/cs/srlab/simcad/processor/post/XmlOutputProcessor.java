@@ -90,7 +90,7 @@ public class XmlOutputProcessor extends AbstractProcessor {
 	    //System.out.println("Total clone class : "+ nGroup );
 	    //System.out.println("Total clone frag : "+ nFragment );
 	    
-	    String outputFileName =  "simcad_"+detectionSettings.getCloneGranularity()+"_clone-"+detectionSettings.getCloneSetType()+"s_"+detectionSettings.getTypeString()+(withSource?"_withsource":"")+".xml";
+	    String outputFileName =  "simcad_"+detectionSettings.getCloneGranularity()+"_clone-"+detectionSettings.getCloneSetType()+"s_"+detectionSettings.getTypeString()+"_"+detectionSettings.getSourceTransformation()+(withSource?"_withsource":"")+".xml";
 	    String outputFullFileName = outputFolderName + (outputFolderName.endsWith(System.getProperty("file.separator")) ?"":System.getProperty("file.separator"))+ outputFileName;
 	   
 //	    File outputFile = new File(outputFileName);

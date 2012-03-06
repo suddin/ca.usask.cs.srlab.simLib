@@ -164,7 +164,7 @@ public class SimCad {
 		processorDisptacher.addProcessor(xmlOutputProcessor).applyOn(result, detectionSettings);
 		
 		//log printer
-		String logFileName = output_dir + System.getProperty("file.separator") + "simcad_"+detectionSettings.getCloneGranularity()+"-clones-"+detectionSettings.getTypeString()+".log";
+		String logFileName = output_dir + System.getProperty("file.separator") + "simcad_"+detectionSettings.getCloneGranularity()+"-clones-"+detectionSettings.getTypeString()+"_"+detectionSettings.getSourceTransformation()+".log";
 		PrintWriter logPrinter;
 		try {
 			logPrinter = new PrintWriter(new FileWriter(logFileName));

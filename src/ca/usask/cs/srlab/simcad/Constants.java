@@ -11,6 +11,7 @@ public class Constants {
 	public static final String STRICT_ON_MEMBERSHIP 	= "simcad.settings.advance.strictOnMembership";
 	public static final String CLUSTER_MEMBERSHIP_RATIO = "simcad.settings.advance.clusterMembershipRatio";
 	public static final String LOC_TOLERANCE 			= "simcad.settings.advance.locTolerance";
+	public static final String THRESHOLD_STABILIZATION_VALUE_FOR_GREEDY_TRANSFORM = "simcad.settings.advance.thresholdStabilizationValueForGreedyTransform";
 	public static final String TYPE3CLONE_SIMTHRESHOLD 	= "simcad.settings.advance.type3clone.simthreshold";
 	
 	public static final int TYPE3CLONE_SIMTHRESHOLD_MAX_VAL = 13;
