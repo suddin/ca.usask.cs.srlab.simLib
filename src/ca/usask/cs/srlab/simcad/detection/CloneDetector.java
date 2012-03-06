@@ -2,10 +2,12 @@ package ca.usask.cs.srlab.simcad.detection;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import ca.usask.cs.srlab.simcad.Constants;
@@ -38,6 +40,19 @@ public final class CloneDetector {
 	private ICloneIndex cloneIndex;
 	private DetectionSettings detectionSettings;
 	private ICloneDetectionListener detectionListener;
+	
+	private static Map<Integer, Integer> syncedSimthreshold2Map = new HashMap<Integer, Integer>(8);
+	
+	static {
+	syncedSimthreshold2Map.put(6, 5);
+	syncedSimthreshold2Map.put(7, 6);
+	syncedSimthreshold2Map.put(8, 7);
+	syncedSimthreshold2Map.put(9, 8);
+	syncedSimthreshold2Map.put(10, 8);
+	syncedSimthreshold2Map.put(11, 9);
+	syncedSimthreshold2Map.put(12, 12);
+	syncedSimthreshold2Map.put(13, 13);
+	}
 	
 	public List<CloneSet> detect(Collection<CloneFragment> candidateFragments) {
 		if(candidateFragments == null || candidateFragments.size() == 0)
@@ -198,104 +213,9 @@ public final class CloneDetector {
 			//dynamic threshold update
 			if(simThreshold1 != 0){
 				
-				simThreshold2 = simThreshold1;
+				simThreshold2 = syncedSimthreshold2Map.get(simThreshold1);
 				
-				switch(simThreshold1){
-				
-				case 6:
-					simThreshold2 = 5;
-					break;
-				
-				case 7:
-					if(searchItem.getLineOfCode() < 6){
-						deviation = -1;
-					}else if(searchItem.getLineOfCode() < 8){
-						deviation = -1;
-					}
-					simThreshold2 = 6;
-					break;
-				
-				case 8:
-					if(searchItem.getLineOfCode() < 6){
-						deviation = -2;
-					}else if(searchItem.getLineOfCode() < 8){
-						deviation = -1;
-					}
-					simThreshold2 = 7;
-					break;
-				
-				case 9:
-					if(searchItem.getLineOfCode() < 6){
-						deviation = -3;
-					}else if(searchItem.getLineOfCode() < 8){
-						deviation = -2;
-					}else if(searchItem.getLineOfCode() < 10){
-						deviation = -1;
-					}
-					simThreshold2 = 8;
-					break;
-				
-				case 10:
-					if(searchItem.getLineOfCode() < 6){
-						deviation = -3;
-					}else if(searchItem.getLineOfCode() < 8){
-						deviation = -2;
-					}else if(searchItem.getLineOfCode() < 10){
-						deviation = -2;
-					}else if(searchItem.getLineOfCode() < 20){
-						deviation = -1;
-					}
-					simThreshold2 = 8;
-					break;
-				
-				case 11:
-					if(searchItem.getLineOfCode() < 6){
-						deviation = -4;
-					}else if(searchItem.getLineOfCode() < 8){
-						deviation = -3;
-					}else if(searchItem.getLineOfCode() < 10){
-						deviation = -2;
-					}else if(searchItem.getLineOfCode() < 20){
-						deviation = -1;
-					}
-					simThreshold2 = 9;
-					break;
-				
-				case 12:
-					if(searchItem.getLineOfCode() < 6){
-						deviation = -5;
-					}else if(searchItem.getLineOfCode() < 8){
-						deviation = -4;
-					}else if(searchItem.getLineOfCode() < 10){
-						deviation = -3;
-					}else if(searchItem.getLineOfCode() < 20){
-						deviation = -2;
-					}else if(searchItem.getLineOfCode() < 30){
-						deviation = -1;
-					}	
-					simThreshold2 = 12;
-					break;
-				case 13:
-					if(searchItem.getLineOfCode() < 6){
-						deviation = -5;
-					}else if(searchItem.getLineOfCode() < 8){
-						deviation = -4;
-					}else if(searchItem.getLineOfCode() < 10){
-						deviation = -3;
-					}else if(searchItem.getLineOfCode() < 20){
-						deviation = -2;
-					}else if(searchItem.getLineOfCode() < 30){
-						deviation = -1;
-					}	
-					simThreshold2 = 13;
-					break;
-				}
-				
-				/*else if(item.lineOfCode > 40){
-					deviation = 2;
-				}else if(item.lineOfCode > 30){
-					deviation = 1;
-				}*/
+				deviation = getThresholDeviationValue((CloneFragment)searchItem, simThreshold1);
 				
 				dynamicSimThreshold1 = simThreshold1 + deviation;
 				dynamicSimThreshold2 = simThreshold2 + deviation;
@@ -458,104 +378,9 @@ public final class CloneDetector {
 		//dynamic threshold update
 			if(simThreshold1 != 0){
 				
-				simThreshold2 = simThreshold1;
+				simThreshold2 = syncedSimthreshold2Map.get(simThreshold1);
 				
-				switch(simThreshold1){
-				
-				case 6:
-					simThreshold2 = 5;
-					break;
-				
-				case 7:
-					if(searchItem.getLineOfCode() < 6){
-						deviation = -1;
-					}else if(searchItem.getLineOfCode() < 8){
-						deviation = -1;
-					}
-					simThreshold2 = 6;
-					break;
-				
-				case 8:
-					if(searchItem.getLineOfCode() < 6){
-						deviation = -2;
-					}else if(searchItem.getLineOfCode() < 8){
-						deviation = -1;
-					}
-					simThreshold2 = 7;
-					break;
-				
-				case 9:
-					if(searchItem.getLineOfCode() < 6){
-						deviation = -3;
-					}else if(searchItem.getLineOfCode() < 8){
-						deviation = -2;
-					}else if(searchItem.getLineOfCode() < 10){
-						deviation = -1;
-					}
-					simThreshold2 = 8;
-					break;
-				
-				case 10:
-					if(searchItem.getLineOfCode() < 6){
-						deviation = -3;
-					}else if(searchItem.getLineOfCode() < 8){
-						deviation = -2;
-					}else if(searchItem.getLineOfCode() < 10){
-						deviation = -2;
-					}else if(searchItem.getLineOfCode() < 20){
-						deviation = -1;
-					}
-					simThreshold2 = 8;
-					break;
-				
-				case 11:
-					if(searchItem.getLineOfCode() < 6){
-						deviation = -4;
-					}else if(searchItem.getLineOfCode() < 8){
-						deviation = -3;
-					}else if(searchItem.getLineOfCode() < 10){
-						deviation = -2;
-					}else if(searchItem.getLineOfCode() < 20){
-						deviation = -1;
-					}
-					simThreshold2 = 9;
-					break;
-				
-				case 12:
-					if(searchItem.getLineOfCode() < 6){
-						deviation = -5;
-					}else if(searchItem.getLineOfCode() < 8){
-						deviation = -4;
-					}else if(searchItem.getLineOfCode() < 10){
-						deviation = -3;
-					}else if(searchItem.getLineOfCode() < 20){
-						deviation = -2;
-					}else if(searchItem.getLineOfCode() < 30){
-						deviation = -1;
-					}	
-					simThreshold2 = 12;
-					break;
-				case 13:
-					if(searchItem.getLineOfCode() < 6){
-						deviation = -5;
-					}else if(searchItem.getLineOfCode() < 8){
-						deviation = -4;
-					}else if(searchItem.getLineOfCode() < 10){
-						deviation = -3;
-					}else if(searchItem.getLineOfCode() < 20){
-						deviation = -2;
-					}else if(searchItem.getLineOfCode() < 30){
-						deviation = -1;
-					}	
-					simThreshold2 = 13;
-					break;
-				}
-				
-				/*else if(item.lineOfCode > 40){
-					deviation = 2;
-				}else if(item.lineOfCode > 30){
-					deviation = 1;
-				}*/
+				deviation = getThresholDeviationValue(searchItem, simThreshold1);
 				
 				dynamicSimThreshold1 = simThreshold1 + deviation;
 				dynamicSimThreshold2 = simThreshold2 + deviation;
@@ -622,6 +447,110 @@ public final class CloneDetector {
 			}
 		
 		return neighbors;
+	}
+
+	public <T extends CloneFragment> int getThresholDeviationValue(T searchItem, 
+			int simThreshold1) {
+		
+		int deviation = 0;
+		
+		switch(simThreshold1){
+		
+		case 6:
+			///simThreshold2 = 5;
+			break;
+		
+		case 7:
+			if(searchItem.getLineOfCode() < 6){
+				deviation = -1;
+			}else if(searchItem.getLineOfCode() < 8){
+				deviation = -1;
+			}
+			///simThreshold2 = 6;
+			break;
+		
+		case 8:
+			if(searchItem.getLineOfCode() < 6){
+				deviation = -2;
+			}else if(searchItem.getLineOfCode() < 8){
+				deviation = -1;
+			}
+			///simThreshold2 = 7;
+			break;
+		
+		case 9:
+			if(searchItem.getLineOfCode() < 6){
+				deviation = -3;
+			}else if(searchItem.getLineOfCode() < 8){
+				deviation = -2;
+			}else if(searchItem.getLineOfCode() < 10){
+				deviation = -1;
+			}
+			///simThreshold2 = 8;
+			break;
+		
+		case 10:
+			if(searchItem.getLineOfCode() < 6){
+				deviation = -3;
+			}else if(searchItem.getLineOfCode() < 8){
+				deviation = -2;
+			}else if(searchItem.getLineOfCode() < 10){
+				deviation = -2;
+			}else if(searchItem.getLineOfCode() < 20){
+				deviation = -1;
+			}
+			///simThreshold2 = 8;
+			break;
+		
+		case 11:
+			if(searchItem.getLineOfCode() < 6){
+				deviation = -4;
+			}else if(searchItem.getLineOfCode() < 8){
+				deviation = -3;
+			}else if(searchItem.getLineOfCode() < 10){
+				deviation = -2;
+			}else if(searchItem.getLineOfCode() < 20){
+				deviation = -1;
+			}
+			///simThreshold2 = 9;
+			break;
+		
+		case 12:
+			if(searchItem.getLineOfCode() < 6){
+				deviation = -5;
+			}else if(searchItem.getLineOfCode() < 8){
+				deviation = -4;
+			}else if(searchItem.getLineOfCode() < 10){
+				deviation = -3;
+			}else if(searchItem.getLineOfCode() < 20){
+				deviation = -2;
+			}else if(searchItem.getLineOfCode() < 30){
+				deviation = -1;
+			}	
+			///simThreshold2 = 12;
+			break;
+		case 13:
+			if(searchItem.getLineOfCode() < 6){
+				deviation = -5;
+			}else if(searchItem.getLineOfCode() < 8){
+				deviation = -4;
+			}else if(searchItem.getLineOfCode() < 10){
+				deviation = -3;
+			}else if(searchItem.getLineOfCode() < 20){
+				deviation = -2;
+			}else if(searchItem.getLineOfCode() < 30){
+				deviation = -1;
+			}	
+			///simThreshold2 = 13;
+			break;
+		}
+		
+		/*else if(item.lineOfCode > 40){
+			deviation = 2;
+		}else if(item.lineOfCode > 30){
+			deviation = 1;
+		}*/
+		return deviation;
 	}
 	
 	private int hamming_dist(Long simhash1, Long simhash2) {
