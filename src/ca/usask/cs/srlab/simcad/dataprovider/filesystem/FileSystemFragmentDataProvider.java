@@ -40,6 +40,7 @@ public class FileSystemFragmentDataProvider extends AbstractFragmentDataProvider
 	private String[] extractDataFromFilesystem() {
 		
 		String simLibRoot = Environment.getSimLibRoot();
+		simLibRoot = simLibRoot.replace(" ", "\\ ");
 		String simcadInstallationUrl = PropsUtil.getSimcadInstallUrl();
 		
 //		System.err.println("simlib container root: "+simLibRoot);

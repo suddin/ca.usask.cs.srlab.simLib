@@ -56,6 +56,9 @@ public final class PropsUtil {
 		
 		String simcadInstallationUrl = PropsUtil.getSimcadInstallUrl();
 		String simLibRoot = Environment.getSimLibRoot();//Environment.getResourcePath("");//Environment.getSimLibRoot();
+		
+		simLibRoot = simLibRoot.replace(" ", "\\ ");
+		
 		String[] cmd = {
 				"/bin/sh",
 				"-c",

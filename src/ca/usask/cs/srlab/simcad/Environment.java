@@ -144,15 +144,25 @@ public class Environment {
 		return null;
 	}
 
+//	CodeSource src = VehicleFactory.class.getProtectionDomain().getCodeSource();
+//	if (src == null) {
+//	 return null;
+//	}
+//	return new File(src.getLocation().getFile()).getParent();
+	
 	public static String getSimLibRoot() {
 		try {
 			CodeSource codeSource = Environment.class.getProtectionDomain().getCodeSource();
-			File root = new File(codeSource.getLocation().toURI().getPath());
-			if(root.isDirectory())
-				return root.getAbsolutePath();
-			else
-				return root.getParent();
-		} catch (URISyntaxException e) {
+			if (codeSource == null) {
+			 return null;
+			}
+			return new File(codeSource.getLocation().getFile()).getParent();
+//			File root = new File(codeSource.getLocation().toURI().getPath());
+//			if(root.isDirectory())
+//				return root.getAbsolutePath();
+//			else
+//				return root.getParent();
+		} catch (/*URISyntax*/Exception e) {
 			e.printStackTrace();
 			throw new SimcadException(e);
 		}
