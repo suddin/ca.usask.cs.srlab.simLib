@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="build" name="simcad">
+
+	<property name="project.name" value="SimCad" />
+	<property name="project.version" value="2.0" />
+
+	<property name="src.dir" value="src/" />
+	<property name="lib.dir" value="lib/" />
+	<property name="bin.dir" value="bin" />
+	<property name="build.dir" value="build/" />
+	<property name="dist.dir" value="dist/" />
+	<property name="simcad.scripts.dir" value="SimCad-2.0/" />
+	<property name="project.jar" location="${build.dir}/jar/simLib.jar" />
+
+	<property name="distribution.name" value="${project.name}-${project.version}" />
+	<property name="distribution.zip" value="${dist.dir}/${distribution.name}.zip" />
+	<property name="distribution.tar" value="${dist.dir}/${distribution.name}.tar" />
+
+	<path id="compile.classpath">
+		<fileset dir="${lib.dir}" />
+	</path>
+
+	<target name="init">
+		<!--delete dir="${build.dir}" />
+		<delete dir="${bin.dir}" />
+		<delete dir="${dist.bin}" /-->
+
+		<mkdir dir="${bin.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<mkdir dir="${build.dir}" />
+	</target>
+
+	<target name="clean" depends="init" description="Clean up temporary files">
+		<echo message="Cleaning up old binaries and builds..." />
+		<delete includeemptydirs="true" >
+			<fileset dir="${bin.dir}" includes="**/*"/>
+			<fileset dir="${dist.dir}" includes="**/*"/>
+			<fileset dir="${build.dir}" includes="**/*" defaultexcludes="false"/>
+		</delete>
+	</target>
+
+	<target name="compile" depends="clean" description="Compile java source files">
+		<echo message="Compiling source..." />
+		<javac srcdir="${src.dir}" includeantruntime="false" destdir="${bin.dir}" source="1.5" target="1.5" debug="on">
+			<classpath refid="compile.classpath" />
+			<compilerarg value="-Xlint:all,-path,-unchecked" />
+		</javac>
+		<!-- Copy the .properties files from the source directory. -->
+		<copy todir="${bin.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.properties"/>
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="jar" depends="compile" description="building jar file">
+		<mkdir dir="${build.dir}/jar"/>
+		<jar destfile="${project.jar}" basedir="${bin.dir}">
+			<manifest>
+				<attribute name="Main-Class" value="ca.usask.cs.srlab.simcad.SimCad"/>
+				<attribute name="Class-Path" value="commons-collections-3.2.1.jar guava-10.0.1.jar ejb3-persistence.jar ../simcad.cfg.xml"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="build" depends="compile, jar">
+		<echo message="Building distribution..." />
+
+		<!--copy all scripts in distribution-->
+		<!--copy todir="${dist.dir}">
+			<fileset dir="${simcad.scripts.dir}"/>
+		</copy-->
+
+		<mkdir dir="${build.dir}/${distribution.name}"/>
+
+		<!--copy all scripts in distribution-->
+		<exec executable="cp" dir="." output="/dev/null" failonerror="true">
+			<arg value="-r"/>
+			<arg value="${simcad.scripts.dir}"/>
+			<arg value="${build.dir}/${distribution.name}"/>
+		</exec>
+
+		<!--copy the jars-->
+		<copy todir="${build.dir}/${distribution.name}/tools">
+			<!-- copy all required jars-->
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar" />
+				<exclude name="**/hibernate*.jar" />
+			</fileset>
+			<!-- copy simLib jar-->
+			<fileset dir="${build.dir}/jar">
+				<include name="**/*.jar" />
+			</fileset>
+		</copy>
+
+		<!--build the distribution zip file-->
+
+		<!--zip destfile="${distribution.zip}" >
+			<fileset dir="${build.dir}" 
+			excludes="**/jar/"/>
+		</zip-->
+
+		<exec executable="zip" dir="${build.dir}" failonerror="true">
+			<arg value="-r"/>
+			<arg value="-q"/>
+			<arg value="../${distribution.zip}"/>
+			<arg value="${distribution.name}"/>
+		</exec>
+
+		<!--tar destfile="${distribution.tar}" longfile="gnu" compression="gzip">
+			<tarfileset dir="${build.dir}">
+				<include name="**" />
+				<exclude name="jar/**" />
+			</tarfileset>
+		</tar-->
+
+	</target>
+
+
+</project>

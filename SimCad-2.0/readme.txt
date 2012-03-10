@@ -1,10 +1,10 @@
-
 SimCad Clone Detector
 ---------------------
 Version 	: 2.0
 Released on	: February 2012
-Reference 	: http://dx.doi.org/10.1109/WCRE.2011.12
-Origin 		: Software Research Laboratory, Dept. of Computer Science, University of Saskatchewan
+Supported OS	: Mac OS X, Linux.
+Technical Ref. 	: http://dx.doi.org/10.1109/WCRE.2011.12
+Origin 		: Software Research Lab., Dept. of Computer Science, University of Saskatchewan, Canada
 
 Disclaimer
 ----------
@@ -26,15 +26,15 @@ Installation Steps
 3. Install SimCad
 	3.1 Extract the archive
 		$ cd PATH_CONTAINING_SimCad-2.0.zip
-		$ tar -xvf SimCad-2.0.zip
+		$ tar -xf SimCad-2.0.zip (or $ unzip SimCad-2.0.zip)
 	3.2 $ cd SimCad-2.0
 	3.3 $ make 
 	3.4 Check SimCad installation
-		$ ./simCad2 -version
+		$ ./simcad2 -version
 
 4. Run SimCad
 	4.1 $ cd PATH_CONTAINING_SimCad-2.0/SimCad-2.0
-	4.2 $ ./simCad2 [-version] [-v] -s source_path -l language
+	4.2 $ ./simcad2 [-version] [-v] -s source_path -l language
                [-g granularity] [-t clone_type]
                [-c clone_grouping] [-x source_transform]
                [-o output_path]          
@@ -50,5 +50,5 @@ Installation Steps
 		output_path       = absolute path to output folder : default = {source_path}_simcad_clones
 		
 	4.3 example
-		$ ./simCad2 -s /Users/foo/Documents/workspaces/my-project -l java
+		$ ./simcad2 -s /Users/foo/Documents/workspaces/my-project -l java
 		

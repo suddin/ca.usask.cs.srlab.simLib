@@ -39,7 +39,7 @@ public class IndexKey<T extends Number> implements Serializable {
 	            throw new IllegalArgumentException("The array of keys must not be null");
 	        }
 	        if (makeCopy) {
-	            this.keys = (T[]) keys.clone();
+	            this.keys = keys.clone();
 	        } else {
 	            this.keys = keys;
 	        }
@@ -63,7 +63,7 @@ public class IndexKey<T extends Number> implements Serializable {
 	     * @return the individual keys
 	     */
 	    public T[] getKeys() {
-	        return (T[]) keys.clone();
+	        return keys.clone();
 	    }
 	    
 	    public T getLineKey(){

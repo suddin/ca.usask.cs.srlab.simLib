@@ -27,7 +27,7 @@ debug_mode="false"
 txlversion=`txl -V 2>&1 | grep 10.5`
 if [ "${txlversion}" = "" ]
 then
-echo "*** Error:  simCad requires FreeTXL 10.5"
+echo "*** Error:  simCad requires FreeTXL 10.5 or higher"
 echo ""
 exit 99
 fi

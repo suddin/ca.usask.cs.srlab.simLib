@@ -242,7 +242,7 @@ public final class CloneDetector {
 								
 								boolean coolDude = false;
 								//for(ICloneFragment eMember : neighbors){
-								for(Iterator<ICloneFragment> it  = (Iterator<ICloneFragment>) neighbors.iterator(); it.hasNext();){	
+								for(Iterator<ICloneFragment> it  = neighbors.iterator(); it.hasNext();){	
 									CloneFragment eMember = (CloneFragment) it.next();
 									//set initial friendship to false
 									eMember.isTempFriend = false;
@@ -267,7 +267,7 @@ public final class CloneDetector {
 									length++;
 									
 									//move temp friends count to real count
-									for(Iterator<ICloneFragment> it  = (Iterator<ICloneFragment>) neighbors.iterator(); it.hasNext();){
+									for(Iterator<ICloneFragment> it  = neighbors.iterator(); it.hasNext();){
 										CloneFragment eMember = (CloneFragment) it.next();
 										if(eMember.isTempFriend) {
 											//eMember.friendlist.add(matchCandidate);
@@ -295,7 +295,7 @@ public final class CloneDetector {
 
 						//removedMember.clear();
 						
-						for(Iterator<ICloneFragment> it  = (Iterator<ICloneFragment>) neighbors.iterator(); it.hasNext();){
+						for(Iterator<ICloneFragment> it  = neighbors.iterator(); it.hasNext();){
 							CloneFragment eMember = (CloneFragment) it.next();
 							
 							if(eMember.friendCount/*eMember.friendlist.size()*/ < minFriendCount){ 
