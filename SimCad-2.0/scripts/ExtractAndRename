@@ -9,6 +9,8 @@ usage() {
     echo ""
 }
 
+debug_mode="false"
+
 # Find our installation
 lib="${0%%/scripts/ExtractAndRename}"
 
@@ -38,6 +40,7 @@ then
     fi    
     shift
 else
+    echo "error in granularity paramener"
     usage
     exit 99
 fi
@@ -48,6 +51,7 @@ then
     language=$1
     shift
 else
+ echo "error in language paramener"
     usage
     exit 99
 fi
@@ -62,6 +66,7 @@ else
         rename=$1
 	shift
     else
+ echo "error in rename paramener"
         usage
         exit 99
     fi
@@ -73,6 +78,7 @@ then
     system=$1
     shift
 else
+    echo "error in system dir paramener"
     usage
     exit 99
 fi
@@ -83,16 +89,22 @@ then
     output_dir=$1
     shift
 else
+    echo "error in output dir paramener"
+
     usage
     exit 99
 fi
 
-#echo "system=${system}"
-#echo "output-dir=${output_dir}"
-#echo "granularity=${granularity}"
-#echo "language=${language}"
-#echo "rename=${rename}"
-#echo ""
+if [ ${debug_mode} = "true" ]
+then
+echo "system      =${system}"
+echo "output-dir  =${output_dir}"
+echo "granularity =${granularity}"
+echo "language    =${language}"
+echo "rename      =${rename}"
+echo ""
+
+fi
 
 # Check we have a system
 if [ ! -d "${system}" ]
@@ -116,9 +128,11 @@ then
     #echo > ${output_dir}/${granularity}-${datestamp}.log 2>&1
     checklog=0
 else
-    echo "Extracting ${granularity} from ${language} files in ${output_dir}"
-    #echo "EXECUTING [${lib}/scripts/Extract ${granularity} ${language} ${system}]"
-    time ${lib}/scripts/Extract ${granularity} ${language} ${system} ${output_dir} > ${output_dir}/${granularity}-${datestamp}.log 2>&1
+
+    
+echo "Extracting ${granularity} from ${language} files in ${system}"
+#time 
+${lib}/scripts/Extract ${granularity} ${language} "${system}"  "${output_dir}" > "${output_dir}"/${granularity}-${datestamp}.log 2>&1
 fi
 
 result=$?
@@ -135,7 +149,7 @@ fi
 # Check for parsing problems
 if [ ${checklog} = 1 ]
 then
- syntaxerrors=`(grep "TXL019[12]E" ${output_dir}/${granularity}-${datestamp}.log | wc -l)`
+ syntaxerrors=`(grep "TXL019[12]E" "${output_dir}"/${granularity}-${datestamp}.log | wc -l)`
  if [ ${syntaxerrors} != 0 ]
  then
     if [ ${syntaxerrors} = 1 ]
@@ -152,7 +166,7 @@ fi
 # echo "Extracted ${npcs} ${granularity}"
 # echo ""
 
-pcfile=${output_dir}/${granularity}
+pcfile="${output_dir}"/${granularity}
 
 # Check for renaming to be done
 if [ ${rename} != none ]
@@ -162,7 +176,8 @@ then
 	echo "Using previously ${rename} renamed extracted ${granularity} from ${language} files in ${system}"
     else
 	echo "Applying ${rename} renaming to extracted ${granularity} from ${language} files in ${system}"
-	time ${lib}/scripts/Rename ${granularity} ${language} ${pcfile}.xml ${rename} >> ${output_dir}/${granularity}-${datestamp}.log 2>&1
+#time 
+    ${lib}/scripts/Rename ${granularity} ${language} "${pcfile}.xml" ${rename} >> "${output_dir}"/${granularity}-${datestamp}.log 2>&1
     fi
 
     result=$?

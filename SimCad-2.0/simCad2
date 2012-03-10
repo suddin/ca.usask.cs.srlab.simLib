@@ -20,6 +20,7 @@ echo "output_path       = absolute path to output folder : default = {source_pat
 }
 
 simcad_version="SimCad 2.0 (February 2012) : University of Saskatchewan, Canada"
+
 debug_mode="false"
 
 # check we have TXL
@@ -245,8 +246,8 @@ fi
 if [ ! -d "${OUTPUT_DIR}" ]
 then
 #echo ""
-	mkdir -p ${OUTPUT_DIR}
-	chmod +rw ${OUTPUT_DIR} 
+	/bin/mkdir -p "${OUTPUT_DIR}"
+	/bin/chmod +rw "${OUTPUT_DIR}" 
 fi
 
 echo ""
@@ -271,7 +272,7 @@ echo ""
 #echo ""
 #echo "java -Xmx1024m -jar ${lib}/tools/simLib.jar ${VERBOSE} ${SOURCE_DIR} ${LANGUAGE} ${GRANULARITY} ${CLONE_TYPE} ${CLONE_GROUPING} ${SOURCE_TRANSFORM} ${OUTPUT_DIR}"
 
-java -Xmx1024m -jar ${lib}/tools/simLib.jar ${VERBOSE} ${SOURCE_DIR} ${LANGUAGE} ${GRANULARITY} ${CLONE_TYPE} ${CLONE_GROUPING} ${SOURCE_TRANSFORM} ${OUTPUT_DIR} 2>&1
+java -Xmx1024m -jar ${lib}/tools/simLib.jar ${VERBOSE} "${SOURCE_DIR}" ${LANGUAGE} ${GRANULARITY} ${CLONE_TYPE} ${CLONE_GROUPING} ${SOURCE_TRANSFORM} "${OUTPUT_DIR}" 2>&1
 
 exit 0
 

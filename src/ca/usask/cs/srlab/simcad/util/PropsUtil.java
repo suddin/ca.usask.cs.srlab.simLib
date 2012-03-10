@@ -70,7 +70,7 @@ public final class PropsUtil {
 			int exitVal = SimCadCommandRunner.INSTANCE.executeCommand(cmd, false);
 			
 			if(exitVal == 127){
-				throw new SimcadException("Invalid simcad location on configuration file, location must be absolute ot relative to simcad2.jar");
+				throw new SimcadException("Invalid simcad location on configuration file, location must be absolute or relative to simcad2.jar");
 			}
 			
 			if(exitVal > 99){

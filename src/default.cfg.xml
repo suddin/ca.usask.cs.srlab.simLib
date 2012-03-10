@@ -19,6 +19,6 @@
 
 	<entry key="simcad.settings.general.preprocess.regularhash_class">ca.usask.cs.srlab.simcad.hash.DefaultRegularHashGenerator</entry>
 	<entry key="simcad.settings.general.preprocess.tokenbuilder_class">ca.usask.cs.srlab.simcad.token.DefaultTokenBuilder</entry>
-	<entry key="simcad.settings.general.install.url">../SimCad-2.0</entry>
+	<entry key="simcad.settings.general.install.url">./SimCad-2.0</entry>
 	<entry key="simcad.settings.general.index.indexholder_class">ca.usask.cs.srlab.simcad.index.MemoryCloneIndexByJavaCollection</entry>
 </properties>

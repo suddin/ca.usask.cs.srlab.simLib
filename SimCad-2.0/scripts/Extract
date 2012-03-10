@@ -9,6 +9,8 @@
 
 ulimit -s hard
 
+debug_mode="false" 
+
 # Find our installation
 lib="${0%%/scripts/Extract}"
 if [ ! -d ${lib} ]
@@ -24,6 +26,7 @@ then
     granularity=$1
     shift
 else
+    echo " *** Error (script/Extract : line 24) : in granularity" 
     echo "Usage:  Extract granularity language system-directory [output_dir]"
     echo "          where granularity is one of:  { functions blocks }"
     echo "          and   language    is one of:  { c java cs py }"
@@ -36,6 +39,7 @@ then
     language=$1
     shift
 else
+    echo " *** Error (script/Extract : line 37): in lanuage"
     echo "Usage:  Extract granularity language system-directory [output_dir]"
     echo "          where granularity is one of:  { functions blocks }"
     echo "          and   language    is one of:  { c java cs py }"
@@ -43,8 +47,14 @@ else
 fi
 
 # check at least one system directory
+if [ ${debug_mode} = "true" ]
+then
+echo "Checking ${1} being a valid directory"
+fi
+
 if [ ! -d "$1" ]
 then
+    echo " *** Error (script/Extract : line 50): in system dir"
     echo "Usage:  Extract granularity language system-directory [output_dir]"
     echo "          where granularity is one of:  { functions blocks }"
     echo "          and   language    is one of:  { c java cs py }"
@@ -68,10 +78,11 @@ else
     shift
 fi
 
+
 #check output_dir
 if [ "$1" = "" ]
 then 
-    output_dir=${system}_simcad_clones
+    output_dir="${system}_simcad_clones"
 else
     output_dir=$1
 fi
@@ -79,7 +90,7 @@ fi
 if [ ! -d "${output_dir}" ]
 then
 #echo ""
-	mkdir -p -m 777 ${output_dir}
+	mkdir -p -m 777 "${output_dir}"
 	#chmod +rw ${output_dir} 
 fi
 
@@ -92,12 +103,58 @@ then
     exit 99
 fi
 
+
+system=${system// /\ }
+output_dir=${output_dir// /\ }
+
+
+if [ ${debug_mode} = "true" ]
+then
+echo "system      =${system}"
+echo "output-dir  =${output_dir}"
+echo "granularity =${granularity}"
+echo "language    =${language}"
+echo ""
+fi
+
+if [ "${debug_mode}" = "true" ]
+then
+ echo "Cleaning up any previous results in : ${output_dir}/${granularity}" 
+fi
+
 # Clean up any previous results
-/bin/rm -rf ${output_dir}/${granularity}
-echo -n > ${output_dir}/${granularity}.xml
+/bin/rm -rf "${output_dir}"/${granularity}.xml
+echo -n > "${output_dir}"/${granularity}.xml
+
 
 # Extract potential clones
-date
+#date
+
+#workaround for space in source path
+
+subject_system=${system}
+temp_system=""
+
+if [[ "${subject_system}" == *\ * ]]
+then 
+    temp_system=${TMPDIR}simcad_temp
+
+    /bin/rm -rf ${temp_system}
+    /bin/mkdir -p ${temp_system}/subject
+    if [ "${debug_mode}" = "true" ]
+    then
+       echo "copying system in ${temp_system}/subject"
+    fi
+    /bin/cp -Ra "${subject_system}"/** ${temp_system}/subject
+    subject_system=${temp_system}/subject
+
+    result=$?
+    if [ $result != 0 ]
+    then
+        exit 99
+    fi
+fi
+
 
 # Find all language source files in the directory and its subdirectories
 if [ -x ${lib}/txl/${language}-extract-${granularity}.x ]
@@ -109,7 +166,7 @@ fi
 
 result=0
 
-for i in `find ${system} | grep "\.${language}"'$'` 
+for i in `find "${subject_system}" | grep "\.${language}"'$'` 
 do
     source=$i
     if [ ${language} = "c" ] || [ ${language} = "cs" ]
@@ -138,11 +195,11 @@ do
     fi
     if [ -x ${lib}/txl/${language}-extract-${granularity}.x ]
     then
-        # echo "${lib}/txl/${language}-extract-${granularity}.x -s 400 ${source} >> ${output_dir}/${granularity}.xml"
-        ${lib}/txl/${language}-extract-${granularity}.x -s 400 ${source} >> ${output_dir}/${granularity}.xml
+        # echo "${lib}/txl/${language}-extract-${granularity}.x -s 400 ${source} >> "${output_dir}"/${granularity}.xml"
+        ${lib}/txl/${language}-extract-${granularity}.x -s 400 ${source} >> "${output_dir}"/${granularity}.xml
     else
         # echo "txl -q -s 400 ${source} ${lib}/txl/${language}-extract-${granularity}.txl >> ${output_dir}/${granularity}.xml"
-        txl -q -s 400 ${source} ${lib}/txl/${language}-extract-${granularity}.txl >> ${output_dir}/${granularity}.xml
+        txl -q -s 400 ${source} ${lib}/txl/${language}-extract-${granularity}.txl >> "${output_dir}"/${granularity}.xml
     fi
 
     if [ $? != 0 ]
@@ -150,6 +207,15 @@ do
 	result=$?
     fi
 done
+
+
+if [ ! "${temp_system}" = "" ]
+then
+    #echo "s:${subject_system}:${system}:g' "${output_dir}"/${granularity}.xml > "${output_dir}"/${granularity}.xml.new"
+    sed "s:$subject_system:$system:g" "${output_dir}"/${granularity}.xml > "${output_dir}"/${granularity}.xml.new
+    mv "${output_dir}"/${granularity}.xml.new "${output_dir}"/${granularity}.xml
+    /bin/rm -rf ${subject_system}
+fi
 
 echo ""
 date

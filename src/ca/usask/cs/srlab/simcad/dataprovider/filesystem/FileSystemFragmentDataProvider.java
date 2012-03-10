@@ -62,7 +62,7 @@ public class FileSystemFragmentDataProvider extends AbstractFragmentDataProvider
 					"-c",
 					"cd "+simLibRoot+
 					"\ncd "+simcadInstallationUrl+
-					"\n ./scripts/ExtractAndRename "+config.getSourceFragmentType()+" "+config.getLanguage()+" "+config.getTransformationAction()+" "+config.getSourceFolder()+" "+output_dir
+					"\n ./scripts/ExtractAndRename "+config.getSourceFragmentType()+" "+config.getLanguage()+" "+config.getTransformationAction()+" "+config.getSourceFolder().replace(" ", "\\ ")+" "+output_dir.replace(" ", "\\ ")
 					};
 
 		    exitVal = SimCadCommandRunner.INSTANCE.executeCommand(cmd, true);
