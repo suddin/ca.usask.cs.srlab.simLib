@@ -40,7 +40,6 @@ public abstract class CloneFragment implements ICloneFragment, Cloneable {
 	private Long simhash2;
 	
 	@Lob
-	@Column(length=32767)
 	private String originalCodeBlock;
 
 //	@Lob
@@ -196,12 +195,20 @@ public abstract class CloneFragment implements ICloneFragment, Cloneable {
 		}
 		return loc;
 	}
+
+	public void resetDetectionFlags(){
+		isTempFriend = false;
+		isProceessed = false;
+		friendCount = 0;
+	}
 	
+	//detection flags
 	public transient boolean isTempFriend;
-	
 	public transient boolean isProceessed;
-	
 	public transient int friendCount;
+	//detection flags
+	
+	public transient boolean isInjected;
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -226,6 +233,10 @@ public abstract class CloneFragment implements ICloneFragment, Cloneable {
 	@Override
 	public String toString() {
 		return fileName+" ("+fromLine+","+toLine+")\n"+originalCodeBlock/*+"\n"+transformedCodeBlock*/;
+	}
+	
+	public String toShortString() {
+		return fileName+" ("+fromLine+","+toLine+")";
 	}
 	
 	@Override

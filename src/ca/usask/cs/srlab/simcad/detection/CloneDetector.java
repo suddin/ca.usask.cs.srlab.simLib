@@ -1,5 +1,7 @@
 package ca.usask.cs.srlab.simcad.detection;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,6 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import ca.usask.cs.srlab.simcad.Constants;
 import ca.usask.cs.srlab.simcad.DetectionSettings;
@@ -19,7 +24,7 @@ import ca.usask.cs.srlab.simcad.event.DetectionEndEvent;
 import ca.usask.cs.srlab.simcad.event.DetectionProgressEvent;
 import ca.usask.cs.srlab.simcad.event.DetectionStartEvent;
 import ca.usask.cs.srlab.simcad.index.ICloneIndex;
-import ca.usask.cs.srlab.simcad.index.IndexKey;
+import ca.usask.cs.srlab.simcad.index.memory.IndexKey;
 import ca.usask.cs.srlab.simcad.listener.ICloneDetectionListener;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.model.CloneGroup;
@@ -36,6 +41,7 @@ public final class CloneDetector {
 	private static final Double 	CLUSTER_MEMBERSHIP_RATIO = PropsUtil.getClusterMembershipRatio();
 	private static final Double 	LOC_TOLERANCE = PropsUtil.getLocTolerance();
 	private static final Double 	THRESHOLD_STABILIZATION_VALUE_FOR_GREEDY_TRANSFORM = PropsUtil.thresholdStabilizationValueForGreedyTransform();
+	private static final Integer 	THRESHOLD_STABILIZATION_APLY_ON_VALUE_OVER = PropsUtil.thresholdStabilizationApplyOnThresholdOver();
 	
 	private ICloneIndex cloneIndex;
 	private DetectionSettings detectionSettings;
@@ -52,7 +58,19 @@ public final class CloneDetector {
 	syncedSimthreshold2Map.put(11, 9);
 	syncedSimthreshold2Map.put(12, 12);
 	syncedSimthreshold2Map.put(13, 13);
+	
+	try {
+		InputStream resource = Environment.getResourceAsStream("logging.properties");
+		LogManager.getLogManager().readConfiguration(resource);
+	} catch (SecurityException e) {
+		e.printStackTrace();
+	} catch (IOException e) {
+		e.printStackTrace();
 	}
+	
+	}
+	
+	private static Logger log = Logger.getLogger(CloneDetector.class.getName());
 	
 	public List<CloneSet> detect(Collection<CloneFragment> candidateFragments) {
 		if(candidateFragments == null || candidateFragments.size() == 0)
@@ -89,13 +107,19 @@ public final class CloneDetector {
 		List<CloneSet> detectedCloneSets = new LinkedList<CloneSet>();
 		
 		int nCodeFragment = candidateFragments.size();
-		int nCloneFragment = 0;
+		//int nCloneFragment = 0;
+		Set<Integer> cloneFragmentPCIDs = new TreeSet<Integer>(); 
 		int currentProgressIndex = 1;
 		int cloneSetIndex = 1;
 		
 		fireDetectionStartEvent(nCodeFragment);
+
+		cloneIndex.setDirty(true);
 		
 		long startTime = System.currentTimeMillis();
+		
+		log.info("Detection started...");
+	try{
 		
 		for(CloneFragment cloneFragment : candidateFragments){
 			
@@ -110,7 +134,8 @@ public final class CloneDetector {
 					CloneGroup newCloneGroup = new CloneGroup(newCluster, null, cloneSetIndex++);
 					if(filterByTypeInDetectionSettings(detectedCloneSets, newCloneGroup)){
 						fireCloneFoundEvent(newCloneGroup);
-						nCloneFragment += newCloneGroup.size();
+						//nCloneFragment += newCloneGroup.size();
+						cloneFragmentPCIDs.addAll(newCloneGroup.getCloneFragmentPCIDs());
 					}
 				}
 			}else{
@@ -119,19 +144,28 @@ public final class CloneDetector {
 					ClonePair newClonePair = new ClonePair(cloneFragment, matchedFragment, null, cloneSetIndex++);
 					if(filterByTypeInDetectionSettings(detectedCloneSets, newClonePair)){
 						fireCloneFoundEvent(newClonePair);
-						nCloneFragment += newClonePair.size();
+						//nCloneFragment += newClonePair.size();
+						cloneFragmentPCIDs.addAll(newClonePair.getCloneFragmentPCIDs());
 					}
 				}
 			}
 		}//for
 		
+	}catch (Exception e) {
+		log.info(e.getMessage());
+	}
+	
+	log.info("Detection ended...");
+	
 		long endTime = System.currentTimeMillis();
 		long diff  = endTime - startTime;
 		detectionSettings.getDetectionReport().setDetectionTime(diff);
-		detectionSettings.getDetectionReport().setnCloneFragment(nCloneFragment);
+		detectionSettings.getDetectionReport().setnCloneFragment(cloneFragmentPCIDs.size());
 		detectionSettings.getDetectionReport().setnCloneSet(cloneSetIndex-1);
 		
 		fireDetectionEndEvent();
+		
+		
 		return detectedCloneSets;
 	}
 	
@@ -159,7 +193,7 @@ public final class CloneDetector {
 	
 	private void fireDetectionProgressEvent(int currentIndex, int of) {
 		if(detectionSettings.isVerbose())
-			System.out.println("Processing item "+currentIndex+" of "+of);
+			System.out.println("Processing fragment "+currentIndex+" of "+of);
 		if (detectionListener != null) {
 			detectionListener.progressDetection(new DetectionProgressEvent(this, currentIndex));
 		}		
@@ -222,8 +256,10 @@ public final class CloneDetector {
 				
 				if(detectionSettings.getSourceTransformation() !=null &&
 						 Constants.SOURCE_TRANSFORMATION_APPROACH_GREEDY.equals(detectionSettings.getSourceTransformation())){
-					dynamicSimThreshold1 -= dynamicSimThreshold1 * THRESHOLD_STABILIZATION_VALUE_FOR_GREEDY_TRANSFORM;
-					dynamicSimThreshold2 -= dynamicSimThreshold2 * THRESHOLD_STABILIZATION_VALUE_FOR_GREEDY_TRANSFORM;
+					if(dynamicSimThreshold1 > THRESHOLD_STABILIZATION_APLY_ON_VALUE_OVER){
+						dynamicSimThreshold1 -= dynamicSimThreshold1 * THRESHOLD_STABILIZATION_VALUE_FOR_GREEDY_TRANSFORM;
+						dynamicSimThreshold2 -= dynamicSimThreshold2 * THRESHOLD_STABILIZATION_VALUE_FOR_GREEDY_TRANSFORM;
+					}
 				}				
 				
 				Set<IndexKey> keySet = cloneIndex.getAllKeys();
@@ -255,7 +291,8 @@ public final class CloneDetector {
 										
 										if(matchCandidate.friendCount == minFriendCount){ //target reached, he got the ticket to join in friends club
 											coolDude = true;
-											if(!STRICT_ON_MEMBERSHIP) break;
+											//if(!STRICT_ON_MEMBERSHIP) 
+												break;
 										}
 									}
 								} //done with friendship checking
@@ -379,7 +416,6 @@ public final class CloneDetector {
 			if(simThreshold1 != 0){
 				
 				simThreshold2 = syncedSimthreshold2Map.get(simThreshold1);
-				
 				deviation = getThresholDeviationValue(searchItem, simThreshold1);
 				
 				dynamicSimThreshold1 = simThreshold1 + deviation;
@@ -391,8 +427,7 @@ public final class CloneDetector {
 					dynamicSimThreshold2 -= dynamicSimThreshold2 * THRESHOLD_STABILIZATION_VALUE_FOR_GREEDY_TRANSFORM;
 				}
 
-				Set<IndexKey> keySet = cloneIndex.getAllKeys();
-				for (IndexKey indexKey : keySet) {
+				for (IndexKey indexKey : cloneIndex.getAllKeys()) {
 					if((searchItem.getLineOfCode() - (searchItem.getLineOfCode() * LOC_TOLERANCE) < indexKey.getLineKey().intValue() && searchItem.getLineOfCode() + (searchItem.getLineOfCode() * LOC_TOLERANCE) > indexKey.getLineKey().intValue())
 							&& (searchItem.getOneBitCount() - dynamicSimThreshold1 <= indexKey.getBitKey().intValue() && searchItem.getOneBitCount() + dynamicSimThreshold1 >= indexKey.getBitKey().intValue())){
 					
@@ -434,11 +469,12 @@ public final class CloneDetector {
 					if(!matchCandidate.isProceessed && searchItem.getSimhash1().equals(matchCandidate.getSimhash1())
 							&& searchItem.getSimhash2().equals(matchCandidate.getSimhash2())){
 						
-						if(detectionSettings.containsType(CloneSet.CLONE_TYPE_2))
+						if(detectionSettings.containsType(CloneSet.CLONE_TYPE_2)){
 							neighbors.add((T) matchCandidate);
-						else{ //only type-1 is searched for
-							if(FastStringComparator.INSTANCE.compare(searchItem.getOriginalCodeBlock(), matchCandidate.getOriginalCodeBlock()) == 0)
+						}else{ //only type-1 is searched for
+							if(FastStringComparator.INSTANCE.compare(searchItem.getOriginalCodeBlock(), matchCandidate.getOriginalCodeBlock()) == 0){
 								neighbors.add((T) matchCandidate);
+							}
 						}
 						
 						//matchCandidate.isProceessed = true;
@@ -517,9 +553,9 @@ public final class CloneDetector {
 		
 		case 12:
 			if(searchItem.getLineOfCode() < 6){
-				deviation = -5;
-			}else if(searchItem.getLineOfCode() < 8){
 				deviation = -4;
+			}else if(searchItem.getLineOfCode() < 8){
+				deviation = -3;
 			}else if(searchItem.getLineOfCode() < 10){
 				deviation = -3;
 			}else if(searchItem.getLineOfCode() < 20){
@@ -531,9 +567,9 @@ public final class CloneDetector {
 			break;
 		case 13:
 			if(searchItem.getLineOfCode() < 6){
-				deviation = -5;
-			}else if(searchItem.getLineOfCode() < 8){
 				deviation = -4;
+			}else if(searchItem.getLineOfCode() < 8){
+				deviation = -3;
 			}else if(searchItem.getLineOfCode() < 10){
 				deviation = -3;
 			}else if(searchItem.getLineOfCode() < 20){

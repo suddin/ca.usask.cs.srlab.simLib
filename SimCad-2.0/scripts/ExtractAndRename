@@ -2,7 +2,7 @@
 # Generic simCad extract and find clones script
 
 usage() {
-    echo "Usage: Extract&Rename granularity language rename source-dir output-dir"
+    echo "Usage: Extract&Rename granularity language rename source-dir output-dir [forceExtract]"
     echo "          where granularity   is one of:  { function block }"
     echo "          and   language      is one of:  { c java cs py }"
     echo "          and   rename        is one of:  { blind consistent }"
@@ -95,6 +95,15 @@ else
     exit 99
 fi
 
+
+forceX="false"
+# check for force extraction
+if [ "$1" = "forceExtract" ]
+then
+    forceX="true"
+fi
+
+
 if [ ${debug_mode} = "true" ]
 then
 echo "system      =${system}"
@@ -102,6 +111,7 @@ echo "output-dir  =${output_dir}"
 echo "granularity =${granularity}"
 echo "language    =${language}"
 echo "rename      =${rename}"
+echo "forceExtract=${forceX}"
 echo ""
 
 fi
@@ -122,13 +132,12 @@ echo ""
 checklog=1
 
 
-if [ -s "${output_dir}/${granularity}.xml" ]
+if [ -s "${output_dir}/${granularity}.xml" -a ${forceX} = "false" ]
 then
     echo "Using previously extracted ${granularity} from ${language} files in ${output_dir}"
     #echo > ${output_dir}/${granularity}-${datestamp}.log 2>&1
     checklog=0
 else
-
     
 echo "Extracting ${granularity} from ${language} files in ${system}"
 #time 
@@ -171,7 +180,7 @@ pcfile="${output_dir}"/${granularity}
 # Check for renaming to be done
 if [ ${rename} != none ]
 then
-    if [ -s "${pcfile}-${rename}.xml" ]
+    if [ -s "${pcfile}-${rename}.xml" -a ${forceX} = "false"]
     then
 	echo "Using previously ${rename} renamed extracted ${granularity} from ${language} files in ${system}"
     else

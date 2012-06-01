@@ -1,12 +1,14 @@
 package ca.usask.cs.srlab.simcad.index;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
+
+import ca.usask.cs.srlab.simcad.index.memory.MemoryCloneIndexByGoogleCollection;
 
 
 public class TestMemoryIndexByGoogleCollection extends AbstractMemoryIndexTest {
 	
-	@BeforeClass
-	public static void setup(){
+	@Before
+	public void setup(){
 		supersetup(new MemoryCloneIndexByGoogleCollection());
 	}
 	

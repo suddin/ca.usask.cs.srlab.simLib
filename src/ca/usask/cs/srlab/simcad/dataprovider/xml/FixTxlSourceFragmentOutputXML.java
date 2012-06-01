@@ -7,10 +7,16 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 
 import ca.usask.cs.srlab.simcad.SimcadException;
+import ca.usask.cs.srlab.simcad.util.PropsUtil;
 
-public class FixTxlSourceFragmentOutputXML implements
-		IXMLFragmentDataProviderTransformer {
+public class FixTxlSourceFragmentOutputXML implements IXMLFragmentDataProviderTransformer {
 
+	boolean unicodeFilterOn;
+	
+	public FixTxlSourceFragmentOutputXML(){
+		unicodeFilterOn = PropsUtil.isUnicodeFilterOn();
+	}
+	
 	@Override
 	public String transform(Object sourceFileName) {
 		String newFileName = ((String) sourceFileName).subSequence(0, ((String) sourceFileName).lastIndexOf('.'))+"_fix.xml";
@@ -32,15 +38,39 @@ public class FixTxlSourceFragmentOutputXML implements
 			out.println("<prog_language></prog_language>");
 			out.println("<source_elements>");
 			
-			// If line begins with "Received:", ditch it, and its continuations
 			while ((lin = inputReader.readLine()) != null) {
 				if (lin.startsWith("<source file")) {
-					out.println(lin + "<![CDATA[");
+					if(lin.endsWith(">"))
+						out.println(lin + "<![CDATA[");
+					else{ //sometimes long filename breaks it in multiple lines
+						StringBuffer sb = new StringBuffer(lin);
+						while ((lin = inputReader.readLine()) != null) {
+							if(lin.endsWith(">")){
+								out.println(sb.toString() + lin + "<![CDATA[");
+								break;
+							}
+							else
+								sb.append(lin);
+						}
+					}
 					// out.println("<![CDATA[");
 				} else if (lin.startsWith("</source>")) {
 					// out.println("]]>");
 					out.println("]]>" + lin);
 				} else {
+					
+					if(unicodeFilterOn){
+						StringBuilder sb = new StringBuilder(lin.trim());
+						int index = 0;
+						for(Character c : sb.toString().toCharArray()){
+							if(Character.getType(c) == Character.CONTROL)
+								sb.deleteCharAt(index);
+							else
+								index++;
+						}
+						lin = sb.toString();
+					}
+					
 					if (lin.contains("<![CDATA[")) {
 						String st = lin
 								.replaceAll("<!\\[CDATA\\[", "BEGINOFCDATA ");

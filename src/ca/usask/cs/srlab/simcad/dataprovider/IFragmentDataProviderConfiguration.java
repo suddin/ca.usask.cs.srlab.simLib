@@ -6,4 +6,6 @@ public interface IFragmentDataProviderConfiguration {
 	
 	public String getSourceDaraRootUrl();
 
+	boolean isForceExtract();
+
 }

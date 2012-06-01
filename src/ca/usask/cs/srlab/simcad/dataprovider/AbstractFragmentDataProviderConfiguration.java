@@ -3,6 +3,8 @@ package ca.usask.cs.srlab.simcad.dataprovider;
 
 public abstract class AbstractFragmentDataProviderConfiguration  implements IFragmentDataProviderConfiguration {
 
+	protected boolean forceExtract;
+
 	protected String sourceDaraRootUrl;
 	protected String sourceFragmentType; //granularity: function or block
 	
@@ -10,9 +12,19 @@ public abstract class AbstractFragmentDataProviderConfiguration  implements IFra
 	private AbstractFragmentDataProviderConfiguration(){
 	}
 	
-	protected AbstractFragmentDataProviderConfiguration(String sourceDaraRootUrl, String sourceFragmentType) {
+	protected AbstractFragmentDataProviderConfiguration(String sourceDaraRootUrl, String sourceFragmentType){
+		this(sourceDaraRootUrl, sourceFragmentType, false);
+	}
+	
+	protected AbstractFragmentDataProviderConfiguration(String sourceDaraRootUrl, String sourceFragmentType, boolean forceExtract) {
+		this.forceExtract = forceExtract;
 		this.sourceDaraRootUrl = sourceDaraRootUrl;
 		this.sourceFragmentType = sourceFragmentType;
+	}
+	
+	@Override
+	public boolean isForceExtract() {
+		return forceExtract;
 	}
 
 	@Override

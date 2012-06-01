@@ -2,6 +2,7 @@ package ca.usask.cs.srlab.simcad.index;
 
 import ca.usask.cs.srlab.simcad.Environment;
 import ca.usask.cs.srlab.simcad.SimcadException;
+import ca.usask.cs.srlab.simcad.index.memory.MemoryCloneIndexByJavaCollection;
 
 public class IndexFactory {
 

@@ -1,5 +1,8 @@
 package ca.usask.cs.srlab.simcad.processor.post;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collection;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -59,48 +62,86 @@ public class XmlOutputProcessor extends AbstractProcessor {
 	}
 
 	public void writeXmlDocument(Collection<CloneSet> inputCloneSets, Document doc, boolean withSource) {
-		Element root = doc.createElement("clones");
-	    doc.appendChild(root);
-
-		for(CloneSet cs: inputCloneSets){
-			Node child = doc.createElement((cs instanceof CloneGroup) ? "clone_group" : "clone_pair");
-			((Element)child).setAttribute("groupid", cs.getCloneSetId().toString());
-			((Element)child).setAttribute("nfragments", String.valueOf(cs.size()));
-			((Element)child).setAttribute("type", cs.getCloneType());
-			
-			for(ICloneFragment cloneFragment : cs.getCloneFragments()){
-				Node child2 = doc.createElement("clone_fragment");
-				((Element)child2).setAttribute("file", cloneFragment.getFileName());
-				((Element)child2).setAttribute("startline", cloneFragment.getFromLine().toString());
-				((Element)child2).setAttribute("endline", cloneFragment.getToLine().toString());
-				((Element)child2).setAttribute("pcid", cloneFragment.getProgramComponentId().toString());
-				
-				if(withSource)
-					child2.appendChild(doc.createCDATASection("\n"+cloneFragment.getOriginalCodeBlock()+"\n"));
-				
-				child.appendChild(child2);
-			}
-	        root.appendChild(child);
-		}
 		
-	    root.setAttribute("ngroups", Integer.toString(detectionSettings.getDetectionReport().getnCloneSet()));
-	    root.setAttribute("nfragments", Integer.toString(detectionSettings.getDetectionReport().getnCloneFragment()));
-	    root.setAttribute("cloneTypes",  detectionSettings.getCloneSetType());
-	    
-	    //System.out.println("Total clone class : "+ nGroup );
-	    //System.out.println("Total clone frag : "+ nFragment );
-	    
+		String xmlWriteStrategy = "TEXT"; 
 	    String outputFileName =  "simcad_"+detectionSettings.getCloneGranularity()+"_clone-"+detectionSettings.getCloneSetType()+"s_"+detectionSettings.getTypeString()+"_"+detectionSettings.getSourceTransformation()+(withSource?"_withsource":"")+".xml";
 	    String outputFullFileName = outputFolderName + (outputFolderName.endsWith(System.getProperty("file.separator")) ?"":System.getProperty("file.separator"))+ outputFileName;
-	   
-//	    File outputFile = new File(outputFileName);
-		try {
-			XMLUtil.writeXmlFile(doc, outputFullFileName);
-			//if(detectionSettings.isVerbose())
-				//System.out.println(outputFullFileName);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new SimcadException("Can not create output file", e);
+
+		if(xmlWriteStrategy.equals("DOM")){
+		
+			Element root = doc.createElement("clones");
+		    doc.appendChild(root);
+	
+			for(CloneSet cs: inputCloneSets){
+				Node child = doc.createElement((cs instanceof CloneGroup) ? "clone_group" : "clone_pair");
+				((Element)child).setAttribute("groupid", cs.getCloneSetId().toString());
+				((Element)child).setAttribute("nfragments", String.valueOf(cs.size()));
+				((Element)child).setAttribute("type", cs.getCloneType());
+				
+				for(ICloneFragment cloneFragment : cs.getCloneFragments()){
+					Node child2 = doc.createElement("clone_fragment");
+					((Element)child2).setAttribute("file", cloneFragment.getFileName());
+					((Element)child2).setAttribute("startline", cloneFragment.getFromLine().toString());
+					((Element)child2).setAttribute("endline", cloneFragment.getToLine().toString());
+					((Element)child2).setAttribute("pcid", cloneFragment.getProgramComponentId().toString());
+					
+					if(withSource)
+						child2.appendChild(doc.createCDATASection("\n"+cloneFragment.getOriginalCodeBlock()+"\n"));
+					
+					child.appendChild(child2);
+				}
+		        root.appendChild(child);
+			}
+			
+		    root.setAttribute("ngroups", Integer.toString(detectionSettings.getDetectionReport().getnCloneSet()));
+		    root.setAttribute("nfragments", Integer.toString(detectionSettings.getDetectionReport().getnCloneFragment()));
+		    root.setAttribute("cloneTypes",  detectionSettings.getCloneSetType());
+		    
+		    //System.out.println("Total clone class : "+ nGroup );
+		    //System.out.println("Total clone frag : "+ nFragment );
+		    
+	//	    File outputFile = new File(outputFileName);
+			try {
+				XMLUtil.writeXmlFile(doc, outputFullFileName);
+				//if(detectionSettings.isVerbose())
+					//System.out.println(outputFullFileName);
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new SimcadException("Can not create output file", e);
+			}
+		}else{
+			
+			PrintWriter cloneOutputWriter;
+			try {
+				cloneOutputWriter = new PrintWriter(new FileWriter(outputFullFileName));
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new SimcadException("Can not create clone output file", e);
+			}
+			
+			cloneOutputWriter.println("<clones fragmentType=\""+detectionSettings.getCloneGranularity()+"\" cloneSetType=\""+detectionSettings.getCloneSetType()+"\" nfragments=\""+Integer.toString(detectionSettings.getDetectionReport().getnCloneFragment())+"\" ngroups=\""+Integer.toString(detectionSettings.getDetectionReport().getnCloneSet())+"\">");
+			
+			for(CloneSet cs: inputCloneSets){
+			
+				cloneOutputWriter.println("<"+((cs instanceof CloneGroup) ? "clone_group" : "clone_pair")+" groupid=\""+cs.getCloneSetId().toString()+"\" nfragments=\""+String.valueOf(cs.size())+"\" type=\""+cs.getCloneType()+"\">");
+			
+				for(ICloneFragment cloneFragment : cs.getCloneFragments()){
+					if(withSource){
+						cloneOutputWriter.println("<clone_fragment file=\""+cloneFragment.getFileName()+"\" startline=\""+cloneFragment.getFromLine().toString()+"\" endline=\""+cloneFragment.getToLine().toString()+"\" pcid=\""+cloneFragment.getProgramComponentId().toString()+"\"><![CDATA[");
+						
+						cloneOutputWriter.println(cloneFragment.getOriginalCodeBlock());
+						
+						cloneOutputWriter.println("]]></clone_fragment>");
+					}else
+						cloneOutputWriter.println("<clone_fragment file=\""+cloneFragment.getFileName()+"\" startline=\""+cloneFragment.getFromLine().toString()+"\" endline=\""+cloneFragment.getToLine().toString()+"\" pcid=\""+cloneFragment.getProgramComponentId().toString()+"\"/>");
+					
+				}
+				cloneOutputWriter.println("</"+((cs instanceof CloneGroup) ? "clone_group" : "clone_pair")+">");
+			
+			}
+			cloneOutputWriter.print("</clones>");
+			
+			cloneOutputWriter.close();
 		}
 
 	}

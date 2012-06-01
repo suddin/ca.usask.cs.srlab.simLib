@@ -18,7 +18,7 @@ import ca.usask.cs.srlab.simcad.dataprovider.xml.XMLMultiSourceFragmentDataProvi
 import ca.usask.cs.srlab.simcad.dataprovider.xml.XMLMultiSourceFragmentDataProviderConfiguration;
 import ca.usask.cs.srlab.simcad.index.ICloneIndex;
 import ca.usask.cs.srlab.simcad.index.IndexBuilder;
-import ca.usask.cs.srlab.simcad.index.MemoryCloneIndexByGoogleCollection;
+import ca.usask.cs.srlab.simcad.index.memory.MemoryCloneIndexByGoogleCollection;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.model.CloneSet;
 
@@ -71,7 +71,7 @@ public class DetectionTest {
 		String sourceFragmentFile = Environment.getResourcePath("ca/usask/cs/srlab/simcad/detection/test_functions.xml");
 		String transformedSourceFragmentFile = Environment.getResourcePath("ca/usask/cs/srlab/simcad/detection/test_transformed_functions.xml");
 		
-		XMLMultiSourceFragmentDataProviderConfiguration dataProviderConfig = new XMLMultiSourceFragmentDataProviderConfiguration(sourceFragmentFile, transformedSourceFragmentFile, Environment.getResourcePath(""), Constants.CLONE_GRANULARITY_FUNTION);
+		XMLMultiSourceFragmentDataProviderConfiguration dataProviderConfig = new XMLMultiSourceFragmentDataProviderConfiguration(sourceFragmentFile, transformedSourceFragmentFile, "/Volumes/Data/auni_home/test_systems/dnsjava/dnsjava-0-3", Constants.CLONE_GRANULARITY_FUNTION);
 		dataProviderConfig.addDataTransformer(new FixTxlSourceFragmentOutputXML());
 		
 		IFragmentDataProvider cloneFragmentDataProvider = new XMLMultiSourceFragmentDataProvider(dataProviderConfig);

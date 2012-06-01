@@ -26,7 +26,7 @@ Installation Steps
 3. Install SimCad
 	3.1 Extract the archive
 		$ cd PATH_CONTAINING_SimCad-2.0.zip
-		$ tar -xf SimCad-2.0.zip (or $ unzip SimCad-2.0.zip)
+		$ unzip SimCad-2.0.zip
 	3.2 $ cd SimCad-2.0
 	3.3 $ make 
 	3.4 Check SimCad installation
@@ -51,4 +51,21 @@ Installation Steps
 		
 	4.3 example
 		$ ./simcad2 -s /Users/foo/Documents/workspaces/my-project -l java
-		
+
+
+Customize SimCad Configuration
+------------------------------
+SimCad uses the following list of configuration parameters that can be overridden by providing a similar entry with new value in the external configuration file simcad.cfg.xml located in folder SimCad-2.0/tools/.
+
+<entry key="simcad.settings.advance.strictOnMembership">false</entry>
+<entry key="simcad.settings.advance.clusterMembershipRatio">0.5</entry>
+<entry key="simcad.settings.advance.locTolerance">1.0</entry>
+<entry key="simcad.settings.advance.thresholdStabilizationValueForGreedyTransform">0.3</entry>
+<entry key="simcad.settings.advance.tokenFrequencyNormalization">true</entry>
+<entry key="simcad.settings.advance.tokenFrequencyNormalizationThreshold">5</entry>
+<entry key="simcad.settings.advance.tokenFrequencyNormalizationOverThresholdValue">5</entry>
+<entry key="simcad.settings.general.minClusterSize">2</entry>
+<entry key="simcad.settings.general.minSizeOfGranularity">5</entry>
+<entry key="simcad.settings.general.fragment.file.relativeURL">true</entry>
+<entry key="simcad.settings.general.fragment.unicodeFilterOn">false</entry>
+<entry key="simcad.settings.general.install.url">../../SimCad-2.0</entry>

@@ -58,6 +58,9 @@ public class Environment {
 			// System.out.println(resource+
 			// " got by Thread.currentThread().getContextClassLoader()");
 		}
+		if (classLoader != null) {
+			stream = ClassLoader.getSystemClassLoader().getResourceAsStream(stripped);
+		}
 		if (stream == null) {
 			stream = Environment.class.getResourceAsStream(resource);
 			// if(stream != null)

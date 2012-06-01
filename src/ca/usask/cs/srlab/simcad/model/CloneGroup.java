@@ -2,8 +2,14 @@ package ca.usask.cs.srlab.simcad.model;
 
 import java.util.List;
 
+import javax.persistence.Entity;
+
+@Entity
 public class CloneGroup extends CloneSet {
 
+	@SuppressWarnings("unused")
+	private CloneGroup(){}
+	
 	public Integer getGroupId() {
 		return getCloneSetId();
 	}
@@ -12,10 +18,4 @@ public class CloneGroup extends CloneSet {
 			Integer groupId) {
 		super(groupId, cloneFragments, cloneType);
 	}
-
-//	@Override
-//	public String getTitle() {
-//		return "CloneGroup :" + getCloneSetId();
-//	}
-
 }

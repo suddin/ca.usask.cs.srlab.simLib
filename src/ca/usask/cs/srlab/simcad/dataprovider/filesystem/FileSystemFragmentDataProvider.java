@@ -12,6 +12,7 @@ import ca.usask.cs.srlab.simcad.dataprovider.xml.XMLMultiSourceFragmentDataProvi
 import ca.usask.cs.srlab.simcad.dataprovider.xml.XMLMultiSourceFragmentDataProviderConfiguration;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.util.PropsUtil;
+import ca.usask.cs.srlab.simcad.util.SimCadCommandRunner;
 
 public class FileSystemFragmentDataProvider extends AbstractFragmentDataProvider{
 	
@@ -58,11 +59,11 @@ public class FileSystemFragmentDataProvider extends AbstractFragmentDataProvider
 		    }
 			// Execute a command with an argument that contains a space
 		    String[] cmd = {
-					"/bin/sh",
+					"/bin/bash",
 					"-c",
 					"cd "+simLibRoot+
 					"\ncd "+simcadInstallationUrl+
-					"\n ./scripts/ExtractAndRename "+config.getSourceFragmentType()+" "+config.getLanguage()+" "+config.getTransformationAction()+" "+config.getSourceFolder().replace(" ", "\\ ")+" "+output_dir.replace(" ", "\\ ")
+					"\n./scripts/ExtractAndRename "+config.getSourceFragmentType()+" "+config.getLanguage()+" "+config.getTransformationAction()+" "+config.getSourceFolder().replace(" ", "\\ ")+" "+output_dir.replace(" ", "\\ ")+" "+(config.isForceExtract() ? "forceExtract":"")
 					};
 
 		    exitVal = SimCadCommandRunner.INSTANCE.executeCommand(cmd, true);

@@ -5,6 +5,9 @@ import javax.persistence.Entity;
 @Entity
 public class BlockCloneFragment extends CloneFragment {
 
+	@SuppressWarnings("unused")
+	private BlockCloneFragment(){};
+	
 	public BlockCloneFragment(String fileName, Integer fromLine,
 			Integer toLine, Integer programComponentId, String codeBlock/*, Long id,
 			 String transformedCodeBlock, long hash1, long hash2*/) {

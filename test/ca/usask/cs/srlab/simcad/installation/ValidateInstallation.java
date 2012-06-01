@@ -6,8 +6,8 @@ import org.junit.Test;
 
 import ca.usask.cs.srlab.simcad.Environment;
 import ca.usask.cs.srlab.simcad.SimcadException;
-import ca.usask.cs.srlab.simcad.dataprovider.filesystem.SimCadCommandRunner;
 import ca.usask.cs.srlab.simcad.util.PropsUtil;
+import ca.usask.cs.srlab.simcad.util.SimCadCommandRunner;
 
 public class ValidateInstallation {
 

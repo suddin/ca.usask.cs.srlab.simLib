@@ -10,7 +10,11 @@ public class FileSystemFragmentDataProviderConfiguration extends AbstractFragmen
 	private String transformation;
 
 	public FileSystemFragmentDataProviderConfiguration(String sourceFolder, String outputFolder, String language, String transformation, String sourceFragmentType) {
-		super(sourceFolder.endsWith(Constants.FILE_SEPARATOR) ? sourceFolder.substring(0, sourceFolder.length()-1):sourceFolder, sourceFragmentType);
+		this(sourceFolder, outputFolder, language, transformation, sourceFragmentType, false);
+	}		
+	
+	public FileSystemFragmentDataProviderConfiguration(String sourceFolder, String outputFolder, String language, String transformation, String sourceFragmentType, boolean forceExtract) {
+		super(sourceFolder.endsWith(Constants.FILE_SEPARATOR) ? sourceFolder.substring(0, sourceFolder.length()-1):sourceFolder, sourceFragmentType, forceExtract);
 		//this.sourceFolder = sourceFolder.endsWith(Constants.FILE_SEPARATOR) ? sourceFolder.substring(0, sourceFolder.length()-1):sourceFolder;
 		this.outputFolder = outputFolder.endsWith(Constants.FILE_SEPARATOR) ? outputFolder.substring(0, outputFolder.length()-1):outputFolder;
 		this.language = language;

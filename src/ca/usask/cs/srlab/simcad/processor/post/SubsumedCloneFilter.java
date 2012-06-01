@@ -1,15 +1,18 @@
 package ca.usask.cs.srlab.simcad.processor.post;
 
 import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
 
 import ca.usask.cs.srlab.simcad.DetectionSettings;
 import ca.usask.cs.srlab.simcad.model.CloneSet;
 import ca.usask.cs.srlab.simcad.model.ICloneFragment;
+import ca.usask.cs.srlab.simcad.processor.AbstractProcessor;
 import ca.usask.cs.srlab.simcad.processor.IProcessor;
 
 import com.google.common.collect.ImmutableList;
 
-public final class SubsumedCloneFilter implements IProcessor {
+public final class SubsumedCloneFilter extends AbstractProcessor {
 	
 	
 	private DetectionSettings detectionSettings;
@@ -17,18 +20,27 @@ public final class SubsumedCloneFilter implements IProcessor {
 	private SubsumedCloneFilter(){};
 	
 	public SubsumedCloneFilter(DetectionSettings detectionSettings){
+		this(detectionSettings, null);
+	}
+	
+	public SubsumedCloneFilter(DetectionSettings detectionSettings, String message){
+		super(message);
 		this.detectionSettings = detectionSettings;
 	}
 	
 	@Override
 	public boolean process(Collection<CloneSet> inputCloneSets, Collection<CloneSet> outputCloneSets) {
-
+		super.process(inputCloneSets, outputCloneSets);
+		
 		int subsumedCluster = 0;
-		int subsumedFragment = 0;
+		Set<Integer> subsumedFragmentPCIds = new TreeSet<Integer>();
 		
 		 ImmutableList<CloneSet> cloneSetList = ImmutableList.copyOf(inputCloneSets);
 		
 		for(int i = 0; i < cloneSetList.size(); i++){
+			if(detectionSettings.isVerbose())
+				System.out.println("Processing clone "+ detectionSettings.getCloneSetType()+" " +i+" of "+cloneSetList.size());
+			
 			CloneSet sourceCloneSet = cloneSetList.get(i);
 			
 			if(!sourceCloneSet.isSubsumed()){
@@ -70,7 +82,7 @@ public final class SubsumedCloneFilter implements IProcessor {
 						if(fullSubsume){
 							targetCloneSet.setSubsumed(true);
 							subsumedCluster++;
-							subsumedFragment += targetCloneSet.size();  
+							subsumedFragmentPCIds.addAll(targetCloneSet.getCloneFragmentPCIDs());  
 						}
 				
 						
@@ -93,7 +105,7 @@ public final class SubsumedCloneFilter implements IProcessor {
 //			}
 		}
 		
-		detectionSettings.getDetectionReport().setnCloneFragment(detectionSettings.getDetectionReport().getnCloneFragment()-subsumedFragment);
+		detectionSettings.getDetectionReport().setnCloneFragment(detectionSettings.getDetectionReport().getnCloneFragment()-subsumedFragmentPCIds.size());
 		detectionSettings.getDetectionReport().setnCloneSet(detectionSettings.getDetectionReport().getnCloneSet()-subsumedCluster);
 		
 		return true;

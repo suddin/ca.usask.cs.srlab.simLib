@@ -9,7 +9,8 @@ public class FunctionCloneFragment extends CloneFragment {
 	@Column
 	private String functionSignature;
 
-	public FunctionCloneFragment(){
+	@SuppressWarnings("unused")
+	private FunctionCloneFragment(){
 		super();
 	}
 	
@@ -22,7 +23,29 @@ public class FunctionCloneFragment extends CloneFragment {
 	}
 
 	private String extractfunctionSignature(String codeBlock) {
-		return codeBlock != null ? codeBlock.split("\n")[0] : "";
+		if(codeBlock == null) return "";
+		
+		int function_end = getFileName().endsWith(".py") ? codeBlock.indexOf(":") - 1: codeBlock.indexOf("{") - 1;
+		int bracket_start = codeBlock.lastIndexOf("(");
+		int function_start = 0;
+		/*
+		boolean overTheName = false;
+		for (int i = bracket_start - 1; i > 0; i--) {
+			if (!overTheName && !Character.isWhitespace(codeBlock.charAt(i))) {
+				overTheName = true;
+				continue;
+			}
+
+			if (overTheName == true
+					&& Character.isWhitespace(codeBlock.charAt(i))) {
+				function_start = i;
+				break;
+			}
+		}
+		*/
+		return codeBlock.substring(function_start, function_end).replace("\n", "")
+		.replace("@Override", "")
+		.replace("@SuppressWarnings", "");
 	}
 
 	public String getFunctionName() {

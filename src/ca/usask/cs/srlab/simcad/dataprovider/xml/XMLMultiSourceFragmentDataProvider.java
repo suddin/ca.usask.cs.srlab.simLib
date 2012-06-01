@@ -18,7 +18,6 @@ import org.xml.sax.InputSource;
 
 import ca.usask.cs.srlab.simcad.SimcadException;
 import ca.usask.cs.srlab.simcad.dataprovider.AbstractFragmentDataProvider;
-import ca.usask.cs.srlab.simcad.dataprovider.filesystem.FileSystemFragmentDataProviderConfiguration;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.util.PropsUtil;
 
@@ -111,7 +110,7 @@ public class XMLMultiSourceFragmentDataProvider extends AbstractFragmentDataProv
 			
 		}catch (Exception e) {
 			e.printStackTrace();
-			throw new SimcadException("unable to parse code frafgment from file", e);
+			throw new SimcadException("Unable to parse code fragment from file", e);
 		}
 		return null;
 	}
@@ -149,16 +148,18 @@ public class XMLMultiSourceFragmentDataProvider extends AbstractFragmentDataProv
 			//System.out.println(fileT +" ("+startlineT+","+endlineT+")");
 			
 			if(!file.equals(fileT)){
-				throw new SimcadException("Original and transformed source are not synced to each other");
+				throw new SimcadException("Original ("+file+" ( "+startline+"/"+endline+")) and transformed ("+fileT+" ("+startlineT+"/"+endlineT+")) source (at file) are not synced to each other");
 			}else if(!startline.equals(startlineT)){
-				throw new SimcadException("Original and transformed source are not synced to each other");
+				throw new SimcadException("Original ("+file+" ( "+startline+"/"+endline+")) and transformed ("+fileT+" ("+startlineT+"/"+endlineT+")) source (at startline) are not synced to each other");
 			}if(!endline.equals(endlineT)){
-				throw new SimcadException("Original and transformed source are not synced to each other");
+				throw new SimcadException("Original ("+file+" ( "+startline+"/"+endline+")) and transformed ("+fileT+" ("+startlineT+"/"+endlineT+")) source (at endline) are not synced to each other");
 			}
 			
 			if(fileUrlRelative){
-				file = file.replace(dataProviderConfig.getSourceDaraRootUrl(), "");
+				//file = file.replace(dataProviderConfig.getSourceDaraRootUrl(), "");
+				file = file.substring(dataProviderConfig.getSourceDaraRootUrl().length());
 			}
+//			System.out.println(file);
 			
 			String transformedContent = transformedSource.getFirstChild().getTextContent().trim();
 			CloneFragment cloneFragment = createNewCloneFragment(file, startline, endline, originalContent, transformedContent, items++/*, transformedContent, 0, 0*/);

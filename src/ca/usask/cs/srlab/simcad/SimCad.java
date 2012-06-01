@@ -155,7 +155,7 @@ public class SimCad {
 		ProcessorDisptacher processorDisptacher = ProcessorDisptacher.getInstance();
 
 		if(detectionSettings.getCloneGranularity().equals(Constants.CLONE_GRANULARITY_BLOCK)){
-			SubsumedCloneFilter sbsmfilter = new SubsumedCloneFilter(detectionSettings);
+			SubsumedCloneFilter sbsmfilter = new SubsumedCloneFilter(detectionSettings, "Process subsume filtering...");
 			processorDisptacher.addProcessor(sbsmfilter);
 		}
 

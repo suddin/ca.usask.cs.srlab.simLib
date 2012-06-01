@@ -15,7 +15,7 @@ import ca.usask.cs.srlab.simcad.dataprovider.xml.XMLMultiSourceFragmentDataProvi
 import ca.usask.cs.srlab.simcad.dataprovider.xml.XMLMultiSourceFragmentDataProviderConfiguration;
 import ca.usask.cs.srlab.simcad.index.ICloneIndex;
 import ca.usask.cs.srlab.simcad.index.IndexBuilder;
-import ca.usask.cs.srlab.simcad.index.MemoryCloneIndexByGoogleCollection;
+import ca.usask.cs.srlab.simcad.index.memory.MemoryCloneIndexByGoogleCollection;
 import ca.usask.cs.srlab.simcad.model.CloneFragment;
 import ca.usask.cs.srlab.simcad.model.CloneSet;
 

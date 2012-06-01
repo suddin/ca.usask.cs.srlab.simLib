@@ -7,12 +7,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.Cascade;
+
 import ca.usask.cs.srlab.simcad.util.FastStringComparator;
 
 /**
  * @author sharif
  *
  */
+@Entity
+@Inheritance(strategy=InheritanceType.JOINED)
 public abstract class CloneSet implements ICloneSet, Cloneable {
 	
 	public static final String CLONE_TYPE_1 = "Type-1";
@@ -30,10 +45,20 @@ public abstract class CloneSet implements ICloneSet, Cloneable {
 	public static final String[] CLONE_TYPE_123 = new String[] {CLONE_TYPE_1, CLONE_TYPE_2, CLONE_TYPE_3};
 	public static final String[] CLONE_TYPE_ALL = CLONE_TYPE_123;
 	
+	@Id @GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	
+	@Column
 	private Integer cloneSetId;
+	
+	@OneToMany (fetch=FetchType.EAGER, targetEntity=CloneFragment.class)
+	@Cascade(value=org.hibernate.annotations.CascadeType.SAVE_UPDATE)
 	private List<ICloneFragment> cloneFragments;
+
+	@Column (length=10)
 	private String cloneType;	
+
+	protected CloneSet(){};
 	
 	public CloneSet(CloneSet cloneSet) {
 		this.id = cloneSet.id;
@@ -42,6 +67,19 @@ public abstract class CloneSet implements ICloneSet, Cloneable {
 		this.cloneFragments = cloneSet.cloneFragments;
 	}
 
+	private transient Set <Integer> cloneFragmentPCIDs;
+	
+	@Transient
+	public Set<Integer> getCloneFragmentPCIDs() {
+		if(cloneFragmentPCIDs == null){
+			cloneFragmentPCIDs = new HashSet<Integer>();
+			for(ICloneFragment fragment : cloneFragments){
+				cloneFragmentPCIDs.add(fragment.getProgramComponentId());
+			}
+		}
+		return cloneFragmentPCIDs;
+	}
+	
 	public CloneSet(Integer cloneSetId, List<ICloneFragment> cloneFragments,
 			String cloneType) {
 		super();
@@ -124,7 +162,7 @@ public abstract class CloneSet implements ICloneSet, Cloneable {
 
 		private CloneTypeMapper(){};
 		
-		public static void mapTypeFor(CloneSet cloneSet) {
+		public static String mapTypeFor(CloneSet cloneSet) {
 			String cloneType = CLONE_TYPE_1;
 
 			int type2_vote = 0;
@@ -154,7 +192,9 @@ public abstract class CloneSet implements ICloneSet, Cloneable {
 	             cloneType = CLONE_TYPE_2;
 	         }
 	         
-	         cloneSet.setCloneType(cloneType);
+	        cloneSet.setCloneType(cloneType);
+	         
+			return cloneType;
 		}
 
 		public static String[] getTypeFromString(String typeString) {

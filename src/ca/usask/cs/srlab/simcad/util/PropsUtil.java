@@ -6,7 +6,6 @@ import java.util.Properties;
 import ca.usask.cs.srlab.simcad.Constants;
 import ca.usask.cs.srlab.simcad.Environment;
 import ca.usask.cs.srlab.simcad.SimcadException;
-import ca.usask.cs.srlab.simcad.dataprovider.filesystem.SimCadCommandRunner;
 
 public final class PropsUtil {
 		
@@ -138,4 +137,17 @@ public final class PropsUtil {
 	public static Double thresholdStabilizationValueForGreedyTransform() {
 		return Double.valueOf(properties.getProperty(Constants.THRESHOLD_STABILIZATION_VALUE_FOR_GREEDY_TRANSFORM, "0.3"));
 	}
+	
+	public static Integer thresholdStabilizationApplyOnThresholdOver() {
+		return Integer.valueOf(properties.getProperty(Constants.THRESHOLD_STABILIZATION_APPLY_ON_THRESHOLD_OVER, "5"));
+	}
+
+	public static boolean isUnicodeFilterOn() {
+		return Boolean.valueOf(properties.getProperty(Constants.UNICODE_FILTER_ON, "false"));
+	}
+	
+	public static String getDbConfigFileUrl(){
+		return properties.getProperty(Constants.DATABASE_CONFIG_URL);
+	}
+	
 }
