@@ -1,0 +1,30 @@
+<CloneIndex project="dummy" language="java" fragmentType="function"
+	transformationType="generous">
+	<LineIndex lineNumber="1">
+		<BitIndex bitNumber="5">
+			<CloneFragment fileName="file1" fromLine="1" toLine="4"
+				pcid="1" simhash1="1234" simhash2="1234"><![CDATA[
+original1() {code1}
+]]></CloneFragment>
+			<CloneFragment fileName="file11" fromLine="1" toLine="4"
+				pcid="2" simhash1="1234" simhash2="1234"><![CDATA[
+original1() {code1}
+]]></CloneFragment>
+		</BitIndex>
+		<BitIndex bitNumber="7">
+			<CloneFragment fileName="file1" fromLine="11" toLine="44"
+				pcid="3" simhash1="5678" simhash2="5678"><![CDATA[
+original3() {code2}
+]]></CloneFragment>
+		</BitIndex>
+	</LineIndex>
+	<LineIndex lineNumber="2">
+		<BitIndex bitNumber="6">
+			<CloneFragment fileName="file3" fromLine="11" toLine="44"
+				pcid="4" simhash1="3267" simhash2="3267"><![CDATA[
+original() {code3
+code4}
+]]></CloneFragment>
+		</BitIndex>
+	</LineIndex>
+</CloneIndex>
